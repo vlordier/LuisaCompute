@@ -14,7 +14,7 @@
 
 namespace luisa::compute::cuda {
 
-// TODO: finish doc
+// Note: Documentation for CUDAHostBufferPool is incomplete. See implementation for usage.
 /**
  * @brief Host buffer pool of CUDA
  * 

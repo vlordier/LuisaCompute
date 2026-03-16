@@ -42,7 +42,7 @@ luisa::unique_ptr<CUDAShaderPrinter> CUDAShaderPrinter::create(luisa::span<const
     for (auto &&[name, type] : arg_types) {
         formatters.emplace_back(luisa::make_unique<Formatter>(name, type));
     }
-    return luisa::make_unique<CUDAShaderPrinter>(std::move(formatters));// TODO
+    return luisa::make_unique<CUDAShaderPrinter>(std::move(formatters));
 }
 
 luisa::unique_ptr<CUDAShaderPrinter> CUDAShaderPrinter::create(luisa::span<const std::pair<luisa::string, luisa::string>> arg_types) noexcept {

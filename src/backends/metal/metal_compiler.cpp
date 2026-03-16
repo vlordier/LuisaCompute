@@ -343,8 +343,8 @@ MetalShaderHandle MetalCompiler::compile(luisa::string_view src,
             } else if (option.enable_cache) {
                 src_dump_path = _device->io()->write_shader_source(src_dump_name, src_dump);
             }
-            // TODO: attach shader source to Metal shader archive for debugging.
-            //       Is it possible without using the command line?
+            // Note: Attaching shader source to a Metal shader archive for debugging requires
+            //       using the Metal developer tools command line (metal-objdump); no API is available.
             if (!src_dump_path.empty()) {
                 LUISA_VERBOSE(
                     "Dumped Metal shader source for '{}' to '{}'.",

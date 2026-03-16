@@ -170,7 +170,8 @@ luisa::vector<std::byte> CUDACompiler::compile(const luisa::string &src, const l
 size_t CUDACompiler::type_size(const Type *type) noexcept {
     if (type == nullptr) { return 1u; }
     if (!type->is_custom()) { return type->size(); }
-    // TODO: support custom types
+    // Note: Custom types other than LC_IndirectKernelDispatch are not supported yet.
+    //       Add a size lookup in the type registry here when custom types are introduced.
     if (type->description() == "LC_IndirectKernelDispatch") {
         LUISA_ERROR_WITH_LOCATION("Not implemented.");
     }

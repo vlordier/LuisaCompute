@@ -114,12 +114,12 @@ void HIPDevice::destroy_motion_instance(uint64_t handle) noexcept {
 }
 
 luisa::string HIPDevice::query(luisa::string_view property) noexcept {
-    // TODO: support more properties
+    // Note: Only base DeviceInterface properties are currently supported for HIP.
     return DeviceInterface::query(property);
 }
 
 DeviceExtension *HIPDevice::extension(luisa::string_view name) noexcept {
-    // TODO: support extensions
+    // Note: Extensions are not yet implemented for HIP; falls back to base DeviceInterface.
     return DeviceInterface::extension(name);
 }
 

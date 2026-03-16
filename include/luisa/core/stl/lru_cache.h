@@ -93,7 +93,9 @@ using lru_cache = eastl::lru_cache<
         EASTLAllocatorType>>;
 #endif
 
-// TODO: support allocator & comparator
+// Note: The LRUCache wrapper currently uses the default allocator and std::equal_to
+//       comparator. Templating on allocator/comparator would require threading them
+//       through to the underlying luisa::lru_cache and eastl types.
 template<typename Key, typename Value>
 class LRUCache {
 

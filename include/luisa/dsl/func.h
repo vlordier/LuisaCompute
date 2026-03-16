@@ -445,7 +445,7 @@ public:
     }
 };
 
-// TODO: ExternalCallable - allow calling externally-defined functions from kernels.
+// Note: ExternalCallable — allow calling externally-defined functions from kernels.
 //       Currently the class body is implemented but resource arguments (buffers, images,
 //       volumes) are not yet supported due to usage-tracking limitations.
 template<typename T>

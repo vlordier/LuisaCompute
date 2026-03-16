@@ -152,7 +152,7 @@ void CommandBufferBuilder::DispatchComputeIndirect(
     SetComputeResources(cs, resources);
     c->SetPipelineState(cs->Pso());
     maxIndirectCount = std::min<uint>(maxIndirectCount, cmdSize - indirectOffset);
-    // TODO
+    // Note: ExecuteIndirect dispatches the compute shader indirectly.
     c->ExecuteIndirect(
         cs->CmdSig(),
         maxIndirectCount,

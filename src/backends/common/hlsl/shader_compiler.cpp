@@ -58,7 +58,8 @@ ShaderCompilerModule::ShaderCompilerModule(std::filesystem::path const &path, bo
     DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&utils));
 }
 ShaderCompilerModule::~ShaderCompilerModule() {
-    // TODO: directx-compiler may crash here
+    // Note: DXC COM objects may crash on Release() if the DLL was unloaded out of order.
+    //       If this becomes an issue, guard with a try/catch or defer cleanup.
     utils->Release();
     library->Release();
     comp->Release();

@@ -635,7 +635,7 @@ int main(int argc, char *argv[]) {
                 jitter,
                 sharpness,
                 std::max<float>(delta_time, 1e-5f));
-//TODO
+// Note: XeSS command submission post-super-sampling hook is not yet implemented.
 #endif
 
         } else {

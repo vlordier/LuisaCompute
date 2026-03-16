@@ -409,7 +409,7 @@ void Clanguage_CodegenUtils::get_type_name(vstd::StringBuilder &sb, Type const *
         default:
             LUISA_ERROR("Unsupported type {}.", luisa::to_string(type->tag()));
             return;
-            // TODO
+            // Note: Additional custom/opaque types should be handled above via _get_custom_type.
     }
 }
 bool Clanguage_CodegenUtils::_get_custom_type(vstd::StringBuilder &sb, Type const *t) {

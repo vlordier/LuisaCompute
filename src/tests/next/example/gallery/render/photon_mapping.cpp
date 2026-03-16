@@ -219,7 +219,8 @@ int photon_mapping(Device &device) {
             Var<TriangleHit> hit = accel.intersect(light_ray, {});
             $if (hit->miss()) { $break; };
             // $if(hit.inst == 0 & hit.prim == 0) { $break; };
-            // TODO
+            // Note: Using the last mesh as the light emitter sentinel; replace with a
+            //       proper light-hit check once a material/emitter flag is introduced.
             $if (hit.inst == static_cast<uint>(meshes.size() - 1u)) {
                 $break;
             };

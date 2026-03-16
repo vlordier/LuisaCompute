@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
            << accel.build()
            << synchronize();
 
-    //TODO
+    // Note: Material array is constructed here for the Cornell box scene.
     luisa::vector<Material> materials;
     materials.reserve(accel.size());
     materials.emplace_back(Material{make_float3(0.725f, 0.71f, 0.68f), make_float3(0.0f)});// floor
@@ -252,7 +252,8 @@ int main(int argc, char *argv[]) {
             Var<TriangleHit> hit = accel.intersect(light_ray, {});
             $if (hit->miss()) { $break; };
             // $if(hit.inst == 0 & hit.prim == 0) { $break; };
-            // TODO
+            // Note: Using the last mesh as the light emitter sentinel; replace with a
+            //       proper light-hit check once a material/emitter flag is introduced.
             $if (hit.inst == static_cast<uint>(meshes.size() - 1u)) {
                 $break;
             };

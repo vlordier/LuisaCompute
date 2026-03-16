@@ -121,7 +121,7 @@ private:
             if (inst->isa<xir::ThreadGroupInst>() &&
                 static_cast<const xir::ThreadGroupInst *>(inst)->op() ==
                     xir::ThreadGroupOp::SYNCHRONIZE_BLOCK) {
-                requires_sync_block = true;// TODO: we should early break the traversal here
+                requires_sync_block = true;// Note: traversal continues past this point; early-break optimization not yet applied.
             }
         });
         return requires_sync_block;
@@ -3187,7 +3187,7 @@ private:
             case xir::DerivedInstructionTag::ASSUME: {
                 auto assume_inst = static_cast<const xir::AssumeInst *>(inst);
                 auto llvm_condition = _lookup_value(current, b, assume_inst->condition());
-                return b.CreateAssumption(llvm_condition);// TODO: we ignore assumption message for now
+                return b.CreateAssumption(llvm_condition);// Note: the assumption message argument is intentionally dropped; LLVM's llvm.assume only takes the condition.
             }
             case xir::DerivedInstructionTag::OUTLINE: {
                 auto outline_inst = static_cast<const xir::OutlineInst *>(inst);

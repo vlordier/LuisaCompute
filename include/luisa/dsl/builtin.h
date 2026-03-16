@@ -386,7 +386,9 @@ inline namespace dsl {
 template<typename T, typename... Args>
     requires std::negation_v<std::disjunction<std::is_pointer<std::remove_cvref_t<Args>>...>>
 [[nodiscard]] auto def(Args &&...args) noexcept {
-    // TODO: generate default initializer list?
+    // Note: A zero-argument def<T>() could generate a default-constructed DSL variable,
+    //       but this would silently differ from C++ value-initialization semantics on GPU.
+    //       Explicit initialization is intentionally required for clarity.
     return Var<expr_value_t<T>>{std::forward<Args>(args)...};
 }
 

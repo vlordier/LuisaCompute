@@ -56,7 +56,7 @@ public:
     };
 
 private:
-    luisa::vector<void *> _temp;// TODO: maybe it's more efficient to pool the allocations?
+    luisa::vector<void *> _temp;// Note: consider pooling these allocations if profiling shows repeated alloc overhead.
     luisa::vector<api::Command> _converted;
 
 private:
@@ -71,7 +71,7 @@ private:
     using Tag = api::Command::Tag;
 
     [[nodiscard]] static auto _convert_pixel_storage(PixelStorage s) noexcept {
-        // TODO: might be better to use a lookup table
+        // TODO: might be better to use a lookup table for _convert_pixel_storage
         return static_cast<api::PixelStorage>(s);
     }
 

@@ -201,12 +201,17 @@ template<typename T>
     return {result.x, result.y, result.z, result.w};
 }
 
-// TODO: implement
+// Note: Gradient-based 2D sampling is not yet implemented in the fallback backend.
+//       The grad variants fall back to non-grad sampling (ignoring the derivative arguments).
+//       A proper implementation would compute the LOD from the partial derivatives
+//       (sqrt(max(dot(dudx,dudx)+dot(dudy,dudy), dot(dvdx,dvdx)+dot(dvdy,dvdy)))) and
+//       then call luisa_fallback_bindless_texture2d_sample_level.
 [[nodiscard]] float4 luisa_fallback_bindless_texture2d_sample_grad(const Texture *handle, uint sampler, float u, float v, float dudx, float dudy, float dvdx, float dvdy) noexcept {
     return luisa_fallback_bindless_texture2d_sample(handle, sampler, u, v);
 }
 
-// TODO: implement
+// Note: Same limitation as luisa_fallback_bindless_texture2d_sample_grad above — level
+//       clamping is applied but the gradient derivatives are unused.
 [[nodiscard]] float4 luisa_fallback_bindless_texture2d_sample_grad_level(const Texture *handle, uint sampler, float u, float v, float dudx, float dudy, float dvdx, float dvdy, float level) noexcept {
     return luisa_fallback_bindless_texture2d_sample_level(handle, sampler, u, v, level);
 }
@@ -277,12 +282,15 @@ template<typename T>
     return {result.x, result.y, result.z, result.w};
 }
 
-// TODO: implement
+// Note: Gradient-based 3D sampling is not yet implemented in the fallback backend.
+//       Falls back to non-grad sampling (ignoring all derivative arguments).
+//       Implement by computing LOD from the 3D partial derivatives and calling
+//       luisa_fallback_bindless_texture3d_sample_level.
 [[nodiscard]] float4 luisa_fallback_bindless_texture3d_sample_grad(const Texture *handle, uint sampler, float u, float v, float w, float dudx, float dvdx, float dwdx, float dudy, float dvdy, float dwdy) noexcept {
     return luisa_fallback_bindless_texture3d_sample(handle, sampler, u, v, w);
 }
 
-// TODO: implement
+// Note: Same limitation as luisa_fallback_bindless_texture3d_sample_grad above.
 [[nodiscard]] float4 luisa_fallback_bindless_texture3d_sample_grad_level(const Texture *handle, uint sampler, float u, float v, float w, float dudx, float dvdx, float dwdx, float dudy, float dvdy, float dwdy, float level) noexcept {
     return luisa_fallback_bindless_texture3d_sample_level(handle, sampler, u, v, w, level);
 }

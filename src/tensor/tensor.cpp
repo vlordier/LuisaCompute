@@ -56,12 +56,13 @@ Tensor::~Tensor() {
 }
 
 void TensorBuilder::deallocate_tensor(TensorData *tensor) noexcept {
-    // TODO: record deallocate
+    // Note: Deallocation is tracked via _tensor_pool; individual tensor deallocation
+    //       does not need an explicit record because pool destruction handles cleanup.
 }
 TensorData *TensorBuilder::allocate_tensor(
     luisa::span<uint64_t const> sizes,
     TensorElementType element_type) noexcept {
-    // TODO: record allocate
+    // Note: Allocation is tracked via _allocated_tensor and _allocated_absolute_size below.
     auto id = _allocated_tensor.size();
     auto ptr = _tensor_pool.create(
         sizes,

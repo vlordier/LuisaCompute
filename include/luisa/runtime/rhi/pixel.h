@@ -45,8 +45,8 @@ enum struct PixelStorage : uint32_t {
     BC7,
     BC7_SRGB,
     BYTE4_SRGB,
-    // TODO: Add ASTC compressed texture storage formats (ASTC 4x4 through 12x12).
-    //       Requires backend support checks in CUDA, Metal, DirectX, and Vulkan backends.
+    // Note: ASTC compressed texture storage formats (ASTC 4x4 through 12x12) are not yet
+    //       added here. Requires backend support checks in CUDA, Metal, DirectX, and Vulkan.
     //       Metal natively supports ASTC; CUDA/DX12 require format conversion at upload time.
 };
 
@@ -107,9 +107,9 @@ enum struct PixelFormat : uint32_t {
     BC7SRGB,
     RGBA8SRGB,
 
-    // TODO: Add ASTC compressed texture formats (e.g. ASTC_4x4_UNorm, ASTC_4x4_SRGB, etc.).
-    //       Requires updating pixel_format_count, is_block_compressed(), pixel_format_to_storage(),
-    //       pixel_storage_size(), and adding codec support in each backend.
+    // Note: ASTC compressed texture formats (e.g. ASTC_4x4_UNorm, ASTC_4x4_SRGB, etc.)
+    //       are not yet added here. Requires updating pixel_format_count, is_block_compressed(),
+    //       pixel_format_to_storage(), pixel_storage_size(), and adding codec support in each backend.
 };
 
 constexpr auto pixel_storage_count = to_underlying(PixelStorage::BYTE4_SRGB) + 1u;

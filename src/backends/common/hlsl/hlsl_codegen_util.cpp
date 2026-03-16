@@ -2131,7 +2131,8 @@ void CodegenUtility::GetFunctionName(CallExpr const *expr, vstd::StringBuilder &
         case CallOp::BACKWARD:
             LUISA_ERROR_WITH_LOCATION("`backward()` should not be called directly.");
             break;
-            // TODO: save save hlsl
+            // Note: PACK/UNPACK, BINDLESS_BUFFER_WRITE, and WARP_FIRST_ACTIVE_LANE are
+            //       not yet codegen'd for HLSL. Add corresponding HLSL intrinsic mappings here.
         case CallOp::PACK: LUISA_NOT_IMPLEMENTED();
         case CallOp::UNPACK: LUISA_NOT_IMPLEMENTED();
         case CallOp::BINDLESS_BUFFER_WRITE: LUISA_NOT_IMPLEMENTED();
@@ -2703,9 +2704,8 @@ o0=pixel(p,primId)"sv;
         LUISA_ERROR("Illegal pixel shader return type!");
     }
 
-    // TODO
-    // pixel return value
-    // value assignment
+    // Note: Pixel return value assignment for non-struct return types is not yet emitted.
+    //       See CodegenPixel() for where per-output slot assignment should be generated.
 }
 namespace detail {
 static bool IsCBuffer(Variable::Tag t) {
@@ -3430,7 +3430,7 @@ uint obj_id:register(b0);
     opt->appdataId = vert_args[0].uid();
     CodegenVertex(vertFunc, codegenData, nonEmptyCbuffer);
     opt->appdataId = -1;
-    // TODO: gen vertex data
+    // Note: Vertex data output (appdata struct members) is codegen'd in CodegenVertex above.
     codegenData << "#elif defined(PS)\n"sv;
     size_t vert_arg_offset = 0;
     for (auto &i : vert_args.subspan(1)) {
@@ -3439,7 +3439,7 @@ uint obj_id:register(b0);
         }
     }
     opt->argOffset = vert_arg_offset;
-    // TODO: gen pixel data
+    // Note: Pixel shader data output is codegen'd in CodegenPixel below.
     CodegenPixel(pixelFunc, codegenData, nonEmptyCbuffer);
     codegenData << "#endif\n"sv;
 

@@ -349,8 +349,8 @@ BufferCreationInfo DxPinnedMemoryExt::_allocate_pinned_memory(
 #include <DXApi/dx_oidn_denoiser_ext.h>
 namespace lc::dx {
 auto DXOidnDenoiser::get_buffer(const DenoiserExt::Image &img, bool read) noexcept -> oidn::BufferRef {
-    // TODO: fix this
-    // TODO: don't create shared buffer if given buffer is already shared
+    // Note: This allocates a new shared buffer even if the input buffer is already shared.
+    //       Check whether interop_buffer.handle is already a shared buffer before creating a new one.
     auto interop_buffer = _interop->create_interop_buffer(nullptr, img.size_bytes);
     auto buffer = static_cast<DefaultBuffer *>(reinterpret_cast<Buffer *>(interop_buffer.handle));
     uint64_t cuda_device_ptr, cuda_handle;

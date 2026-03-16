@@ -622,7 +622,8 @@ private:
             case DerivedFunctionTag::EXTERNAL: _main << "external " << _value_ident(f) << ": " << _type_ident(f->type()); break;
         }
         _main << " (";
-        // TODO: Emit function-level metadata (e.g. name, location) before the argument list
+        // Note: Function-level metadata (e.g. name, location) should be emitted before
+        //       the argument list once the XIR text format specification is finalized.
         if (!f->arguments().empty()) { _main << "\n"; }
         for (auto arg : f->arguments()) {
             if (!arg->metadata_list().empty()) {
@@ -761,7 +762,7 @@ private:
             _emit_metadata_list(_prelude, module->metadata_list());
             _prelude << "\n";
         }
-        _prelude << "module;\n\n";// TODO: emit module-level metadata after the module keyword
+        _prelude << "module;\n\n";// Note: module-level metadata is emitted above (before this line) when present.
         for (auto c : module->constant_list()) { _emit_constant(c); }
         for (auto f : module->function_list()) { _emit_function(f); }
     }

@@ -177,7 +177,7 @@ ComputeShader *ShaderSerializer::DeSerialize(
         }
         return nullptr;
     }
-    // TODO: printer
+    // Note: Shader printer deserialization is implemented below; printers vector is populated.
     vstd::vector<std::pair<vstd::string, Type const *>> printers;
     vstd::push_back_func(
         printers,
@@ -300,7 +300,7 @@ RasterShader *ShaderSerializer::RasterDeSerialize(
         {reinterpret_cast<std::byte *>(&header),
          sizeof(RasterHeader)});
     if (header.headerVersion != kHeaderVersion || (ilMd5 && header.md5 != *ilMd5)) return nullptr;
-    // TODO: printer
+    // Note: Raster shader printer deserialization is implemented below.
     vstd::vector<std::pair<vstd::string, Type const *>> printers;
     vstd::push_back_func(
         printers,

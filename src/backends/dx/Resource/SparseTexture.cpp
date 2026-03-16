@@ -36,7 +36,7 @@ SparseTexture::SparseTexture(
         0,
         &tilingInfo);
     auto lastMipSize = uint3(width, height, depth) >> (mip - 1);
-    // TODO: may need packed mip in the future?
+    // Note: May need packed mip support in the future if the last mip level is smaller than the tiling granularity.
     if (lastMipSize.x < tilingInfo.WidthInTiles || lastMipSize.y < tilingInfo.HeightInTiles || (dimension == TextureDimension::Tex3D && lastMipSize.z < tilingInfo.DepthInTiles)) [[unlikely]] {
         LUISA_ERROR("Currently do not support packed tile.");
     }

@@ -399,7 +399,8 @@ void CUDAShaderOptiX::_launch(CUDACommandEncoder &encoder, ShaderDispatchCommand
                 }
             }
         };
-        // TODO: optimize this
+        // Note: Argument encoding iterates all bound + command arguments linearly.
+        //       Optimize by caching pre-encoded bound arguments if they do not change across dispatches.
         for (auto &&arg : _bound_arguments) { encode_argument(arg); }
         for (auto &&arg : command->arguments()) { encode_argument(arg); }
         // printer

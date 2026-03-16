@@ -132,7 +132,7 @@ void DxCudaInteropImpl::cuda_buffer(uint64_t dx_buffer_handle, uint64_t *cuda_pt
         CUexternalMemory externalMemory{};
         LUISA_CHECK_CUDA(cuImportExternalMemory(&externalMemory, &externalMemoryHandleDesc));
         *cuda_handle = reinterpret_cast<uint64_t>(externalMemory);
-        // TODO: need cuda buffer here
+        // Note: The CUDA buffer view of the imported DX buffer is created below via cuExternalMemoryGetMappedBuffer.
         CUDA_EXTERNAL_MEMORY_BUFFER_DESC bufferDesc{};
         bufferDesc.offset = 0;
         bufferDesc.size = dxBuffer->GetByteSize();

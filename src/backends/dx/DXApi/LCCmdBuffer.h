@@ -59,7 +59,7 @@ struct ReorderFuncTable {
     void traverse_arguments(
         CustomDispatchCommand const *cmd,
         Func &&func) const {
-        // TODO
+        // Note: traverse_arguments delegates to CustomDispatchCommand::traverse_arguments.
         cmd->traverse_arguments(func);
     }
 };

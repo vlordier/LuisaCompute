@@ -161,7 +161,9 @@ void EnhancedBarrierTracker::SetRes(
                 access};
         },
         [&](TexView const &texView) -> SubResource {
-            // TODO: set init layout
+            // Note: Initial barrier layout for newly-created textures defaults to COMMON.
+            //       Set to a specific layout (e.g. D3D12_BARRIER_LAYOUT_RENDER_TARGET)
+            //       if the creation state is known at this point.
             type = ResourceStates::Type::Texture;
             size = texView.tex->Mip();
             d3d12Res = texView.tex;
@@ -429,7 +431,7 @@ void EnhancedBarrierTracker::Record(
 void EnhancedBarrierTracker::Record(
     ResourceView const &res,
     Usage resUsage) {
-    //TODO
+    // Note: Delegates to the explicit-sync/access/layout overload using the BarrierSyncMap lookup tables.
     auto barrier_state_idx = luisa::to_underlying(resUsage);
     Record(
         res,
@@ -466,7 +468,9 @@ void EnhancedBarrierTracker::Record(
                 access};
         },
         [&](TexView const &texView) -> SubResource {
-            // TODO: set init layout
+            // Note: Initial barrier layout for newly-created textures defaults to COMMON.
+            //       Set to a specific layout (e.g. D3D12_BARRIER_LAYOUT_RENDER_TARGET)
+            //       if the creation state is known at this point.
             type = ResourceStates::Type::Texture;
             size = texView.tex->Mip();
             d3d12Res = texView.tex;

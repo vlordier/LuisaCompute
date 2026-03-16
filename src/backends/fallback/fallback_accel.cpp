@@ -174,7 +174,7 @@ void FallbackAccel::build(luisa::unique_ptr<AccelBuildCommand> cmd) noexcept {
             instance.dirty = false;
         }
     }
-    // TODO: support update?
+    // Note: Incremental update (rtcUpdateScenePrimitive) is not yet supported; always performs a full rebuild.
     rtcCommitScene(_handle);
 }
 

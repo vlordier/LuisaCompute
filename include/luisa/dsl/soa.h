@@ -425,7 +425,9 @@ struct Expr<SOAView<T>> : public Expr<SOA<T>> {
     using Expr<SOA<T>>::Expr;
 };
 
-// TODO: This can result in template instantiation failure... C++ too hard!!!
+// Note: Expr<SOA<T[N]>> inheriting from Expr<SOA<std::array<T,N>>> triggers a
+//       template instantiation cycle in some compilers. If this causes issues,
+//       replace the inheritance with a standalone explicit specialization.
 template<typename T, size_t N>
     requires(sizeof(T) >= sizeof(uint))// if T is smaller than uint, we do not split it
 struct Expr<SOA<T[N]>> : public Expr<SOA<std::array<T, N>>> {

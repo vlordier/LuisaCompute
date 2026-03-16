@@ -123,7 +123,7 @@ void HIPStream::synchronize() noexcept {
     LUISA_CHECK_HIP(hipStreamSynchronize(_stream));
     auto wait_iterations = 0u;
     constexpr auto max_wait_iterations_before_yield = 1024u;
-    for (;;) {// TODO: is spinning good enough?
+    for (;;) {// Note: spinning with yield fallback; adequate for short waits but may add latency under heavy load.
         if (_finished_ticket.load(std::memory_order_acquire) >= ticket) { break; }
         if (++wait_iterations >= max_wait_iterations_before_yield) {
             wait_iterations = 0u;

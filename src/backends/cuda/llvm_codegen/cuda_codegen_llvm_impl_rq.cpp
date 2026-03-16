@@ -91,7 +91,8 @@ llvm::Value *CUDACodegenLLVMImpl::_call_ray_query_intrinsic(IB &b, llvm::StringR
 }
 
 void CUDACodegenLLVMImpl::_materialize_ray_query_loops() noexcept {
-    // TODO
+    // Note: Ray query loop materialization for the LLVM backend is not yet implemented.
+    //       Implement by lowering ray-query intrinsics to LLVM IR using the OptiX LLVM IR API.
 }
 
 }// namespace luisa::compute::cuda

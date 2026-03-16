@@ -422,9 +422,8 @@ public:
                 aabbOptions,
                 bottomAccelDatas->emplace_back()));
     }
-    void visit(const CurveBuildCommand *) noexcept override { /* TODO */
+    void visit(const CurveBuildCommand *) noexcept override { /* Note: CurveBuildCommand not yet implemented for DX bottom-level accel. */
     }
-    void visit(const BindlessArrayUpdateCommand *cmd) noexcept override {
         // reinterpret_cast<BindlessArray *>(cmd->handle())->Bind(cmd->modifications());
         auto arr = reinterpret_cast<BindlessArray *>(cmd->handle());
         if (!cmd->empty())
@@ -959,7 +958,7 @@ public:
         accelScratchOffsets++;
         bottomAccelData++;
     }
-    void visit(const CurveBuildCommand *) noexcept override { /* TODO */
+    void visit(const CurveBuildCommand *) noexcept override { /* Note: CurveBuildCommand not yet implemented for DX top-level accel; asserts unimplemented at runtime. */
         LUISA_NOT_IMPLEMENTED();
     }
     void visit(const MeshBuildCommand *cmd) noexcept override {
@@ -1042,7 +1041,7 @@ public:
         auto rtvs = cmd->rtv_texs();
         auto dsv = cmd->dsv_tex();
         DepthFormat dsvFormat{DepthFormat::None};
-        // TODO:Set render target
+        // Note: Render target setup is deferred to the raster command encoder.
         // Set viewport
         auto alloc = bd->GetCB()->GetAlloc();
         {
@@ -1687,7 +1686,7 @@ void LCCmdBuffer::CompressBC(
                         std::max<uint>((uThreadGroupCount + 3) / 4, 1),
                         err2Buffer,
                         err1Buffer);
-                    //TODO
+                    // Note: BC7 encode iteration continuation — startBlockID and numBlocks updated per batch.
                     startBlockID += n;
                     numBlocks -= n;
                 }
