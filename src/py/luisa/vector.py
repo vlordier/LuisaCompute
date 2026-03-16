@@ -1,6 +1,5 @@
 from .dylibs import lcapi
-from .types import to_lctype, from_lctype
-
+from .types import from_lctype, to_lctype
 
 # Note: vector & matrix types are directly imported from .dylibs.lcapi
 
@@ -21,7 +20,7 @@ def is_swizzle_name(sw):
     if len(sw) > 4:
         return False
     for ch in sw:
-        if not ch in {'x', 'y', 'z', 'w'}:
+        if ch not in {'x', 'y', 'z', 'w'}:
             return False
     return True
 

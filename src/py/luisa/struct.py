@@ -1,5 +1,5 @@
 from .dylibs import lcapi
-from .types import dtype_of, to_lctype, nameof
+from .types import dtype_of, nameof, to_lctype
 
 
 class Struct:
@@ -46,9 +46,7 @@ class Struct:
                 packed_bytes += b'\0'
             if lctype.is_basic():
                 packed_bytes += lcapi.to_bytes(value)
-            elif lctype.is_array():
-                packed_bytes += value.to_bytes()
-            elif lctype.is_structure():
+            elif lctype.is_array() or lctype.is_structure():
                 packed_bytes += value.to_bytes()
             else:
                 assert False
@@ -60,7 +58,7 @@ class Struct:
     def __repr__(self):
         idd = self.structType.idx_dict
         return '{' + ', '.join([name + ':' + repr(self.values[idd[name]]) for name in idd]) + '}'
-    
+
     def __hash__(self):
         return hash(repr(self))
 

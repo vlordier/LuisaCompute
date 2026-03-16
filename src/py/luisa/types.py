@@ -1,6 +1,21 @@
 from .dylibs import lcapi
-from .dylibs.lcapi import int2, float2, bool2, uint2, int3, float3, bool3, uint3, int4, float4, bool4, uint4
-from .dylibs.lcapi import float2x2, float3x3, float4x4
+from .dylibs.lcapi import (
+    bool2,
+    bool3,
+    bool4,
+    float2,
+    float2x2,
+    float3,
+    float3x3,
+    float4,
+    float4x4,
+    int2,
+    int3,
+    int4,
+    uint2,
+    uint3,
+    uint4,
+)
 
 
 class uint:

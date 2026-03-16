@@ -1,17 +1,20 @@
 import sys
+
 if len(sys.argv) < 2:
     print('Must input backend')
     exit(1)
 if sys.argv[1] != 'dx' and sys.argv[1] != 'vk':
     print('Backend only support dx and vk')
     exit(1)
+import logging
+
+import numpy as np
+import torch
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
 from luisa.util import *
-import numpy as np
-import logging
-import torch
+
 init(sys.argv[1])
 if not torch.cuda.is_available():
     logging.error("CUDA environment unavailable.")

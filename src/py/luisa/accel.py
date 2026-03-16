@@ -1,12 +1,12 @@
-from .dylibs import lcapi
 from . import globalvars
-from .globalvars import get_global_device
-from .mathtypes import *
-from .func import func
-from .types import to_lctype, BuiltinFuncBuilder, uint
 from .builtin import bitwise_cast, check_exact_signature
+from .dylibs import lcapi
+from .func import func
+from .globalvars import get_global_device
 from .hit import TriangleHit
-from .rayquery import rayQueryAllType, rayQueryAnyType, Ray
+from .mathtypes import *
+from .rayquery import Ray, rayQueryAllType, rayQueryAnyType
+from .types import BuiltinFuncBuilder, to_lctype, uint
 
 
 @func
@@ -154,7 +154,7 @@ class Accel:
         check_exact_signature([Ray, uint], [ray, vis_mask], "trace_closest")
         expr = lcapi.builder().call(to_lctype(TriangleHit), lcapi.CallOp.RAY_TRACING_TRACE_CLOSEST, [self.expr, ray.expr, vis_mask.expr])
         return TriangleHit, expr
-    
+
     @BuiltinFuncBuilder
     def trace_closest_cullback(self, ray, vis_mask):
         check_exact_signature([Ray, uint], [ray, vis_mask], "trace_closest_cullback")
@@ -166,7 +166,7 @@ class Accel:
         check_exact_signature([Ray, uint], [ray, vis_mask], "trace_any")
         expr = lcapi.builder().call(to_lctype(bool), lcapi.CallOp.RAY_TRACING_TRACE_ANY, [self.expr, ray.expr, vis_mask.expr])
         return bool, expr
-    
+
     @BuiltinFuncBuilder
     def trace_any_cullback(self, ray, vis_mask):
         check_exact_signature([Ray, uint], [ray, vis_mask], "trace_any_cullback")
@@ -178,13 +178,13 @@ class Accel:
         check_exact_signature([uint], [index], "instance_transform")
         expr = lcapi.builder().call(to_lctype(float4x4), lcapi.CallOp.RAY_TRACING_INSTANCE_TRANSFORM, [self.expr, index.expr])
         return float4x4, expr
-    
+
     @BuiltinFuncBuilder
     def user_id(self, index):
         check_exact_signature([uint], [index], "uesr_id")
         expr = lcapi.builder().call(to_lctype(uint), lcapi.CallOp.RAY_TRACING_INSTANCE_USER_ID, [self.expr, index.expr])
         return uint, expr
-    
+
     @BuiltinFuncBuilder
     def visibility_mask(self, index):
         check_exact_signature([uint], [index], "mask")
@@ -209,7 +209,7 @@ class Accel:
         check_exact_signature([uint, bool], [index, opacity], "set_instance_opacity")
         expr = lcapi.builder().call(lcapi.CallOp.RAY_TRACING_SET_INSTANCE_OPACITY, [self.expr, index.expr, opacity.expr])
         return None, expr
-    
+
     @BuiltinFuncBuilder
     def set_instance_user_id(self, index, opacity):
         check_exact_signature([uint, uint], [index, opacity], "set_instance_opacity")

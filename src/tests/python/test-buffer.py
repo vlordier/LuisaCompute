@@ -1,8 +1,10 @@
+import sys
+
+import numpy as np
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
-import numpy as np
-import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -23,7 +25,7 @@ def kernel():
     # "Macro Branch" showoff here
     ConstantFlag = ((1 + 1) == 3) # ConstantFlag is an always-false constant value, simple calculations supported
     # this "if ConstantFlag" branch will be eliminated before codegen, so this code block can be ridiculously illegal!
-    
+
     # if True:
     if ConstantFlag:
         ridiculous.wtf_is_this(nothing)

@@ -1,10 +1,9 @@
+import json
 import multiprocessing
 import os
-import sys
-import json
 import shutil
-from subprocess import Popen, call, DEVNULL, check_output
-from typing import List
+import sys
+from subprocess import DEVNULL, call, check_output
 
 ALL_FEATURES = ['dsl', 'python', 'gui', 'cuda', 'hip', 'cpu', 'remote', 'dx', 'metal', 'vulkan', 'tests', 'clangcxx']
 ALL_DEPENDENCIES = ['rust', 'ninja', 'xmake', 'cmake']
@@ -209,7 +208,7 @@ def install_xmake(skip_installed):
     if skip_installed and os.path.exists(f"{DEPS_DIR}/xmake_bin"):
         return
     ps_file = download_file("https://fastly.jsdelivr.net/gh/xmake-io/xmake@master/scripts/get.ps1", "get_xmake.ps1")
-    with open(ps_file, 'r') as f:
+    with open(ps_file) as f:
         ps_script = f.read()
     # find the latest version $LastRelease = "value"
     last_release = ps_script.split('$LastRelease = "')[1].split('"')[0]
@@ -221,7 +220,7 @@ def install_xmake(skip_installed):
         with open(f"{DEPS_DIR}/xmake_bin", "w") as f:
             f.write(f"{DEPS_DIR}/xmake/xmake.exe")
     else:
-        file_name = f"xmake-master.tar.gz"
+        file_name = "xmake-master.tar.gz"
         xmake_url = f"https://github.com/xmake-io/xmake/releases/download/{last_release}/{file_name}"
         xmake_file = download_file(xmake_url, file_name)
         unzip_file(xmake_file, DEPS_DIR)
@@ -302,7 +301,7 @@ def get_config(parsed_args):
     }
     # check if config.json exists
     if os.path.exists('config.json'):
-        with open('config.json', 'r') as f:
+        with open('config.json') as f:
             config.update(json.load(f))
     config['build_system'] = parsed_args['build_system']
     if "toolchain" in parsed_args:
@@ -314,7 +313,7 @@ def get_config(parsed_args):
 
     def find_program(name):
         if os.path.exists(f'{DEPS_DIR}/{name}_bin'):
-            with open(f'{DEPS_DIR}/{name}_bin', 'r') as f:
+            with open(f'{DEPS_DIR}/{name}_bin') as f:
                 return os.path.abspath(f.read().strip())
         else:
             return name
@@ -447,7 +446,7 @@ def dump_build_system_options(config: dict):
 
 def find_msvc(version, pattern):
     if os.path.exists(f'{DEPS_DIR}/vswhere_bin'):
-        with open(f'{DEPS_DIR}/vswhere_bin', 'r') as f:
+        with open(f'{DEPS_DIR}/vswhere_bin') as f:
             vswhere_exe = f.read().strip()
     else:
         vswhere_version = '3.1.1'
@@ -468,7 +467,7 @@ def find_msvc(version, pattern):
         version_args = ['-latest']
 
     vswhere_args = [vswhere_exe, '-format', 'json', '-utf8',
-                    '-nologo', '-sort', '-products', '*', '-find', pattern] + version_args
+                    '-nologo', '-sort', '-products', '*', '-find', pattern, *version_args]
 
     try:
         output = check_output(vswhere_args)
@@ -480,7 +479,7 @@ def find_msvc(version, pattern):
         try:
             path = path.replace('\\', '/').lower().replace(pattern, '').split('/')[-1]
             return [int(x) for x in path.split('.')]
-        except:
+        except Exception:
             return [0, 0, 0]
 
     output = json.loads(output.decode('utf-8'))
@@ -516,7 +515,7 @@ def find_llvm(version):
             output = output[index:].split('\n')[0].strip()
             v = [int(x) for x in output.split(' ')[2].split('.')]
             return v if v[0] == version or version == 0 else None
-        except:
+        except Exception:
             return None
 
     for path in candidate_paths:
@@ -556,9 +555,7 @@ def prepare_toolchain_environment(build_config, build_system):
     if toolchain == 'msvc':
         if build_system == "cmake":
             prepare_msvc_environment(version)
-    elif toolchain == 'llvm':
-        pass
-    elif toolchain == 'gcc':
+    elif toolchain == 'llvm' or toolchain == 'gcc':
         pass
     else:
         raise ValueError(f'Unknown toolchain: {toolchain}-{version}')
@@ -573,8 +570,8 @@ def build_system_config_args_cmake(config: dict, mode: str, toolchain: str, tool
     }
     args.append(f'-DCMAKE_BUILD_TYPE={cmake_mode[mode]}')
     if toolchain == 'msvc':
-        args.append(f'-DCMAKE_C_COMPILER=cl.exe')
-        args.append(f'-DCMAKE_CXX_COMPILER=cl.exe')
+        args.append('-DCMAKE_C_COMPILER=cl.exe')
+        args.append('-DCMAKE_CXX_COMPILER=cl.exe')
     elif toolchain == 'llvm':
         llvm_bin = find_llvm(toolchain_version).replace('\\', '/')
         if sys.platform == 'win32':
@@ -593,7 +590,7 @@ def build_system_config_args_cmake(config: dict, mode: str, toolchain: str, tool
         try:
             check_output([gcc_exe, '--version'])
             check_output([gxx_exe, '--version'])
-        except:
+        except Exception:
             print_red(f'Failed to find GCC-{toolchain_version}')
             return None
         args.append(f"-DCMAKE_C_COMPILER={gcc_exe}")
@@ -664,7 +661,7 @@ def init_submodule():
                       for sec in git_submodules.sections()}
 
     if os.path.exists('.git'):
-        for i in range(3):
+        for _ in range(3):
             if os.system('git submodule update --init --recursive') == 0:
                 break
     else:
@@ -675,15 +672,15 @@ def init_submodule():
         for path, url in git_submodules.items():
             if not os.path.exists(f'{path}/.git'):
                 print(f'Cloning submodule {path} from {url}')
-                for i in range(3):
+                for _ in range(3):
                     if os.system(f'git clone --recursive {url} {path}') == 0:
                         break
             else:
                 print(f'Updating submodule {path}')
-                for i in range(3):
+                for _ in range(3):
                     if call(['git', 'pull'], cwd=path) == 0:
                         break
-                for i in range(3):
+                for _ in range(3):
                     if call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=path) == 0:
                         break
     for s in git_submodules:
@@ -917,7 +914,7 @@ def config_project(config, build_config):
     toolchain_version = build_config['toolchain_version']
 
     print(f'Build System: {build_system}')
-    print(f'Configuration')
+    print('Configuration')
     print(f'  Mode: {mode}')
     print(f'  Toolchain: {toolchain}-{toolchain_version if toolchain_version else "default"}')
     print(f'  Output: {output}')
@@ -943,7 +940,7 @@ def config_project(config, build_config):
             return 1
         ninja_exe = ninja_exe.replace('\\', '/')
         args = [cmake_exe, '-S', '.', '-B', output, '-G', 'Ninja',
-                f'-DCMAKE_MAKE_PROGRAM={ninja_exe}'] + args
+                f'-DCMAKE_MAKE_PROGRAM={ninja_exe}', *args]
         print(f'Configuring the project: {" ".join(args)}')
         return call(args)
     elif config['build_system'] == 'xmake':
@@ -952,7 +949,7 @@ def config_project(config, build_config):
             print_red('xmake not found. Please install xmake first.')
             print_red('xmake can be installed by running `python3 bootstrap.py -i xmake`.')
             return 1
-        args = [xmake_exe, 'f'] + args + ['-o', output]
+        args = [xmake_exe, 'f', *args, '-o', output]
         print(f'Configuring the project: {" ".join(args)}')
         return call(args)
     else:
@@ -971,7 +968,7 @@ def build_project(config, build_config):
         return call(args)
     elif build_system == 'xmake':
         xmake_exe = config['xmake_exe']
-        print(f'Building the project: xmake')
+        print('Building the project: xmake')
         args = [xmake_exe, '-w', '-j', str(build_jobs)]
         return call(args)
     else:
@@ -979,7 +976,7 @@ def build_project(config, build_config):
         return 1
 
 
-def main(args: List[str]):
+def main(args: list[str]):
     parsed_args = parse_cli_args(args)
     if parsed_args is None:
         return
@@ -1018,10 +1015,10 @@ def main(args: List[str]):
             shutil.rmtree(output)
         if config['build_system'] == 'xmake':
             if os.path.exists('.xmake'):
-                print(f'Cleaning .xmake...')
+                print('Cleaning .xmake...')
                 shutil.rmtree('.xmake')
             if os.path.exists('bin'):
-                print(f'Cleaning bin...')
+                print('Cleaning bin...')
                 shutil.rmtree('bin')
 
     if run_config or run_build:
@@ -1044,10 +1041,9 @@ def main(args: List[str]):
         if config_project(config, build_config) != 0:
             print_red('Failed to configure the project.')
             return 1
-        if run_build:
-            if build_project(config, build_config) != 0:
-                print_red('Failed to build the project.')
-                return 1
+        if run_build and build_project(config, build_config) != 0:
+            print_red('Failed to build the project.')
+            return 1
 
 
 if __name__ == '__main__':

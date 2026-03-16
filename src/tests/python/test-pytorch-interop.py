@@ -3,9 +3,10 @@ import torch
 
 luisa.init('cuda')
 
-import numpy as np
-import cupy
 import ctypes
+
+import cupy
+import numpy as np
 
 
 def cu_device_ptr_to_torch_tensor(ptr, shape, dtype=cupy.float32):

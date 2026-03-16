@@ -30,33 +30,30 @@ try:
 except NameError:
     pass
 
-from . import globalvars
-from .types import half, short, ushort, half2, short2, ushort2, half3, short3, ushort3, half4, short4, ushort4
-
-from .func import func
-from .raster_func import save_raster_shader
-from .mathtypes import *
-from .array import array, ArrayType, SharedArrayType
-from .struct import struct, StructType
-from .buffer import buffer, Buffer, ByteBuffer, BufferType, ByteBufferType, IndirectDispatchBuffer
-from .image2d import image2d, Image2D, Texture2DType
-from .image3d import image3d, Image3D, Texture3DType
-from .dylibs.lcapi import PixelStorage
-from .gui import GUI
-
-from .accel import Accel, make_ray, inf_ray, offset_ray_origin
-from .hit import TriangleHit, CommittedHit, ProceduralHit
-from .rayquery import RayQueryAllType, RayQueryAnyType, is_triangle, is_procedural, Ray
-from .bindless import bindless_array, BindlessArray
-from .util import RandomSampler
-from .meshformat import MeshFormat
-
-from .dylibs.lcapi import log_level_verbose, log_level_info, log_level_warning, log_level_error
-from os.path import realpath
+import inspect
 import platform
 import sys
 from os import environ
-import inspect
+from os.path import realpath
+
+from . import globalvars
+from .accel import Accel, inf_ray, make_ray, offset_ray_origin
+from .array import ArrayType, SharedArrayType, array
+from .bindless import BindlessArray, bindless_array
+from .buffer import Buffer, BufferType, ByteBuffer, ByteBufferType, IndirectDispatchBuffer, buffer
+from .dylibs.lcapi import PixelStorage, log_level_error, log_level_info, log_level_verbose, log_level_warning
+from .func import func
+from .gui import GUI
+from .hit import CommittedHit, ProceduralHit, TriangleHit
+from .image2d import Image2D, Texture2DType, image2d
+from .image3d import Image3D, Texture3DType, image3d
+from .mathtypes import *
+from .meshformat import MeshFormat
+from .raster_func import save_raster_shader
+from .rayquery import Ray, RayQueryAllType, RayQueryAnyType, is_procedural, is_triangle
+from .struct import StructType, struct
+from .types import half, half2, half3, half4, short, short2, short3, short4, ushort, ushort2, ushort3, ushort4
+from .util import RandomSampler
 
 
 def _select_backend(backends):
@@ -69,7 +66,7 @@ def _select_backend(backends):
         else:
             print(f"Detected backends: {backends}.",
                   f"Environment variable `LUISA_BACKEND` is set to {backend_name}, but it is not installed.",
-                  f"LuisaCompute will select an alternative backend automatically.",
+                  "LuisaCompute will select an alternative backend automatically.",
                   file=sys.stderr)
     platform_str = str(platform.platform()).lower()
     if platform_str.find("windows") >= 0:

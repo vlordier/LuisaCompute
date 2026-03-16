@@ -1,6 +1,6 @@
 import os
-import subprocess
 import re
+import subprocess
 
 
 def generate_and_embed(system_name: str, machine_name: str):
@@ -13,7 +13,7 @@ def generate_and_embed(system_name: str, machine_name: str):
                     "-fno-stack-protector", "-fno-rtti", "-fno-exceptions",
                     f"--target={machine_name}-unknown-{system_name}",
                     "-nostdinc", "-nostdlib", "-nostdinc++", "-nostdlib++"])
-    with open(dst_path, "r", newline="\n") as f:
+    with open(dst_path, newline="\n") as f:
         content = "".join(line for line in f.readlines()
                           if not line.strip().startswith("@llvm.used") and
                           not line.strip().startswith("@llvm.compiler.used") and
@@ -50,10 +50,10 @@ def generate_and_embed(system_name: str, machine_name: str):
         data = [f"0x{c:02x}" for c in content]
         size = len(data)
         f.write(
-            f'\nstatic const unsigned char luisa_fallback_backend_device_builtin_module[{size}] = {{\n'.encode("utf-8"))
+            f'\nstatic const unsigned char luisa_fallback_backend_device_builtin_module[{size}] = {{\n'.encode())
         wrapped = ["    " + ", ".join(data[i: i + 16]) for i in range(0, len(data), 16)]
         f.write(",\n".join(wrapped).encode("utf-8"))
-        f.write("\n};\n".encode("utf-8"))
+        f.write(b"\n};\n")
 
 
 if __name__ == "__main__":

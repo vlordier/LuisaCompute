@@ -1,9 +1,11 @@
+import math
+import sys
+
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
 from luisa.util import *
-import math
-import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]

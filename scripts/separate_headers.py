@@ -1,5 +1,5 @@
 from os import listdir, makedirs
-from os.path import realpath, relpath, dirname, abspath, isdir, normpath, basename
+from os.path import abspath, dirname, isdir, normpath, realpath, relpath
 from shutil import move
 
 
@@ -34,7 +34,7 @@ def fix_include(src_dir, file, moved_headers):
     print(f"Fixing {file}...")
     fixed_lines = []
     abs_path = f"{src_dir}/{file}"
-    with open(abs_path, "r", encoding="utf8") as f:
+    with open(abs_path, encoding="utf8") as f:
         lines = f.readlines()
     for line in lines:
         if line.strip().startswith("#include"):

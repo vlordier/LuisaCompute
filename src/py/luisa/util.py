@@ -1,7 +1,8 @@
-from . import func, StructType
+import math
+
+from . import StructType, func
 from .mathtypes import *
 from .types import *
-import math
 
 RandomSampler = StructType(state=int)
 

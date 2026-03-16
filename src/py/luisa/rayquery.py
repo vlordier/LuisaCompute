@@ -1,12 +1,11 @@
-from .dylibs import lcapi
-from .types import to_lctype
-from .func import func
-from .struct import StructType
-from .mathtypes import *
-from .builtin import check_exact_signature
-from .types import BuiltinFuncBuilder
-from .hit import TriangleHit, CommittedHit, ProceduralHit
 from .array import ArrayType
+from .builtin import check_exact_signature
+from .dylibs import lcapi
+from .func import func
+from .hit import CommittedHit, ProceduralHit, TriangleHit
+from .mathtypes import *
+from .struct import StructType
+from .types import BuiltinFuncBuilder, to_lctype
 
 Ray = StructType(16, _origin=ArrayType(3, float), t_min=float, _dir=ArrayType(3, float), t_max=float)
 
@@ -118,7 +117,7 @@ class RayQueryAllType:
                                     lcapi.CallOp.RAY_QUERY_IS_PROCEDURAL_CANDIDATE,
                                     [self.expr])
         return bool, expr
-        
+
 
 
 rayQueryAllType = RayQueryAllType()

@@ -1,14 +1,15 @@
 import ctypes
+import logging
 import os
+import sys
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from pathlib import Path
-from torchvision import datasets, transforms
-import logging
 import torchvision.models as models
-import sys
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 
 if not torch.cuda.is_available():
     logging.error("CUDA environment unavailable.")

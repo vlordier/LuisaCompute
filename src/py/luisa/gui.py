@@ -1,6 +1,5 @@
-import numpy as np
-from .dylibs import lcapi
 from . import globalvars
+from .dylibs import lcapi
 from .globalvars import get_global_device
 
 

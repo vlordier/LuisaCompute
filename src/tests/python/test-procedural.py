@@ -1,9 +1,11 @@
-from luisa import *
-from luisa.types import *
-from luisa.builtin import *
-import numpy as np
 import math
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.builtin import *
+from luisa.types import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -110,7 +112,7 @@ def kernel(pos):
     #                     normal = normalize(
     #                         ray_origin + direction * dist - origin)
     #                     sphere_color = normal * .5 + .5
-    #                     q.commit_procedural(dist)        
+    #                     q.commit_procedural(dist)
     match q:
         case is_triangle():
             q.commit_triangle()

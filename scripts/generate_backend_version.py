@@ -1,5 +1,6 @@
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
 proj_dir = Path(__file__).parent.parent
 dst_dir = proj_dir / 'src/runtime/backend_version.inl'
 

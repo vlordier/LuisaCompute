@@ -1,5 +1,5 @@
 from os import listdir
-from os.path import realpath, dirname, isdir, relpath
+from os.path import dirname, isdir, realpath, relpath
 
 
 def glob_headers(headers, folder):
@@ -40,5 +40,5 @@ if __name__ == "__main__":
             for header in headers:
                 f.write(f"#include <luisa/{header}>\n")
             if group in optional_modules:
-                f.write(f"#endif\n")
+                f.write("#endif\n")
             f.write("\n")

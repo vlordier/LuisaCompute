@@ -1,5 +1,4 @@
 import os
-from typing import List, Dict, Tuple, Optional, Union, Set
 
 cpp_def = open('ir_v2_defs.h', 'w')
 fwd_file = open('ir_v2_fwd.h', 'w')
@@ -232,7 +231,7 @@ print('#include <luisa/ir_v2/ir_v2.h>', file=cpp_api_impl)
 print('namespace luisa::compute::ir_v2 {', file=cpp_api_impl)
 
 class Item:
-    def __init__(self, name, base,fields: List[Tuple[str, str]], comment=None,no_copy=False) -> None:
+    def __init__(self, name, base,fields: list[tuple[str, str]], comment=None,no_copy=False) -> None:
         self.cpp_src = ''
         self.name = name
         self.fields = fields
@@ -245,7 +244,7 @@ class Item:
     def gen(self):
         out = 'public:\n'
         for field in self.fields:
-            out += '    {} {}{{}};\n'.format(field[0], field[1])
+            out += f'    {field[0]} {field[1]}{{}};\n'
 
         out += f'    {self.name}() = default;\n'
         if len(self.fields) > 0:
@@ -275,11 +274,11 @@ class Item:
                 f'static {MAP_FFI_TYPE_GET[f[0]]} {fname}({self.name} *self) {{', file=c_api_impl)
             if 'shared_ptr' in f[0]:
                 print(
-                    '    return self->{}.get();'.format(f[1]), file=c_api_impl)
+                    f'    return self->{f[1]}.get();', file=c_api_impl)
             elif f[0] =='Func':
-                print('    return reinterpret_cast<const CFunc*>(&self->{});'.format(f[1]), file=c_api_impl)
+                print(f'    return reinterpret_cast<const CFunc*>(&self->{f[1]});', file=c_api_impl)
             else:
-                print('    return self->{};'.format(f[1]), file=c_api_impl)
+                print(f'    return self->{f[1]};', file=c_api_impl)
             print('}', file=c_api_impl)
 
         # set xx_field(xx)
@@ -291,18 +290,18 @@ class Item:
                 f'static void {fname}({self.name} *self, {MAP_FFI_TYPE_SET[f[0]]} value) {{', file=c_api_impl)
             if 'shared_ptr' in f[0]:
                 print(
-                    '    self->{0} = luisa::static_pointer_cast<std::decay_t<decltype(self->{0})>::element_type>(value->shared_from_this());'.format(f[1]), file=c_api_impl)
+                    f'    self->{f[1]} = luisa::static_pointer_cast<std::decay_t<decltype(self->{f[1]})>::element_type>(value->shared_from_this());', file=c_api_impl)
             elif f[0].startswith('luisa::vector'):
                 print(
-                    '    self->{} = value.to_vector();'.format(f[1]), file=c_api_impl)
+                    f'    self->{f[1]} = value.to_vector();', file=c_api_impl)
             elif f[0].startswith('luisa::string'):
                 print(
-                    '    self->{} = value.to_string();'.format(f[1]), file=c_api_impl)
+                    f'    self->{f[1]} = value.to_string();', file=c_api_impl)
             elif f[0] == 'Func':
                 print(
                     f'    self->{f[1]} = std::move(*reinterpret_cast<Func*>(&value));', file=c_api_impl)
             else:
-                print('    self->{} = value;'.format(f[1]), file=c_api_impl)
+                print(f'    self->{f[1]} = value;', file=c_api_impl)
             print('}', file=c_api_impl)
 
         # gen ctor
@@ -318,14 +317,14 @@ class Item:
         for f in self.fields:
             print(f', {MAP_FFI_TYPE_SET[f[0]]} {f[1]}', end='', file=c_api_impl)
         print(') {', file=c_api_impl)
-        print(f'   auto data = luisa::unique_ptr<{self.name}>();', file=c_api_impl)        
+        print(f'   auto data = luisa::unique_ptr<{self.name}>();', file=c_api_impl)
         for f in self.fields:
             print(f'    {self.name}_set_{f[1]}(data.get(), {f[1]});', file=c_api_impl)
         print(f'   auto tag = {self.name}::static_tag();', file=c_api_impl)
         print(f'   auto cobj = C{self.base}{{}};', file=c_api_impl)
         print(f'   auto obj = {self.base}(tag, std::move(data));', file=c_api_impl)
         print(f'   std::memcpy(&cobj, &obj, sizeof(C{self.base}));', file=c_api_impl)
-        print(f'   (void)obj.steal();', file=c_api_impl)
+        print('   (void)obj.steal();', file=c_api_impl)
         print('    return cobj;', file=c_api_impl)
         print('}', file=c_api_impl)
 
@@ -398,28 +397,26 @@ def parse_cpp_type(s: str) -> CppType:
     return CppAtom(s)
 
 
-def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
+def gen_adt(adt: str, cpp_src: str, variants: list[Item]):
     # gen cpp
-    print('struct {};'.format(adt), file=fwd_file)
-    print('struct {}Data;'.format(adt), file=fwd_file)
+    print(f'struct {adt};', file=fwd_file)
+    print(f'struct {adt}Data;', file=fwd_file)
     print(f'typedef const C{adt}* {adt}Ref;', file=fwd_file)
     print(f'typedef C{adt}* {adt}RefMut;', file=fwd_file)
-    
+
 
     print(f'    enum class {adt}Tag : unsigned int {{', file=fwd_file)
     for variant in variants:
-        print('        {},'.format(
-            variant.tag), file=fwd_file)
+        print(f'        {variant.tag},', file=fwd_file)
     print('    };', file=fwd_file)
 
     print(f'    enum class Rusty{adt}Tag : unsigned int {{', file=fwd_file)
     for variant in variants:
-        print('        {},'.format(
-            variant.tag_rs), file=fwd_file)
+        print(f'        {variant.tag_rs},', file=fwd_file)
     print('    };', file=fwd_file)
 
     print(f'    inline const char* tag_name({adt}Tag tag) {{', file=fwd_file)
-    print(f'        switch(tag) {{',  file=fwd_file)
+    print('        switch(tag) {',  file=fwd_file)
     for variant in variants:
         print(f'        case {adt}Tag::{variant.tag}: return "{variant.name}";', file=fwd_file)
     print('}', file=fwd_file)
@@ -431,12 +428,12 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
     print(f'struct LUISA_IR_API {adt}Data {{ ', file=fwd_file)
     print('#ifndef BINDGEN', file=fwd_file)
     print(f'    virtual {adt}Tag tag() const noexcept = 0;', file=fwd_file)
-    print('    virtual ~{}Data() = default;'.format(adt), file=fwd_file)
+    print(f'    virtual ~{adt}Data() = default;', file=fwd_file)
     print('#endif', file=fwd_file)
     print('};', file=fwd_file)
     for variant in variants:
         if len(variant.fields) > 0:
-            print('struct {};'.format(variant.name), file=fwd_file)
+            print(f'struct {variant.name};', file=fwd_file)
             if variant.no_copy:
                 print('''/**
 * <div rustbindgen nocopy></div>
@@ -447,16 +444,15 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
 * <div rustbindgen nocopy></div>
 */''', file=fwd_file)
             print(f'typedef {variant.name}* {variant.name}RefMut;', file=fwd_file)
-    print('struct LUISA_IR_API {} {{'.format(adt), file=cpp_def)
-    print('    luisa::unique_ptr<{}Data> _data;'.format(adt), file=cpp_def)
-    print('     {}Tag _tag;'.format(adt), file=cpp_def)
+    print(f'struct LUISA_IR_API {adt} {{', file=cpp_def)
+    print(f'    luisa::unique_ptr<{adt}Data> _data;', file=cpp_def)
+    print(f'     {adt}Tag _tag;', file=cpp_def)
     print('public:', file=cpp_def)
     print(f'   explicit {adt}({adt}Tag tag) : _data(luisa::unique_ptr<{adt}Data>()), _tag(tag) {{}}', file=cpp_def)
-    print('    explicit {}({}Tag tag, luisa::unique_ptr<{}Data> data) : _data(std::move(data)), _tag(tag) {{'.format(
-        adt, adt, adt), file=cpp_def)
-    print(f'        LUISA_ASSERT(tag == _data->tag(), "Mismatched tag!!!");', file=cpp_def)
+    print(f'    explicit {adt}({adt}Tag tag, luisa::unique_ptr<{adt}Data> data) : _data(std::move(data)), _tag(tag) {{', file=cpp_def)
+    print('        LUISA_ASSERT(tag == _data->tag(), "Mismatched tag!!!");', file=cpp_def)
     print('    }', file=cpp_def)
-    print('    typedef {}Tag Tag;'.format(adt), file=cpp_def)
+    print(f'    typedef {adt}Tag Tag;', file=cpp_def)
     for variant in variants:
         if len(variant.fields) > 0:
             print(f'    explicit {adt}({variant.name} v);', file=cpp_def)
@@ -464,20 +460,16 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
     print('    [[nodiscard]] Tag tag() const noexcept {', file=cpp_def)
     print('        return _tag;', file=cpp_def)
     print('    }', file=cpp_def)
-    print('    [[nodiscard]] bool isa(Tag tag)const noexcept {{'.format(
-        adt), file=cpp_def)
+    print('    [[nodiscard]] bool isa(Tag tag)const noexcept {{', file=cpp_def)
     print('        return this->tag() == tag;', file=cpp_def)
     print('    }', file=cpp_def)
-    print('     template<class T> requires std::is_base_of_v<{}Data, T>  [[nodiscard]] bool isa()const noexcept {{'.format(
-        adt), file=cpp_def)
+    print(f'     template<class T> requires std::is_base_of_v<{adt}Data, T>  [[nodiscard]] bool isa()const noexcept {{', file=cpp_def)
     print('        return this->isa(T::static_tag());', file=cpp_def)
     print('    }', file=cpp_def)
-    print('    template<class T> requires std::is_base_of_v<{}Data, T> [[nodiscard]]  T* as() {{'.format(
-        adt), file=cpp_def)
+    print(f'    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]]  T* as() {{', file=cpp_def)
     print('        return isa(T::static_tag()) ? static_cast<T*>(_data.get()) : nullptr;', file=cpp_def)
     print('    }', file=cpp_def)
-    print('    template<class T> requires std::is_base_of_v<{}Data, T> [[nodiscard]] const T* as() const {{'.format(
-        adt), file=cpp_def)
+    print(f'    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]] const T* as() const {{', file=cpp_def)
     print('        return isa(T::static_tag()) ? static_cast<const T*>(_data.get()) : nullptr;', file=cpp_def)
     print('    }', file=cpp_def)
     print('    ', cpp_src, file=cpp_def)
@@ -485,22 +477,20 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
     print('        return _data.release();', file=cpp_def)
     print('    }', file=cpp_def)
     print('};', file=cpp_def)
-    print('static_assert(sizeof({}) == 16);'.format(adt), file=cpp_def)
-    print('static_assert(sizeof(luisa::unique_ptr<{}Data>) == 8);'.format(adt), file=cpp_def)
+    print(f'static_assert(sizeof({adt}) == 16);', file=cpp_def)
+    print(f'static_assert(sizeof(luisa::unique_ptr<{adt}Data>) == 8);', file=cpp_def)
 
     for variant in variants:
         if len(variant.fields) == 0:
             continue
-        print('struct LUISA_IR_API {} : public {}Data {{'.format(
-            variant.name, adt), file=cpp_def)
+        print(f'struct LUISA_IR_API {variant.name} : public {adt}Data {{', file=cpp_def)
         print('public:', file=cpp_def)
-        print('    typedef {}Tag Tag;'.format(adt), file=cpp_def)
+        print(f'    typedef {adt}Tag Tag;', file=cpp_def)
         print('    [[nodiscard]] Tag tag() const noexcept override {', file=cpp_def)
         print('        return static_tag();', file=cpp_def)
         print('    }', file=cpp_def)
         print('    static constexpr Tag static_tag() noexcept {', file=cpp_def)
-        print('        return Tag::{};'.format(
-            variant.tag), file=cpp_def)
+        print(f'        return Tag::{variant.tag};', file=cpp_def)
         print('    }', file=cpp_def)
         print('    ', variant.gen(), file=cpp_def)
         print('};', file=cpp_def)
@@ -522,10 +512,10 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
             func_table.append((fname, fsig))
             print(f'static {variant.name} *{fname}(C{adt} *self) {{',
                 file=c_api_impl)
-            print('    return reinterpret_cast<{1}*>(self)->as<{0}>();'.format(variant.name, adt),
+            print(f'    return reinterpret_cast<{adt}*>(self)->as<{variant.name}>();',
                 file=c_api_impl)
             print('}', file=c_api_impl)
-    
+
 
     fname = f'{adt}_tag'
     fsig = f'Rusty{adt}Tag (*{fname})(const C{adt} *self)'
@@ -543,8 +533,8 @@ def gen_adt(adt: str, cpp_src: str, variants: List[Item]):
     print(f'    auto obj = {adt}(static_cast<{adt}Tag>(tag));', file=c_api_impl)
     print(f'    auto cobj = C{adt}{{}};', file=c_api_impl)
     print(f'    std::memcpy(&cobj, &obj, sizeof(C{adt}));', file=c_api_impl)
-    print(f'    (void)obj.steal();', file=c_api_impl)
-    print(f'    return cobj;', file=c_api_impl)
+    print('    (void)obj.steal();', file=c_api_impl)
+    print('    return cobj;', file=c_api_impl)
     print('}', file=c_api_impl)
 
 instructions = [
@@ -950,7 +940,7 @@ def gen_func_metadata():
     for f in funcs:
         print('    {{ {} }},'.format('true' if f.side_effects else 'false'), file=c_api_impl)
     print('};', file=c_api_impl)
-    print('static_assert(sizeof(_func_metadata) == sizeof(FuncMetadata) * {});'.format(len(funcs)), file=c_api_impl)
+    print(f'static_assert(sizeof(_func_metadata) == sizeof(FuncMetadata) * {len(funcs)});', file=c_api_impl)
     print('const FuncMetadata* func_metadata() { return _func_metadata; }', file=c_api_impl)
 
     print('const FuncMetadata& Func::metadata() const noexcept {', file=cpp_api_impl)
@@ -958,10 +948,10 @@ def gen_func_metadata():
     print('}', file=cpp_api_impl)
 
     # add func_metadata to binding table
-    fname = f'func_metadata'
+    fname = 'func_metadata'
     fsig = f'const FuncMetadata* (*{fname})()'
     func_table.append((fname, fsig))
-    
+
 gen_func_metadata()
 
 bindings = [
@@ -1009,7 +999,7 @@ def gen_extra_bindings():
     add_func('bool', 'type_is_struct', 'const Type* ty')
     add_func('bool', 'type_is_custom', 'const Type* ty')
     add_func('bool', 'type_is_matrix', 'const Type* ty')
-    
+
     add_func('const Type*', 'type_element', 'const Type* ty')
     add_func('Slice<const char>', 'type_description', 'const Type* ty')
     add_func('size_t', 'type_dimension', 'const Type* ty')
@@ -1078,7 +1068,7 @@ gen_extra_bindings()
 print('struct IrV2BindingTable {', file=c_def)
 for f in func_table:
     fname, fsig = f
-    print('    {};'.format(fsig), file=c_def)
+    print(f'    {fsig};', file=c_def)
 print('};', file=c_def)
 print('extern "C" LUISA_IR_API IrV2BindingTable lc_ir_v2_binding_table();', file=c_def)
 
@@ -1088,7 +1078,7 @@ print(
 print('    return {', file=c_api_impl)
 for f in func_table:
     fname, fsig = f
-    print('        {},'.format(fname), file=c_api_impl)
+    print(f'        {fname},', file=c_api_impl)
 print('    };', file=c_api_impl)
 print('}', file=c_api_impl)
 
@@ -1122,4 +1112,4 @@ os.system('bindgen ir_v2_api.h -o ../../../src/rust/luisa_compute_ir_v2/src/bind
 
 
 
-    
+

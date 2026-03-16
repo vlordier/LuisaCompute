@@ -1,10 +1,11 @@
-import graphviz
-from sys import argv
 import json
+from sys import argv
+
+import graphviz
 
 
 def parse_control_flow_graphs_from_xir(xir_file):
-    with open(xir_file, 'r') as f:
+    with open(xir_file) as f:
         prefix = "// CFG = "
         lines = [x[len(prefix):] for line in f.readlines() if (x := line.strip()) and x.startswith(prefix)]
     return [json.loads(line) for line in lines]

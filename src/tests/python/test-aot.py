@@ -1,4 +1,5 @@
 from luisa import *
+
 # use headless mode, no runtime available
 log_level_error()
 init_headless()

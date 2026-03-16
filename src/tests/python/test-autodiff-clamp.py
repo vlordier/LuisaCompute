@@ -1,5 +1,5 @@
 from luisa import *
-from luisa.autodiff import requires_grad, autodiff, backward, grad
+from luisa.autodiff import autodiff, backward, grad, requires_grad
 
 
 @func
@@ -30,6 +30,7 @@ def test_autodiff(x):
 
 
 import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]

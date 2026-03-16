@@ -1,12 +1,43 @@
+import ast
+import functools
+from types import SimpleNamespace
+
+from . import globalvars
 from .dylibs import lcapi
 from .mathtypes import *
-from .types import uint, uint3, float2, float3, float4, short, ushort, half, half2, half3, half4, long, ulong, to_lctype, is_bit16_types, is_bit64_types, BuiltinFuncBuilder, arithmetic_dtypes, vector_dtypes, scalar_and_vector_dtypes, matrix_dtypes, vector_and_matrix_dtypes, \
-    vector, length_of, element_of, nameof, implicit_convertible, basic_dtypes, integer_scalar_vector_dtypes
-import functools
-from . import globalvars
-from types import SimpleNamespace
-import ast
 from .struct import StructType
+from .types import (
+    BuiltinFuncBuilder,
+    arithmetic_dtypes,
+    basic_dtypes,
+    element_of,
+    float2,
+    float3,
+    float4,
+    half,
+    half2,
+    half3,
+    half4,
+    implicit_convertible,
+    integer_scalar_vector_dtypes,
+    is_bit16_types,
+    is_bit64_types,
+    length_of,
+    long,
+    matrix_dtypes,
+    nameof,
+    scalar_and_vector_dtypes,
+    short,
+    to_lctype,
+    uint,
+    uint3,
+    ulong,
+    ushort,
+    vector,
+    vector_and_matrix_dtypes,
+    vector_dtypes,
+)
+
 
 def _check_vector_types(*args):
     len = 1
@@ -143,11 +174,11 @@ def builtin_bin_op(op, lhs, rhs):
     lhs_expr, rhs_expr = lhs.expr, rhs.expr
     if op != ast.Mult:
         assert implicit_convertible(dtype0, dtype1) or \
-               (length0 == 1 or length1 == 1 and implicit_convertible(element_of(dtype0), element_of(dtype1))), \
+               (length0 == 1 or (length1 == 1 and implicit_convertible(element_of(dtype0), element_of(dtype1)))), \
             f'Binary operation between ({dtype0} and {dtype1}) is not supported'
     else:
         assert implicit_convertible(dtype0, dtype1) or \
-               (length0 == 1 or length1 == 1 and implicit_convertible(element_of(dtype0), element_of(dtype1))) or \
+               (length0 == 1 or (length1 == 1 and implicit_convertible(element_of(dtype0), element_of(dtype1)))) or \
                (dtype0 == float2x2 and dtype1 in {float2, half2}) or \
                (dtype0 == float3x3 and dtype1 in {float3, half3}) or \
                (dtype0 == float4x4 and dtype1 in {float4, half4}), \
@@ -301,8 +332,8 @@ def make_vector_call(dtype, op, args):
     assert dtype in {int, uint, float, short, ushort, half, bool, long, ulong}
     dim = 1
     for arg in args:
-        if not (implicit_convertible(arg.dtype, dtype) or arg.dtype in vector_dtypes and implicit_convertible(
-                element_of(arg.dtype), dtype)):
+        if not (implicit_convertible(arg.dtype, dtype) or (arg.dtype in vector_dtypes and implicit_convertible(
+                element_of(arg.dtype), dtype))):
             raise TypeError("arguments must be float or float vector")
         if arg.dtype in vector_dtypes:
             if dim != 1:
@@ -353,13 +384,13 @@ def set_block_size(x, y, z):
     for a in [x, y, z]:
         values.append(a.value)
     for i in range(3):
-        if not type(values[i]) in {int, uint}:
+        if type(values[i]) not in {int, uint}:
             raise TypeError(f"set_block_size argument {i} must be int or uint")
         elif values[i] == 0:
-            raise ValueError(f"block size can not be 0")
+            raise ValueError("block size can not be 0")
     accum = values[0] * values[1] * values[2]
     if accum > 1024:
-        raise ValueError(f"block size should be less than or equal to 1024")
+        raise ValueError("block size should be less than or equal to 1024")
     return None, lcapi.builder().set_block_size(values[0], values[1], values[2])
 
 
@@ -634,7 +665,7 @@ _func_map["print"] = _print
 def _pow(name, *args):
     assert len(args) == 2
     for arg in args:
-        if not (arg.dtype in {float, half}):
+        if arg.dtype not in {float, half}:
             arg.dtype, arg.expr = builtin_type_cast(to_float(arg.dtype), arg)
     return make_vector_call(element_of(arg.dtype), lcapi.CallOp.POW, args)
 
@@ -691,7 +722,7 @@ def _int_func(name, *args):
     op = getattr(lcapi.CallOp, name.upper())
     assert len(args) == 1
     assert args[0].dtype == uint or \
-           args[0].dtype in vector_dtypes and element_of(args[0].dtype) is uint, \
+           (args[0].dtype in vector_dtypes and element_of(args[0].dtype) is uint), \
         "invalid parameter"
     # clz(uint) -> uint
     # clz(vector<uint>) -> vector<uint>

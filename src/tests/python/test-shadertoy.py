@@ -1,8 +1,10 @@
-from luisa import *
-from luisa.types import *
-from luisa.builtin import *
-import numpy as np
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.builtin import *
+from luisa.types import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]

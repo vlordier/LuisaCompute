@@ -1,7 +1,8 @@
+from .atomic import float_atomic_functions, int_atomic_functions
 from .dylibs import lcapi
-from .types import dtype_of, to_lctype, nameof
-from .atomic import int_atomic_functions, float_atomic_functions
-from .types import uint, uint, short, ushort
+from .types import dtype_of, nameof, short, to_lctype, uint, ushort
+
+
 class Array:
     def __init__(self, arr):
         if type(arr) is Array:

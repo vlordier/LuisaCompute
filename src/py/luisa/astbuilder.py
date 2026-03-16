@@ -1,16 +1,38 @@
 import ast
-import inspect
 import sys
-from types import SimpleNamespace, ModuleType
-from .types import length_of, element_of, vector, uint, implicit_convertible, short, ushort, long, ulong
+from types import ModuleType, SimpleNamespace
+
 from . import globalvars
+from .builtin import (
+    builtin_bin_op,
+    builtin_func,
+    builtin_func_names,
+    builtin_type_cast,
+    builtin_unary_op,
+    callable_call,
+    wrap_with_tmp_var,
+)
 from .dylibs import lcapi
-from .builtin import builtin_func_names, builtin_func, builtin_bin_op, builtin_type_cast, \
-    builtin_unary_op, callable_call, wrap_with_tmp_var
-from .types import dtype_of, to_lctype, CallableType, vector_dtypes, matrix_dtypes
-from .types import BuiltinFuncType, BuiltinFuncBuilder
-from .vector import is_swizzle_name, get_swizzle_code, get_swizzle_resulttype
 from .struct import StructType
+from .types import (
+    BuiltinFuncBuilder,
+    BuiltinFuncType,
+    CallableType,
+    dtype_of,
+    element_of,
+    implicit_convertible,
+    length_of,
+    long,
+    matrix_dtypes,
+    short,
+    to_lctype,
+    uint,
+    ulong,
+    ushort,
+    vector,
+    vector_dtypes,
+)
+from .vector import get_swizzle_code, get_swizzle_resulttype, is_swizzle_name
 
 
 def ctx():
@@ -192,9 +214,7 @@ class ASTVisitor:
         build(node.value)
         node.lr = node.value.lr
         build(node.slice)
-        if type(node.value.dtype).__name__ == "ArrayType":
-            node.dtype = node.value.dtype.dtype
-        elif type(node.value.dtype).__name__ == "SharedArrayType":
+        if type(node.value.dtype).__name__ == "ArrayType" or type(node.value.dtype).__name__ == "SharedArrayType":
             node.dtype = node.value.dtype.dtype
         elif node.value.dtype in vector_dtypes:
             node.dtype = element_of(node.value.dtype)
@@ -322,7 +342,7 @@ class ASTVisitor:
             dtype = rhs.dtype  # craete variable with same type as rhs
             # store type & ptr info into name
             # ref type
-            
+
             if type(rhs.dtype).__name__ == "SharedArrayType":
                 ctx().local_variable[lhs.id] = VariableInfo(dtype, rhs.expr)
                 lhs.expr = rhs.expr
@@ -458,7 +478,7 @@ class ASTVisitor:
                         for x in c.body:
                             build(x)
             return
-        if not node.subject.dtype in {int, uint, short, ushort, long, ulong}:
+        if node.subject.dtype not in {int, uint, short, ushort, long, ulong}:
             raise TypeError(f"Match condition must be int or uint, got {node.subject.dtype}")
         switch_stmt = lcapi.builder().switch_(node.subject.expr)
         with switch_stmt.body():

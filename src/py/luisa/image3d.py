@@ -1,12 +1,12 @@
-from .dylibs import lcapi
-from . import globalvars
-from .globalvars import get_global_device
-from .types import length_of, element_of, vector, to_lctype
 from functools import cache
-from .func import func
+
+from . import globalvars
 from .builtin import _builtin_call, check_exact_signature
+from .dylibs import lcapi
+from .func import func
+from .globalvars import get_global_device
 from .mathtypes import *
-from .types import uint, uint3, BuiltinFuncBuilder
+from .types import BuiltinFuncBuilder, element_of, length_of, to_lctype, uint, uint3, vector
 
 
 def _check_storage(storage_name, dtype):
@@ -20,9 +20,9 @@ class Image3D:
     def __init__(self, width, height, volume, channel, dtype, mip=1, storage=None, external_memory=None):
         if width == 0 or height == 0 or volume == 0:
             raise Exception("Image3D size must be non-zero")
-        if not dtype in {int, uint, float}:
+        if dtype not in {int, uint, float}:
             raise Exception('Image3D only supports int / uint / float')
-        if not channel in (1, 3, 4):
+        if channel not in (1, 3, 4):
             raise Exception('Image3D can only have 1/2/4 channels')
         self.width = width
         self.height = height
@@ -142,11 +142,11 @@ class Texture3DType:
 
     def __hash__(self):
         return hash(self.dtype) ^ hash(self.channel) ^ 127858794396757894
-    
+
     @BuiltinFuncBuilder
     def texture_size(self):
         return uint3, lcapi.builder().call(to_lctype(uint3), lcapi.CallOp.TEXTURE_SIZE, [self.expr])
-    
+
     @staticmethod
     @cache
     def get_read_method(dtype):

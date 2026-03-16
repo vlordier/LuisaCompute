@@ -1,5 +1,5 @@
-from .types import BuiltinFuncBuilder, basic_dtypes, to_lctype
 from .dylibs import lcapi
+from .types import BuiltinFuncBuilder, to_lctype
 
 
 def autodiff():

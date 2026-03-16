@@ -1,14 +1,26 @@
-from .dylibs import lcapi
-from . import globalvars
-from .globalvars import get_global_device
-from .types import to_lctype, from_lctype, basic_dtypes, dtype_of, BuiltinFuncBuilder
-from .types import vector_dtypes, matrix_dtypes, element_of, length_of
 from functools import cache
-from .mathtypes import *
+
+from . import globalvars
+from .atomic import float_atomic_functions, int_atomic_functions
 from .builtin import check_exact_signature
-from .types import uint, uint, uint3, short, ushort, long, ulong
-from .struct import CustomType
-from .atomic import int_atomic_functions, float_atomic_functions
+from .dylibs import lcapi
+from .globalvars import get_global_device
+from .mathtypes import *
+from .types import (
+    BuiltinFuncBuilder,
+    basic_dtypes,
+    dtype_of,
+    element_of,
+    from_lctype,
+    length_of,
+    matrix_dtypes,
+    short,
+    to_lctype,
+    uint,
+    uint3,
+    ushort,
+    vector_dtypes,
+)
 
 
 class Buffer:

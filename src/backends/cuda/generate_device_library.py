@@ -1,4 +1,3 @@
-from os.path import realpath, dirname
 from sys import argv
 
 HALF_IMPL = '''
@@ -612,10 +611,10 @@ struct lc_float{i}x{i} {{
 
         # ctz
         print(
-            f"[[nodiscard]] __device__ inline auto lc_ctz_impl(lc_uint x) noexcept {{ return (__ffs(x) - 1u) % 32u; }}",
+            "[[nodiscard]] __device__ inline auto lc_ctz_impl(lc_uint x) noexcept { return (__ffs(x) - 1u) % 32u; }",
             file=file)
         print(
-            f"[[nodiscard]] __device__ inline auto lc_ctz_impl(lc_ulong x) noexcept {{ return (__ffsll(x) - 1u) % 64u; }}",
+            "[[nodiscard]] __device__ inline auto lc_ctz_impl(lc_ulong x) noexcept { return (__ffsll(x) - 1u) % 64u; }",
             file=file)
         generate_vector_call("ctz", "lc_ctz_impl", "uz", ["x"])
 
@@ -999,7 +998,7 @@ public:
         non_differentiable_types = [
              "lc_short", "lc_ushort", "lc_int", "lc_uint", "lc_long", "lc_ulong", "lc_bool",'lc_byte', 'lc_ubyte',
             'lc_byte2', 'lc_byte3', 'lc_byte4',
-            'lc_ubyte2', 'lc_ubyte3', 'lc_ubyte4',           
+            'lc_ubyte2', 'lc_ubyte3', 'lc_ubyte4',
             "lc_short2", "lc_short3", "lc_short4",
             "lc_ushort2", "lc_ushort3", "lc_ushort4",
             "lc_int2", "lc_int3", "lc_int4",

@@ -20,7 +20,7 @@ def convert_ty(ty):
     return m[ty]
 
 
-f = open('api.h', 'r')
+f = open('api.h')
 out = open('../rust/luisa_compute_backend/src/binding.rs', 'w')
 lines = f.readlines()
 out.write('use luisa_compute_api_types as api;\n')

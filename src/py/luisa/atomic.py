@@ -1,8 +1,6 @@
+from .builtin import check_exact_signature
 from .dylibs import lcapi
 from .types import BuiltinFuncBuilder
-from .func import func
-from .builtin import check_exact_signature
-
 
 # because indexed access of buffer isn't officially supported (by astbuilder),
 # here we provide the buffer access function for atomic operations
@@ -169,6 +167,6 @@ def _atomic_access_call(n_dtype, n_op_name, buf, idx, member_nest_level, *args):
         assert type(args[l]).__name__ == "Constant"
         chain.member(args[l].value)
     return dtype, chain.operate(op, [x.expr for x in args[member_nest_level.value:]])
-    
 
-__all__ = ["int_atomic_functions", "float_atomic_functions", "_atomic_access_call"]
+
+__all__ = ["_atomic_access_call", "float_atomic_functions", "int_atomic_functions"]

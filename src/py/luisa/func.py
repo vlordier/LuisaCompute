@@ -4,18 +4,17 @@ except ImportError:
     print('sourceinspect not installed. This may cause issues in interactive mode (REPL).')
     import inspect as sourceinspect
     # need sourceinspect for getting source. see (#10)
-import inspect
 import ast
-
-from .dylibs import lcapi
-from . import globalvars, astbuilder
-from .builtin import builtin_func_names
-from .globalvars import get_global_device
-from .types import dtype_of, to_lctype, implicit_convertible, basic_dtypes, uint
-from .astbuilder import VariableInfo
+import inspect
 import textwrap
 from pathlib import Path
-import sys
+
+from . import astbuilder, globalvars
+from .astbuilder import VariableInfo
+from .builtin import builtin_func_names
+from .dylibs import lcapi
+from .globalvars import get_global_device
+from .types import basic_dtypes, dtype_of, implicit_convertible, to_lctype
 
 
 def create_arg_expr(dtype, allow_ref):
@@ -91,7 +90,7 @@ class FuncInstanceInfo:
         sig = inspect.signature(pyfunc)
         return {param.name: param.default for param in sig.parameters.values()
                 if param.default is not inspect.Parameter.empty}
-    
+
     def build_arguments(self, allow_ref: bool, arg_info=None):
         if arg_info is None:
             for idx, name in enumerate(self.func.parameters):
@@ -250,7 +249,7 @@ class func:
                     type_defines.append("luisa::compute::" + name)
                 elif arg.__name__ == "ByteBufferType":
                     if name == None:
-                        name = f"ByteBuffer"
+                        name = "ByteBuffer"
                         type_map[arg] = name
                         if not byte_buffer_declared:
                             front += "#include <luisa/runtime/byte_buffer.h>\n"
@@ -279,9 +278,9 @@ class func:
                     type_defines.append("luisa::compute::" + name)
                 else:
                     assert False
-                    
+
             dimension = f.builder.dimension()
-            func_declare = "" 
+            func_declare = ""
             func_declare += f"luisa::compute::Shader{dimension}D<"
             type_name = ""
             sz = 0
@@ -292,7 +291,7 @@ class func:
                     type_name += ", "
             func_declare += type_name + ">"
             r += "using Type = " + func_declare + ";\n"
-            r += f"inline Type load" + "(luisa::compute::Device &device, luisa::string_view path) {\n    return device.load_shader<" + str(dimension) + ", " + type_name + ">(path);\n}\n"
+            r += "inline Type load" + "(luisa::compute::Device &device, luisa::string_view path) {\n    return device.load_shader<" + str(dimension) + ", " + type_name + ">(path);\n}\n"
             return front + "namespace " + shader_name + ' {\n' +  r + '}// namespace ' + shader_name + '\n'
 
     # compiles an argument-type-specialized callable/kernel
