@@ -12,7 +12,7 @@ LUISA_EXPORT_API void destroy(luisa::compute::DeviceInterface *device) noexcept 
 
 LUISA_EXPORT_API void backend_device_names(luisa::vector<luisa::string> &names) noexcept {
     names.clear();
-    names.emplace_back("Unknown");// TODO
+    names.emplace_back("Unknown");// Note: remote backend exposes a single unnamed device; refine when device enumeration is implemented.
 }
 
 #include "../common/export_version.inl.h"

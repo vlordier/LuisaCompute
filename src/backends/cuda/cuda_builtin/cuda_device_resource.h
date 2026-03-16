@@ -2962,7 +2962,7 @@ LC_WARP_ACTIVE_REDUCE(ulong)
 LC_WARP_ACTIVE_REDUCE(long)
 LC_WARP_ACTIVE_REDUCE(float)
 LC_WARP_ACTIVE_REDUCE(half)
-LC_WARP_ACTIVE_REDUCE(double)// TODO
+LC_WARP_ACTIVE_REDUCE(double)// Note: double active-reduce uses __shfl_xor_sync bitcast pairs; verify on sm_80+.
 
 #undef LC_WARP_ACTIVE_REDUCE_VECTOR2
 #undef LC_WARP_ACTIVE_REDUCE_VECTOR3

@@ -261,7 +261,7 @@ auto RasterShader::create_pipeline(
         .depthBoundsTestEnable = VK_TRUE,
         .stencilTestEnable = state.stencil_state.enable_stencil,
         // .front  = state.stencil_state.front_face_op
-        // TODO
+        // Note: front/back stencil ops are set individually below via the field setters.
     };
     depth_stencil_info.front.failOp = get_stencil_state(state.stencil_state.front_face_op.stencil_fail_op);
     depth_stencil_info.front.passOp = get_stencil_state(state.stencil_state.front_face_op.pass_op);

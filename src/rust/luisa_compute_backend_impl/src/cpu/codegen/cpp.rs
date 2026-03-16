@@ -575,7 +575,7 @@ impl<'a> FunctionEmitter<'a> {
             Func::Log => Some("lc_log"),
             Func::Log2 => Some("lc_log2"),
             Func::Log10 => Some("lc_log10"),
-            Func::Powi => Some("lc_powi"), // TODO: powi
+            Func::Powi => Some("lc_powi"), // Note: lc_powi is mapped here; verify integer-exponent behavior matches GLSL/HLSL powi semantics.
             Func::Powf => Some("lc_pow"),
 
             Func::Sqrt => Some("lc_sqrt"),

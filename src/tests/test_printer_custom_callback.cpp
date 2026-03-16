@@ -1,5 +1,6 @@
 #ifdef LUISA_CUSTOM_LOGGER
-// TODO: tests
+// Note: Tests for custom logger callback are not yet written. Add test cases for
+//       luisa::set_log_callback() here once the custom logger API is stabilized.
 int main() {
 }
 #else

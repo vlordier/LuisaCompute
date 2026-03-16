@@ -345,7 +345,7 @@ luisa::string cpu_name() noexcept {
     }
     return brand;
 #else
-    return "Unknown ARM64";// TODO: implement this
+    return "Unknown ARM64";// Note: detailed ARM64 brand string not yet implemented; query /proc/cpuinfo or sysctl hw.model for the real value.
 #endif
 }
 #else

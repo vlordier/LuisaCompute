@@ -174,7 +174,7 @@ extern "C" fn destroy_context(ctx: api::Context) {
 unsafe extern "C" fn create_device(
     ctx: api::Context,
     device: *const c_char,
-    _config: *const c_char, // TODO: respect config
+    _config: *const c_char, // Note: device config string is currently ignored; parse JSON config here to support headless mode, device index, etc.
 ) -> DeviceInterface {
     let device = CStr::from_ptr(device).to_str().unwrap();
     // let config = CStr::from_ptr(config).to_str().unwrap();

@@ -152,7 +152,8 @@ const Type* buffer_dtype_from_dltensor(DLTensor t)
 
 
 int32_t get_dlndim(const Type *type) {
-    // TODO: support buffer of array
+    // Note: Buffer-of-array element types are not yet mapped to DLPack ndim.
+    //       Arrays would need to contribute additional dimensions beyond the scalar/vector/matrix cases.
     if (type->is_scalar())
         return 1;
     if (type->is_vector())

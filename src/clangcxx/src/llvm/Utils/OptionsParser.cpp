@@ -118,7 +118,7 @@ llvm::Error OptionsParser::init(int &argc, const char **argv,
     if (SourcePathList.empty()) {
         return llvm::Error::success();
     }
-    // TODO: Create CompilationDatabase
+    // Note: CompilationDatabase creation is deferred; a FixedCompilationDatabase with empty flags is used as a fallback.
     if (!Compilations) {
         Compilations = std::make_unique<FixedCompilationDatabase>(".", std::vector<std::string>());
         if (!Compilations) {

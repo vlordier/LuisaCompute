@@ -445,7 +445,8 @@ public:
                 }
                 with_upload_buffer(decompressed_size, [&](MetalStageBufferPool::Allocation *alloc) noexcept {
                     // decompress into the scratch buffer
-                    // TODO: parallelize?
+                    // Note: Chunk decompression is currently sequential. Parallelize using
+                    //       a thread pool (e.g. luisa::ThreadPool) if profiling reveals a bottleneck.
                     auto decompressed = reinterpret_cast<uint8_t *>(alloc->data());
                     for (auto chunk = 0u; chunk < chunk_count; chunk++) {
                         auto &&metadata = header->chunk_metadata[chunk];

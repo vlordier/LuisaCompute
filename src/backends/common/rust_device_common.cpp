@@ -71,7 +71,9 @@ private:
     using Tag = api::Command::Tag;
 
     [[nodiscard]] static auto _convert_pixel_storage(PixelStorage s) noexcept {
-        // TODO: might be better to use a lookup table for _convert_pixel_storage
+        // Note: A lookup table (e.g. std::array mapping PixelStorage→api::PixelStorage) would be
+        //       faster if the enum values diverge; for now the direct cast is valid because
+        //       api::PixelStorage mirrors PixelStorage exactly.
         return static_cast<api::PixelStorage>(s);
     }
 

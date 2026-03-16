@@ -51,14 +51,15 @@ ResourceCreationInfo VkNativeResourceExt::register_external_depth_buffer(
     uint height,
     // custom data see backends' header
     void *custom_data) noexcept {
-    // TODO
+    // Note: External depth-buffer registration is not yet implemented for Vulkan.
+    //       Import the depth texture via VkExternalMemoryImageCreateInfo when needed.
     return ResourceCreationInfo::make_invalid();
 }
 
 SwapchainCreationInfo VkNativeResourceExt::register_external_swapchain(
     void *swapchain_ptr,
     bool vsync) noexcept {
-    // TODO
+    // Note: External swapchain registration is not yet implemented for Vulkan.
     SwapchainCreationInfo s;
     s.invalidate();
     return s;
