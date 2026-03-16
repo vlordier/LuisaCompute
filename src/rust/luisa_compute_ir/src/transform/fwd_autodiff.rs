@@ -5,8 +5,8 @@ use smallvec::SmallVec;
 
 use crate::{
     ir::{
-        BasicBlock, Const, Func, Instruction, IrBuilder, Module, ModuleFlags, ModuleKind,
-        ModulePools, NodeRef, PhiIncoming, SwitchCase, CurveBasisSet,
+        BasicBlock, Const, CurveBasisSet, Func, Instruction, IrBuilder, Module, ModuleFlags,
+        ModuleKind, ModulePools, NodeRef, PhiIncoming, SwitchCase,
     },
     *,
 };

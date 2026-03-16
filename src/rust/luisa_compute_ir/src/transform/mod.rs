@@ -4,14 +4,13 @@ pub mod ssa;
 // pub mod validate;
 pub mod vectorize;
 // pub mod eval;
+pub mod dce;
 pub mod fwd_autodiff;
+pub mod inliner;
 pub mod ref2ret;
 pub mod reg2mem;
-pub mod dce;
-pub mod inliner;
 
 use crate::ir::{self, ModuleFlags};
-
 
 pub trait Transform {
     fn transform(&self, module: ir::Module) -> ir::Module;

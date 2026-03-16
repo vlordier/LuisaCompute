@@ -1313,7 +1313,7 @@ impl<'a> FunctionEmitter<'a> {
                 self.atomic_chain_op(var, node_ty_s, args, args_v, "lc_atomic_fetch_xor", 1);
                 true
             }
-            Func::External(_)=>{
+            Func::External(_) => {
                 panic!("Use CpuFn/CpuCallable to pass closures to kernel directly instead of ExternalCallable on cpu backend!.");
                 true
             }
@@ -1553,9 +1553,7 @@ impl<'a> FunctionEmitter<'a> {
                     "const {0} {1} = {2};",
                     node_ty_s,
                     var,
-                    decode_const_data(bytes.as_ref(), t, &|ty|{
-                        self.type_gen.gen_c_type(ty)
-                    })
+                    decode_const_data(bytes.as_ref(), t, &|ty| { self.type_gen.gen_c_type(ty) })
                 )
                 .unwrap();
                 // let gen_def = |dst: &mut String, qualifier| {

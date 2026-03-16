@@ -76,7 +76,7 @@ impl UseDef {
                         .entry(*value)
                         .or_insert(HashSet::new())
                         .insert(dst);
-                    
+
                     self.uses.entry(*node).or_insert(HashSet::new()).insert(dst);
 
                     self.uses

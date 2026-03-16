@@ -1,5 +1,8 @@
 # rustfmt configuration for the LuisaCompute Rust workspace.
 # Keep this file in sync with any editor / IDE format-on-save settings.
+# Only stable rustfmt options are used here; nightly-only options
+# (imports_granularity, group_imports, trailing_comma) are omitted so that
+# the formatter works with the stable toolchain installed in CI.
 
 edition = "2021"
 
@@ -8,15 +11,6 @@ max_width = 100
 
 # Use the default set of heuristics for short items
 use_small_heuristics = "Default"
-
-# Merge imports within each group (std / external / crate) but keep groups separate
-imports_granularity = "Module"
-
-# Enforce the conventional import group order: std → external → crate-local
-group_imports = "StdExternalCrate"
-
-# Always include trailing commas in multi-line constructs for cleaner diffs
-trailing_comma = "Vertical"
 
 # Reorder module-level `use` declarations alphabetically within groups
 reorder_imports = true

@@ -68,6 +68,13 @@ target-version = "py310"
 # Use a generous line length; hard wrap is not enforced (see ruff.lint ignore E501)
 line-length = 120
 
+# Exclude vendored / generated Python scripts that are not first-party code.
+extend-exclude = [
+    "src/backends/metal/metal-cpp",       # vendored Apple Metal-CPP headers & tools
+    "src/backends/cuda/lcub/codegen",     # CUDA CUB wrapper codegen scripts
+    "src/backends/metal/metal-tex-compress",  # third-party texture compression tool
+]
+
 [tool.ruff.lint]
 # Enable a comprehensive set of rule families:
 #   E/W  — pycodestyle errors & warnings (PEP 8 style)
@@ -102,8 +109,34 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Test/example scripts may use wildcard imports and don't need strict naming
-"src/tests/**"       = ["F401", "F403", "F811", "N", "UP"]
-"src/py/luisa/vector.py" = ["N", "RUF"]  # auto-generated vector swizzle boilerplate
+"src/tests/**" = ["F401", "F403", "F405", "F811", "N", "UP", "W191", "E101", "E402"]
+# The DSL type definitions use lowercase class names (uint, half, short, …) to
+# mirror C++ primitive types — suppress N801 (invalid-class-name) for these files.
+"src/py/luisa/types.py"      = ["N801"]
+"src/py/luisa/lcapi.pyi"     = ["N801"]
+"src/py/luisa/mathtypes.pyi" = ["N801"]
+# The `func` class implements the @func decorator; its lowercase name is part of
+# the public DSL API (users write `@luisa.func`) and cannot be renamed.
+# It also uses `from .mathtypes import *` for vector types in the DSL.
+"src/py/luisa/func.py" = ["N801", "F403", "F405"]
+# __init__.py files are public-API re-export modules; E402 and F401/F403/F405 are
+# intentional (imports must follow a conditional Jupyter detection block, and
+# every imported name is re-exported for callers of `import luisa`).
+"src/py/luisa/__init__.py" = ["E402", "F401", "F403", "F405"]
+# These DSL library files use `from .mathtypes import *` to get all vector types
+# into scope — the same pattern as the generated kernel bodies they support.
+"src/py/luisa/accel.py"    = ["F403", "F405"]
+"src/py/luisa/bindless.py" = ["F403", "F405"]
+"src/py/luisa/buffer.py"   = ["F403", "F405"]
+"src/py/luisa/builtin.py"  = ["F403", "F405"]
+"src/py/luisa/hit.py"      = ["F403", "F405"]
+"src/py/luisa/image2d.py"  = ["F403", "F405"]
+"src/py/luisa/image3d.py"  = ["F403", "F405"]
+"src/py/luisa/raster.py"   = ["F403", "F405"]
+"src/py/luisa/rayquery.py" = ["F403", "F405"]
+"src/py/luisa/util.py"     = ["F403", "F405"]
+# auto-generated vector swizzle boilerplate
+"src/py/luisa/vector.py" = ["N", "RUF"]
 
 # ---------------------------------------------------------------------------
 # mypy — static type checker
