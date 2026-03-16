@@ -276,7 +276,9 @@ void AggregateFieldBitmask::BitSpan::flip() noexcept {
     }
 }
 
-// TODO: Implement the following methods in a SIMD-friendly way
+// TODO: The following bitwise operators iterate bit-by-bit. They could be optimized by
+//       operating on full 64-bit words at a time (SIMD-friendly), aligning the offsets
+//       and processing multiple bits per iteration. Currently correctness is prioritized.
 AggregateFieldBitmask::BitSpan &AggregateFieldBitmask::BitSpan::operator|=(const ConstBitSpan &rhs) noexcept {
     LUISA_DEBUG_ASSERT(_size == rhs.size(), "Size mismatch.");
     for (auto i = 0u; i < _size; i++) {

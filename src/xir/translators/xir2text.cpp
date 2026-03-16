@@ -622,7 +622,7 @@ private:
             case DerivedFunctionTag::EXTERNAL: _main << "external " << _value_ident(f) << ": " << _type_ident(f->type()); break;
         }
         _main << " (";
-        // TODO: metadata
+        // TODO: Emit function-level metadata (e.g. name, location) before the argument list
         if (!f->arguments().empty()) { _main << "\n"; }
         for (auto arg : f->arguments()) {
             if (!arg->metadata_list().empty()) {
@@ -761,7 +761,7 @@ private:
             _emit_metadata_list(_prelude, module->metadata_list());
             _prelude << "\n";
         }
-        _prelude << "module;\n\n";// TODO: metadata
+        _prelude << "module;\n\n";// TODO: emit module-level metadata after the module keyword
         for (auto c : module->constant_list()) { _emit_constant(c); }
         for (auto f : module->function_list()) { _emit_function(f); }
     }

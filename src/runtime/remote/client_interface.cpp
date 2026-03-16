@@ -39,7 +39,9 @@ BufferCreationInfo ClientInterface::create_buffer(
 BufferCreationInfo ClientInterface::create_buffer(const ir::CArc<ir::Type> *element,
                                                   size_t elem_count,
                                                   void *external_memory /* nullptr if now imported from external memory */) noexcept {
-    // TODO
+    // TODO: Serialize the IR-typed buffer creation and send to the server.
+    //       The ir::CArc<ir::Type> variant is not yet handled; use the AST-based
+    //       create_buffer overload as a reference for the serialization protocol.
     return BufferCreationInfo::make_invalid();
 }
 void ClientInterface::destroy_buffer(uint64_t handle) noexcept {
@@ -487,7 +489,8 @@ void ClientInterface::destroy_accel(uint64_t handle) noexcept {
 // query
 luisa::string ClientInterface::query(luisa::string_view property) noexcept { return {}; }
 DeviceExtension *ClientInterface::extension(luisa::string_view name) noexcept {
-    // TODO
+    // TODO: Implement extension lookup by forwarding the query to the remote server
+    //       and returning a proxy object that serializes extension calls over the network.
     return nullptr;
 }
 void ClientInterface::set_name(luisa::compute::Resource::Tag resource_tag, uint64_t resource_handle, luisa::string_view name) noexcept {}

@@ -11,7 +11,9 @@ namespace luisa::compute::xir {
 
 namespace detail {
 
-// TODO: we only handle local alloca's in straight-line code for now
+// TODO: Currently only handles local alloca's in straight-line (single basic block) code.
+//       Extend to handle stores/loads across multiple basic blocks using dominance information
+//       (the dom_tree pass is already available) for a more complete store-forwarding analysis.
 static void run_local_store_forward_on_basic_block(luisa::unordered_set<BasicBlock *> &visited,
                                                    BasicBlock *block,
                                                    LocalStoreForwardInfo &info) noexcept {

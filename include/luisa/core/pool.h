@@ -71,7 +71,7 @@ public:
         _available_objects = std::move(rhs._available_objects);
         return *this;
     }
-    Pool &operator=(const Pool &) noexcept = default;
+    Pool &operator=(const Pool &) noexcept = delete;
 
     /**
      * @brief Destroy the Pool object.
