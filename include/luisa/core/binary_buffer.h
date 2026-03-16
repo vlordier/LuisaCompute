@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include <luisa/core/stl/vector.h>
 #include <luisa/core/stl/memory.h>
 #include <luisa/core/intrin.h>
@@ -21,10 +23,12 @@ public:
         : _bytes{std::move(bytes)} {}
     template<typename T>
     void write(T value) noexcept {
+        static_assert(std::is_trivially_copyable_v<T>, "T must be trivially copyable for binary serialization.");
         _write_bytes(&value, sizeof(T), alignof(T));
     }
     template<typename T>
     void write(const T *data, size_t size) noexcept {
+        static_assert(std::is_trivially_copyable_v<T>, "T must be trivially copyable for binary serialization.");
         _write_bytes(data, size * sizeof(T), alignof(T));
     }
     void clear() noexcept { _bytes.clear(); }
@@ -49,14 +53,18 @@ public:
         : BinaryBufferReader{buffer.data(), buffer.size()} {}
     template<typename T>
     [[nodiscard]] auto read() noexcept {
+        static_assert(std::is_trivially_copyable_v<T>, "T must be trivially copyable for binary deserialization.");
         _offset = align(_offset, alignof(T));
         LUISA_ASSUME(_offset + sizeof(T) <= _size);
         auto ptr = _bytes + _offset;
         _offset += sizeof(T);
-        return *reinterpret_cast<const T *>(ptr);// FIXME: this is UB
+        T value;
+        std::memcpy(&value, ptr, sizeof(T));
+        return value;
     }
     template<typename T>
     void read(T *dst, size_t n) noexcept {
+        static_assert(std::is_trivially_copyable_v<T>, "T must be trivially copyable for binary deserialization.");
         _offset = align(_offset, alignof(T));
         auto size = n * sizeof(T);
         LUISA_ASSUME(_offset + size <= _size);

@@ -7,7 +7,7 @@
 #include <luisa/core/stl/memory.h>
 
 #ifndef NDEBUG
-#define LUISA_MANAGED_OBJECT_CANARY 0xDEADBEEF
+inline constexpr uint32_t LUISA_MANAGED_OBJECT_CANARY = 0xDEADBEEFu;
 #endif
 
 namespace luisa {
@@ -255,7 +255,7 @@ public:
         return get() == rhs.get();
     }
 
-    [[nodiscard]] bool operator==(std::nullptr_t) const { return !is_engaged(); }
+    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return !is_engaged(); }
 
     template<typename U>
         requires requires(T *p) { static_cast<const U *>(p); }

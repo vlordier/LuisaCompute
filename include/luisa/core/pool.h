@@ -21,7 +21,7 @@ template<typename T, bool thread_safe = true, bool check_recycle = !std::is_triv
 class Pool : public thread_safety<conditional_mutex_t<true, luisa::spin_mutex>> {
 
 public:
-    static constexpr auto block_size = 64u;
+    static constexpr auto block_size = 64u;///< number of objects allocated per block
 
 private:
     luisa::vector<T *> _blocks;
@@ -119,6 +119,24 @@ public:
     void destroy(T *object) noexcept {
         if constexpr (!std::is_trivially_destructible_v<T>) { object->~T(); }
         deallocate(object);
+    }
+
+    /**
+     * @brief Returns the total number of objects managed by this pool.
+     */
+    [[nodiscard]] auto capacity() const noexcept {
+        return with_lock([this] {
+            return _blocks.size() * block_size;
+        });
+    }
+
+    /**
+     * @brief Returns the number of objects currently available (not allocated).
+     */
+    [[nodiscard]] auto available() const noexcept {
+        return with_lock([this] {
+            return _available_objects.size();
+        });
     }
 };
 
