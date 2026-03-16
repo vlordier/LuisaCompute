@@ -41,7 +41,9 @@ namespace luisa {
 using std::vector;
 using bitvector = std::vector<bool>;
 
-// FIXME: we should implement an efficient fixed_vector
+// Note: When LUISA_USE_SYSTEM_STL is active, fixed_vector falls back to std::vector and loses
+// the stack-storage optimization (no small-buffer inline storage). An inline_vector or
+// small_vector implementation backed by std::array + fallback heap would be the proper fix.
 template<typename T, size_t node_count, bool allow_overflow = true>
 using fixed_vector = std::vector<T>;
 

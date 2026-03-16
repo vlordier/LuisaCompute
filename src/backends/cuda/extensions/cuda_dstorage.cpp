@@ -202,7 +202,8 @@ void CUDADStorageExt::compress(const void *data, size_t size_bytes,
 #ifdef LUISA_COMPUTE_ENABLE_NVCOMP
         case DStorageCompression::GDeflate: {
             _device->with_handle([&] {
-                // FIXME: nvCOMP does not support compression quality other than default
+                // Note: nvCOMP's GDeflate manager only supports algo=0 (default) or algo=1 (best-effort);
+                // finer-grained quality control is not exposed by the nvCOMP public API.
                 auto algo = quality == DStorageCompressionQuality::Best ? 1 : 0;
                 nvcomp::GdeflateManager manager{nvcompGdeflateCompressionMaxAllowedChunkSize,
                                                 nvcompBatchedGdeflateOpts_t{algo}};

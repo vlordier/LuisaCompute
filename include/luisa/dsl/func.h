@@ -469,7 +469,7 @@ private:
     luisa::shared_ptr<ExternalFunction> _func;
 
 private:
-    // FIXME: Resource arguments (buffers, images, volumes) are not yet tracked here;
+    // Note: Resource arguments (buffers, images, volumes) are not yet tracked here;
     //        they always report READ usage. Full resource support requires plumbing
     //        usage information through ExternalFunction and the backend compilers.
     template<typename T>

@@ -23,7 +23,9 @@ protected:
 
 public:
     FallbackPrim(RTCDevice device, RTCGeometryType geom_type, const AccelOption &option) noexcept;
-    // FIXME: workaround for curve that cannot decide geometry type on construction
+    // Workaround: curve primitives cannot determine their RTCGeometryType at construction time
+    // (the basis type is only known after the curve data is uploaded). This constructor defers
+    // geometry creation; _create_geometry() must be called explicitly before committing the scene.
     FallbackPrim(RTCDevice device, const AccelOption &option) noexcept;
     [[nodiscard]] bool is_motion_instance() const noexcept final { return false; }
     [[nodiscard]] virtual bool is_curve() const noexcept { return false; }

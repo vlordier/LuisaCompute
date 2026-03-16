@@ -137,8 +137,9 @@ public:
         auto frame = new Frame{wxSize{1280, 720}};
 
         auto renderer = new Renderer{frame, *_device, *_stream};
-        // FIXME: initializing in the ctor or on create event
-        //  doesn't work on Windows, so doing it here manually.
+        // Note: Calling renderer->initialize() in the ctor or on wxEVT_CREATE does not work
+        // on Windows (the window handle is not yet valid at those points). Explicit post-creation
+        // initialization here is the correct wxWidgets pattern for this platform.
         renderer->initialize();
 
         auto overlay = new wxWindow{renderer, wxID_ANY};

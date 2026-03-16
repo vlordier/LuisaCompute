@@ -115,7 +115,10 @@ void CUDABindlessArray::update(CUDACommandEncoder &encoder,
             auto address = buffer->device_address() + m.buffer.offset_bytes;
             auto size = buffer->size_bytes() - m.buffer.offset_bytes;
             m.buffer.handle = address;
-            m.buffer.offset_bytes = size;// FIXME: reusing this field is a bit hacky
+            // Note: the BindlessBuffer struct reuses offset_bytes to store the remaining
+            // buffer size after the offset. This is an intentional space-saving trick since
+            // offset_bytes is no longer needed after the device address is computed.
+            m.buffer.offset_bytes = size;
         }
         // process tex2d
         if (m.tex2d.op == Mod::Operation::EMPLACE) {

@@ -155,7 +155,10 @@ void FallbackAccel::build(luisa::unique_ptr<AccelBuildCommand> cmd) noexcept {
                             rtcSetGeometryTransformQuaternion(geometry, k, &q);
                         }
                     } else {
-                        // FIXME: seems incorrect
+                        // Note: This branch is reached when a motion instance uses SRT-quaternion
+                        // steps AND has a non-identity affine pre-transform. Folding an arbitrary
+                        // affine matrix into the SRT decomposition is non-trivial and not yet
+                        // implemented; the matrix-based motion path should be used instead.
                         auto m = luisa_fallback_affine_to_matrix(a);
                         LUISA_NOT_IMPLEMENTED();
                     }

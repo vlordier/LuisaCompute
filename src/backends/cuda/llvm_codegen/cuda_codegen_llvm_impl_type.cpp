@@ -388,7 +388,10 @@ llvm::Type *CUDACodegenLLVMImpl::_get_llvm_ray_query_type() noexcept {
 std::pair<llvm::Value *, const Type *>
 CUDACodegenLLVMImpl::_lower_access_chain_address(IB &b, FunctionContext &func_ctx, llvm::Value *llvm_ptr,
                                                  const Type *type, luisa::span<const xir::Use *const> index_uses) noexcept {
-    // FIXME: we directly calculate the address here, which might hinder LLVM optimizations
+    // Note: Using raw GEP with a computed byte offset instead of LLVM's typed alloca+GEP pattern
+    // prevents alias analysis from reasoning about pointer provenance, potentially blocking
+    // mem2reg, SROA, and load/store forwarding passes. Switch to typed GEP when the xir->LLVM
+    // lowering is stable enough to carry struct type information through the address chain.
     LUISA_DEBUG_ASSERT(llvm_ptr->getType()->isPointerTy());
     for (auto index_use : index_uses) {
         auto llvm_index = _get_llvm_value(b, func_ctx, index_use->value());

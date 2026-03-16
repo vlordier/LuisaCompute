@@ -470,7 +470,7 @@ inline optix::ShaderBindingTable CUDAShaderOptiX::_make_sbt() const noexcept {
     sbt.hitgroupRecordCount = 10u;
     sbt.hitgroupRecordStrideInBytes = sizeof(OptiXSBTRecord);
     sbt.missRecordBase = _sbt_buffer + sizeof(OptiXSBTRecord) * 10u;
-    sbt.missRecordCount = 1u;// FIXME: we are not using miss shaders but it's mandatory to set this to 1
+    sbt.missRecordCount = 1u;// OptiX requires missRecordCount >= 1 even when no miss shaders are used
     sbt.missRecordStrideInBytes = sizeof(OptiXSBTRecord);
     return sbt;
 }

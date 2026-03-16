@@ -423,7 +423,9 @@ protected:
     [[nodiscard]] uint64_t _compute_hash() const noexcept override;
 
 public:
-    // FIXME: too hacky
+    // Note: _unsafe_set_custom is a post-construction mutator needed because the callee
+    // may not be known at CallExpr construction time (e.g. forward-declared callables).
+    // Ideally this would be set via the constructor; tracked as a known design limitation.
     void _unsafe_set_custom(CustomCallee callee) const noexcept;
 
 public:

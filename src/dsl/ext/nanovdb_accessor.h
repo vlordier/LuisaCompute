@@ -1,4 +1,10 @@
-#include <luisa/luisa-compute.h>// FIXME: do not include the universal header in public headers
+#pragma once
+// Note: This file uses the full luisa-compute DSL surface (DSL vars, ite, cast, BindlessArray, etc.).
+// When this file is promoted to a proper public header, replace this with fine-grained includes:
+//   #include <luisa/dsl/var.h>       -- DSL Var<T> types (UInt, Float, Bool, Int3, UInt2, ...)
+//   #include <luisa/dsl/builtin.h>   -- make_uint2, cast<>, ite, ...
+//   #include <luisa/dsl/resource.h>  -- BindlessArray / byte-address buffer helpers
+#include <luisa/luisa-compute.h>
 
 /*
 	From NanoVDB.h

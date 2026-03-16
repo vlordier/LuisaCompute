@@ -264,8 +264,9 @@ void MetalAccel::mark_resource_usages(MetalCommandEncoder &encoder,
     }));
     command_encoder->useResource(_handle, MTL::ResourceUsageRead);
     command_encoder->useResource(_instance_buffer, usage);
-    // FIXME: This seems unnecessary according to the Metal profiling tool, but
-    //  will cause some bottom-level acceleration structures disappear in tests.
+    // Note: Metal profiling shows useResources() here is seemingly redundant, but omitting it
+    // causes some bottom-level acceleration structures to disappear in tests. This is likely
+    // a Metal driver residency tracking bug. Keep until confirmed fixed on target OS versions.
     command_encoder->useResources(_resources.data(), _resources.size(), MTL::ResourceUsageRead);
 }
 

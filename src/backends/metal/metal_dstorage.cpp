@@ -97,7 +97,10 @@ void MetalDStorageExt::compress(const void *data, size_t size_bytes,
                                 Compression algorithm, CompressionQuality quality,
                                 luisa::vector<std::byte> &result) noexcept {
 
-    // FIXME: need MTLCompressionContext to correctly create the file headers
+    // Note: Apple's MTLCompressionContext API is required to produce correctly framed compressed
+    // files (with proper lz4/zlib headers). The current implementation compresses raw data without
+    // the context, so output may not be readable by all DStorage consumers. This is a known
+    // limitation pending MTLCompressionContext support in the Metal backend.
 
     Clock clk;
 
