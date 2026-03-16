@@ -58,3 +58,73 @@ result = "{major}.{minor}.{patch}"
 LUISA_COMPUTE_BUILD_TESTS = "OFF"
 LUISA_COMPUTE_DOWNLOAD_NVCOMP = "OFF"
 LUISA_COMPUTE_USE_SYSTEM_STL = "ON"
+
+# ---------------------------------------------------------------------------
+# ruff — fast Python linter and formatter
+# ---------------------------------------------------------------------------
+[tool.ruff]
+# Match the minimum supported Python version declared in [project]
+target-version = "py310"
+# Use a generous line length; hard wrap is not enforced (see ruff.lint ignore E501)
+line-length = 120
+
+[tool.ruff.lint]
+# Enable a comprehensive set of rule families:
+#   E/W  — pycodestyle errors & warnings (PEP 8 style)
+#   F    — Pyflakes (undefined names, unused imports, …)
+#   I    — isort  (import ordering)
+#   N    — pep8-naming (naming conventions)
+#   UP   — pyupgrade (modern Python idioms)
+#   B    — flake8-bugbear (likely bugs & design issues)
+#   C4   — flake8-comprehensions (simplify list/dict/set comprehensions)
+#   SIM  — flake8-simplify (unnecessary complexity)
+#   RUF  — ruff-specific rules (redundant open modes, etc.)
+select = ["E", "W", "F", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+
+ignore = [
+    # Line-length is a formatter concern, not a linting concern
+    "E501",
+    # The LuisaCompute Python DSL intentionally uses CamelCase variable/function
+    # names inside kernel bodies to match the C++ DSL style.
+    "N802",  # function name should be lowercase
+    "N803",  # argument name should be lowercase
+    "N806",  # variable in function should be lowercase
+    # Keep Optional[X] syntax for clarity in existing code; migrate gradually
+    "UP007",
+    # Ternary operators are sometimes less readable in DSL-heavy code
+    "SIM108",
+    # Default mutable arguments are intentional in several factory helpers
+    "B006",
+    # Do not complain about function calls in default arguments (used for
+    # lctype defaults and similar patterns throughout the DSL)
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Test/example scripts may use wildcard imports and don't need strict naming
+"src/tests/**"       = ["F401", "F403", "F811", "N", "UP"]
+"src/py/luisa/vector.py" = ["N", "RUF"]  # auto-generated vector swizzle boilerplate
+
+# ---------------------------------------------------------------------------
+# mypy — static type checker
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.10"
+files = ["src/py", "src/xir", "bootstrap.py", "include/luisa/ir_v2/gen_ir_def.py"]
+
+# Permissive stubs: many C-extension dependencies have no type stubs
+ignore_missing_imports = true
+
+# Check function bodies even when they lack annotations
+check_untyped_defs = true
+
+# Catch suspicious patterns
+warn_return_any        = true
+warn_unused_ignores    = true
+warn_redundant_casts   = true
+warn_unused_configs    = true
+
+# Exclude files that are intentionally untyped or auto-generated
+exclude = [
+    "src/py/luisa/dylibs",  # compiled pybind11 extension (no stubs)
+]

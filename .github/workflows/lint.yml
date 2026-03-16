@@ -9,6 +9,10 @@ concurrency:
   group: lint-${{ github.ref }}
   cancel-in-progress: true
 
+# All jobs in this workflow are read-only; restrict the GITHUB_TOKEN accordingly.
+permissions:
+  contents: read
+
 jobs:
 
   # -----------------------------------------------------------------------
@@ -197,3 +201,81 @@ jobs:
         with:
           name: clang-analyzer-report
           path: scan-results/
+
+  # -----------------------------------------------------------------------
+  # rust-lint: rustfmt formatting check + Clippy static analysis
+  # -----------------------------------------------------------------------
+  rust-lint:
+    name: "rust lint (rustfmt + clippy)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false   # Rust workspace has no C++ submodule dependencies
+
+      - name: Install stable Rust toolchain with rustfmt and clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check Rust formatting
+        working-directory: src/rust
+        run: cargo fmt --all --check
+
+      - name: Run Clippy (deny all warnings, enable pedantic lints)
+        working-directory: src/rust
+        # -D warnings     — turn every Clippy warning into a hard error
+        # clippy::pedantic — enable the full pedantic lint group which catches
+        #                    subtle bugs (integer cast truncation, etc.)
+        # The individual -A flags silence lints that are intentionally
+        # suppressed for this research-oriented codebase:
+        #   module_name_repetitions — common in layered library APIs
+        #   missing_errors_doc      — Rust docs not yet complete
+        #   missing_panics_doc      — Rust docs not yet complete
+        #   must_use_candidate      — too noisy for internal helpers
+        run: |
+          cargo clippy --all --all-features -- \
+            -D warnings \
+            -W clippy::pedantic \
+            -A clippy::module_name_repetitions \
+            -A clippy::missing_errors_doc \
+            -A clippy::missing_panics_doc \
+            -A clippy::must_use_candidate
+
+  # -----------------------------------------------------------------------
+  # python-lint: ruff (style + format) + mypy (type checking)
+  # -----------------------------------------------------------------------
+  python-lint:
+    name: "python lint (ruff + mypy)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install linting tools
+        # Install ruff and mypy; also install the project's own runtime
+        # dependencies so mypy can resolve imports.
+        run: |
+          pip install --upgrade pip
+          pip install ruff mypy
+          # Install stubs for packages that have them
+          pip install types-setuptools numpy
+
+      - name: ruff — check style and correctness
+        # Uses the [tool.ruff] / [tool.ruff.lint] config in pyproject.toml.
+        run: ruff check .
+
+      - name: ruff — check formatting
+        # Uses the [tool.ruff] config in pyproject.toml.
+        run: ruff format --check .
+
+      - name: mypy — static type checking
+        # Uses the [tool.mypy] config in pyproject.toml.
+        run: mypy --config-file pyproject.toml
