@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <type_traits>
 
 #include <luisa/core/stl/vector.h>
 #include <luisa/core/stl/memory.h>

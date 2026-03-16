@@ -23,13 +23,13 @@ class ManagedObject {
 
 private:
     std::atomic<int32_t> _ref_count;
-#ifdef LUISA_MANAGED_OBJECT_CANARY
+#ifndef NDEBUG
     volatile uint32_t _canary{LUISA_MANAGED_OBJECT_CANARY};
 #endif
 
 public:
     ManagedObject() noexcept : _ref_count{1} {}
-#ifdef LUISA_MANAGED_OBJECT_CANARY
+#ifndef NDEBUG
     virtual ~ManagedObject() noexcept { _canary = 0u; }
     void validate_canary() const noexcept {
         assert(_canary == LUISA_MANAGED_OBJECT_CANARY &&

@@ -30,7 +30,7 @@ constexpr auto ln_2 = 0.69314718055994530941723212145817657f;
 constexpr auto sqrt_three = 1.73205080756887729352744634150587237f;
 /// 1/sqrt(3)
 constexpr auto inv_sqrt_three = 0.57735026918962576450914878050195746f;
-/// golden ratio φ = (1 + sqrt(5)) / 2
+/// golden ratio phi = (1 + sqrt(5)) / 2
 constexpr auto golden_ratio = 1.61803398874989484820458683436563812f;
 }
 }// namespace luisa::constants

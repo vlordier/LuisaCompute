@@ -10,7 +10,7 @@ namespace luisa {
 class spin_mutex {
 
 private:
-    std::atomic_flag _flag;// zero-initialized by default as per C++20
+    std::atomic_flag _flag;// default-initialized to clear state as per C++20
 
 public:
     spin_mutex() noexcept = default;
