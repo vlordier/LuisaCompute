@@ -11,7 +11,6 @@ try:
     if shell != "TerminalInteractiveShell":
         from datetime import datetime
 
-
         def _default_log_callback(level, message):
             now = datetime.now()
             match level:
@@ -24,7 +23,6 @@ try:
                 case _:
                     color, level = 91, "error"
             print(f"[{now}] [luisa] [\033[{color}m{level}\033[00m] {message}")
-
 
         set_log_callback(_default_log_callback)
 except NameError:
@@ -60,14 +58,18 @@ def _select_backend(backends):
     if "LUISA_BACKEND" in environ:
         backend_name = environ["LUISA_BACKEND"].lower()
         if backend_name in backends:
-            print(f"Detected backends: {backends}.",
-                  f"Selecting {backend_name} according to environment variable `LUISA_BACKEND`.")
+            print(
+                f"Detected backends: {backends}.",
+                f"Selecting {backend_name} according to environment variable `LUISA_BACKEND`.",
+            )
             return backend_name
         else:
-            print(f"Detected backends: {backends}.",
-                  f"Environment variable `LUISA_BACKEND` is set to {backend_name}, but it is not installed.",
-                  "LuisaCompute will select an alternative backend automatically.",
-                  file=sys.stderr)
+            print(
+                f"Detected backends: {backends}.",
+                f"Environment variable `LUISA_BACKEND` is set to {backend_name}, but it is not installed.",
+                "LuisaCompute will select an alternative backend automatically.",
+                file=sys.stderr,
+            )
     platform_str = str(platform.platform()).lower()
     if platform_str.find("windows") >= 0:
         backend_name = "dx" if "dx" in backends else backends[0]

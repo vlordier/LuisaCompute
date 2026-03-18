@@ -6,11 +6,9 @@ from .globalvars import get_global_device
 class GUI:
     def __init__(self, title: str, resolution, vsync=False, show_FPS=True):
         if not globalvars.vars.stream_support_gui:
-            raise RuntimeError(
-                "Stream no support GUI, use init(support_gui=True).")
+            raise RuntimeError("Stream no support GUI, use init(support_gui=True).")
         self.window = lcapi.PyWindow()
-        self.window.reset(get_global_device(), globalvars.vars.stream,
-                          title, resolution[0], resolution[1], vsync)
+        self.window.reset(get_global_device(), globalvars.vars.stream, title, resolution[0], resolution[1], vsync)
         self.resolution = resolution
         self.show_FPS = show_FPS
         if show_FPS:
@@ -18,8 +16,15 @@ class GUI:
             self.tic = False
 
     def show(self):
-        self.window.present(globalvars.vars.stream, self.tex.handle, self.tex.native_handle,
-                            self.resolution[0], self.resolution[1], 0, self.tex.storage)
+        self.window.present(
+            globalvars.vars.stream,
+            self.tex.handle,
+            self.tex.native_handle,
+            self.resolution[0],
+            self.resolution[1],
+            0,
+            self.tex.storage,
+        )
         if not self.show_FPS:
             return 0.0
         if self.tic:

@@ -1,10 +1,10 @@
 import sys
 
 if len(sys.argv) < 2:
-    print('Must input backend')
+    print("Must input backend")
     exit(1)
-if sys.argv[1] != 'dx' and sys.argv[1] != 'vk':
-    print('Backend only support dx and vk')
+if sys.argv[1] != "dx" and sys.argv[1] != "vk":
+    print("Backend only support dx and vk")
     exit(1)
 import logging
 
@@ -30,17 +30,21 @@ default_stream = torch.cuda.default_stream()
 interop_buffer.interop_copy_from(tensor_pointer, default_stream.cuda_stream)
 
 interop_buffer.copy_to(arr)
-print('Printing torch tensor from lc')
+print("Printing torch tensor from lc")
 for i in arr:
     print(i)
+
+
 @func
 def kernel():
     id = dispatch_id().x
     interop_buffer.write(id, float(id) + 0.114)
-kernel(dispatch_size=(BUFFER_SIZE,1,1))
+
+
+kernel(dispatch_size=(BUFFER_SIZE, 1, 1))
 interop_buffer.interop_copy_to(tensor_pointer, default_stream.cuda_stream)
 result_arr = torch_tensor.cpu().numpy()
 
-print('Printing lc tensor from torch')
+print("Printing lc tensor from torch")
 for i in result_arr:
     print(i)

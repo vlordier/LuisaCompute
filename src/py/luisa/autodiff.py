@@ -17,9 +17,11 @@ def requires_grad(*x):
 def grad(x):
     return x.dtype, lcapi.builder().call(to_lctype(x.dtype), lcapi.CallOp.GRADIENT, [x.expr])
 
+
 @BuiltinFuncBuilder
 def one(dtype):
     return dtype, lcapi.builder().call(to_lctype(dtype), lcapi.CallOp.ONE, [])
+
 
 @BuiltinFuncBuilder
 def zero(dtype):

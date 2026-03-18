@@ -33,8 +33,8 @@ def clear_indirect():
 def emplace_indirect():
     set_block_size(dispatch_count, 1, 1)
     dispatch_buffer.set_kernel(
-        dispatch_id().x,
-        uint3(kernel_dispatch_size, 1, 1), uint3(dispatch_id().x, 1, 1), dispatch_id().x)
+        dispatch_id().x, uint3(kernel_dispatch_size, 1, 1), uint3(dispatch_id().x, 1, 1), dispatch_id().x
+    )
 
 
 buffer = Buffer(16, uint)

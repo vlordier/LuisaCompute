@@ -25,8 +25,8 @@ from .types import (
 
 class Buffer:
     def __init__(self, size, dtype, external_memory=None, borrowed_deleter=None, enable_interop=False):
-        if dtype not in basic_dtypes and type(dtype).__name__ not in {'StructType', 'ArrayType'}:
-            raise TypeError('Invalid buffer element type')
+        if dtype not in basic_dtypes and type(dtype).__name__ not in {"StructType", "ArrayType"}:
+            raise TypeError("Invalid buffer element type")
         self.bufferType = BufferType(dtype)
         self.read = self.bufferType.read
         self.write = self.bufferType.write
@@ -39,7 +39,7 @@ class Buffer:
         # instantiate buffer on device
         self._interop = enable_interop
         if enable_interop:
-            assert (external_memory is None)
+            assert external_memory is None
             info = get_global_device().impl().create_interop_buffer(lc_type, size)
         elif external_memory is None:  # owned memory
             info = get_global_device().impl().create_buffer(lc_type, size)
@@ -47,8 +47,7 @@ class Buffer:
             if type(external_memory) is lcapi.ResourceCreationInfo:
                 info = external_memory
             else:
-                info = get_global_device().impl().import_external_buffer(
-                    lc_type, external_memory, size)
+                info = get_global_device().impl().import_external_buffer(lc_type, external_memory, size)
         self.handle = info.handle()
         self.native_handle = info.native_handle()
         self.borrowed_deleter = borrowed_deleter
@@ -92,34 +91,26 @@ class Buffer:
         buf.copy_from_array(arr)
         return buf
 
-    def interop_copy_from(self, cu_data_ptr:int, cu_stream_ptr:int, offset_bytes=0, size_bytes=None):
-        assert (offset_bytes < self.bytesize)
-        assert (self._interop)
+    def interop_copy_from(self, cu_data_ptr: int, cu_stream_ptr: int, offset_bytes=0, size_bytes=None):
+        assert offset_bytes < self.bytesize
+        assert self._interop
         if size_bytes is None:
             size_bytes = self.bytesize - offset_bytes
         else:
             size_bytes = min(size_bytes, self.bytesize - offset_bytes)
         get_global_device().impl().interop_buffer_copy_from(
-            self.handle,
-            offset_bytes,
-            cu_stream_ptr,
-            cu_data_ptr,
-            size_bytes
+            self.handle, offset_bytes, cu_stream_ptr, cu_data_ptr, size_bytes
         )
 
     def interop_copy_to(self, cu_data_ptr, cu_stream_ptr, offset_bytes=0, size_bytes=None):
-        assert (offset_bytes < self.bytesize)
-        assert (self._interop)
+        assert offset_bytes < self.bytesize
+        assert self._interop
         if size_bytes is None:
             size_bytes = self.bytesize - offset_bytes
         else:
             size_bytes = min(size_bytes, self.bytesize - offset_bytes)
         get_global_device().impl().interop_buffer_copy_to(
-            self.handle,
-            offset_bytes,
-            cu_stream_ptr,
-            cu_data_ptr,
-            size_bytes
+            self.handle, offset_bytes, cu_stream_ptr, cu_data_ptr, size_bytes
         )
 
     def copy_from_list(self, arr, sync=False, stream=None):
@@ -135,8 +126,7 @@ class Buffer:
             else:
                 packed_bytes += x.to_bytes()
         assert len(packed_bytes) == self.bytesize
-        ulcmd = lcapi.BufferUploadCommand.create(
-            self.handle, 0, self.bytesize, packed_bytes)
+        ulcmd = lcapi.BufferUploadCommand.create(self.handle, 0, self.bytesize, packed_bytes)
         stream.add(ulcmd)
         stream.add_upload_buffer(packed_bytes)
         if sync:
@@ -147,8 +137,7 @@ class Buffer:
             stream = globalvars.vars.stream
         # numpy array of same data layout
         assert arr.size * arr.itemsize == self.bytesize
-        ulcmd = lcapi.BufferUploadCommand.create(
-            self.handle, 0, self.bytesize, arr)
+        ulcmd = lcapi.BufferUploadCommand.create(self.handle, 0, self.bytesize, arr)
         stream.add(ulcmd)
         stream.add_upload_buffer(arr)
         if sync:
@@ -167,8 +156,7 @@ class Buffer:
         if stream is None:
             stream = globalvars.vars.stream
         assert arr.size * arr.itemsize == self.bytesize
-        dlcmd = lcapi.BufferDownloadCommand.create(
-            self.handle, 0, self.bytesize, arr)
+        dlcmd = lcapi.BufferDownloadCommand.create(self.handle, 0, self.bytesize, arr)
         stream.add(dlcmd)
         # stream.add_readback_buffer(arr)
         if sync:
@@ -176,6 +164,7 @@ class Buffer:
 
     def numpy(self, stream=None):  # only supports scalar
         import numpy as np
+
         npf = {int: np.int32, float: np.float32, bool: bool}[self.dtype]
         arr = np.empty(self.size, dtype=npf)
         self.copy_to(arr, sync=True, stream=stream)
@@ -183,15 +172,14 @@ class Buffer:
 
     def to_list(self, stream=None):
         packed_bytes = bytes(self.bytesize)
-        dlcmd = lcapi.BufferDownloadCommand.create(
-            self.handle, 0, self.bytesize, packed_bytes)
+        dlcmd = lcapi.BufferDownloadCommand.create(self.handle, 0, self.bytesize, packed_bytes)
         if stream is None:
             stream = globalvars.vars.stream
         stream.add(dlcmd)
         # stream.add_readback_buffer(packed_bytes)
         stream.synchronize()
         elsize = to_lctype(self.dtype).size()
-        return [from_bytes(self.dtype, packed_bytes[elsize * i: elsize * (i + 1)]) for i in range(self.size)]
+        return [from_bytes(self.dtype, packed_bytes[elsize * i : elsize * (i + 1)]) for i in range(self.size)]
 
     def __dlpack_device__(self):
         backend_name = get_global_device().impl().backend_name()
@@ -212,10 +200,10 @@ class Buffer:
         device_id = 0  # TODO support multi device
         device = lcapi.to_dlpack_device(backend_name, device_id)
         # get dlpack
-        pack = arr.__dlpack__() if hasattr(arr, '__dlpack__') else arr
+        pack = arr.__dlpack__() if hasattr(arr, "__dlpack__") else arr
         lctype, size, addr, ext_device, deleter = lcapi.from_dlpack(pack)
         if device != ext_device:
-            raise RuntimeError('dlpack device mismatch')
+            raise RuntimeError("dlpack device mismatch")
         dtype = from_lctype(lctype)
         return Buffer(size=size, dtype=dtype, external_memory=addr, borrowed_deleter=deleter)
 
@@ -226,8 +214,7 @@ buffer = Buffer.buffer
 class BufferType:
     def __init__(self, dtype):
         self.dtype = dtype
-        self.luisa_type = lcapi.Type.from_(
-            "buffer<" + to_lctype(dtype).description() + ">")
+        self.luisa_type = lcapi.Type.from_("buffer<" + to_lctype(dtype).description() + ">")
         self.read = self.get_read_method(self.dtype)
         self.write = self.get_write_method(self.dtype)
         # disable atomic operations if it's not an int buffer
@@ -267,31 +254,32 @@ class BufferType:
 
 def from_bytes(dtype, packed):
     import struct
+
     if dtype is int:
-        return struct.unpack('i', packed)[0]
+        return struct.unpack("i", packed)[0]
     if dtype is float:
-        return struct.unpack('f', packed)[0]
+        return struct.unpack("f", packed)[0]
     if dtype is bool:
-        return struct.unpack('?', packed)[0]
+        return struct.unpack("?", packed)[0]
     if dtype in vector_dtypes or dtype in matrix_dtypes:
         el = element_of(dtype)
         elsize = to_lctype(el).size()
-        return dtype(*[from_bytes(el, packed[i * elsize: (i + 1) * elsize]) for i in range(0, length_of(dtype))])
-    if hasattr(dtype, 'membertype'):  # struct
+        return dtype(*[from_bytes(el, packed[i * elsize : (i + 1) * elsize]) for i in range(0, length_of(dtype))])
+    if hasattr(dtype, "membertype"):  # struct
         values = []
         offset = 0
         for el in dtype.membertype:
             elsize = to_lctype(el).size()
             curr_align = to_lctype(el).alignment()
             offset = (offset + curr_align - 1) // curr_align * curr_align
-            values.append(from_bytes(el, packed[offset: offset + elsize]))
+            values.append(from_bytes(el, packed[offset : offset + elsize]))
             offset += elsize
 
         return dtype(**{name: values[dtype.idx_dict[name]] for name in dtype.idx_dict})
-    if hasattr(dtype, 'size'):  # array
+    if hasattr(dtype, "size"):  # array
         el = dtype.dtype
         elsize = to_lctype(el).size()
-        return dtype([from_bytes(el, packed[i * elsize: (i + 1) * elsize]) for i in range(0, dtype.size)])
+        return dtype([from_bytes(el, packed[i * elsize : (i + 1) * elsize]) for i in range(0, dtype.size)])
     raise AssertionError(f"from_bytes: unsupported dtype {dtype}")
 
 
@@ -327,7 +315,7 @@ class ByteBuffer:
         self.size = size
         self.bytesize = size
         # instantiate buffer on device
-        assert ((size & 3) == 0)
+        assert (size & 3) == 0
         info = get_global_device().impl().create_buffer(to_lctype(uint), size // 4)
         self.handle = info.handle()
         self.native_handle = info.native_handle()
@@ -376,8 +364,7 @@ class ByteBuffer:
             else:
                 packed_bytes += x.to_bytes()
         assert len(packed_bytes) == self.bytesize
-        ulcmd = lcapi.BufferUploadCommand.create(
-            self.handle, 0, self.bytesize, packed_bytes)
+        ulcmd = lcapi.BufferUploadCommand.create(self.handle, 0, self.bytesize, packed_bytes)
         stream.add(ulcmd)
         stream.add_upload_buffer(packed_bytes)
         if sync:
@@ -388,8 +375,7 @@ class ByteBuffer:
             stream = globalvars.vars.stream
         # numpy array of same data layout
         assert arr.size * arr.itemsize == self.bytesize
-        ulcmd = lcapi.BufferUploadCommand.create(
-            self.handle, 0, self.bytesize, arr)
+        ulcmd = lcapi.BufferUploadCommand.create(self.handle, 0, self.bytesize, arr)
         stream.add(ulcmd)
         stream.add_upload_buffer(arr)
         if sync:
@@ -408,8 +394,7 @@ class ByteBuffer:
         if stream is None:
             stream = globalvars.vars.stream
         assert arr.size * arr.itemsize == self.bytesize
-        dlcmd = lcapi.BufferDownloadCommand.create(
-            self.handle, 0, self.bytesize, arr)
+        dlcmd = lcapi.BufferDownloadCommand.create(self.handle, 0, self.bytesize, arr)
         stream.add(dlcmd)
         # stream.add_readback_buffer(arr)
         if sync:
@@ -417,6 +402,7 @@ class ByteBuffer:
 
     def numpy(self, stream=None):  # only supports scalar
         import numpy as np
+
         npf = {int: np.int32, float: np.float32, bool: bool}[self.dtype]
         arr = np.empty(self.size, dtype=npf)
         self.copy_to(arr, sync=True, stream=stream)
@@ -424,15 +410,14 @@ class ByteBuffer:
 
     def to_list(self, stream=None):
         packed_bytes = bytes(self.bytesize)
-        dlcmd = lcapi.BufferDownloadCommand.create(
-            self.handle, 0, self.bytesize, packed_bytes)
+        dlcmd = lcapi.BufferDownloadCommand.create(self.handle, 0, self.bytesize, packed_bytes)
         if stream is None:
             stream = globalvars.vars.stream
         stream.add(dlcmd)
         # stream.add_readback_buffer(packed_bytes)
         stream.synchronize()
         elsize = to_lctype(self.dtype).size()
-        return [from_bytes(self.dtype, packed_bytes[elsize * i: elsize * (i + 1)]) for i in range(self.size)]
+        return [from_bytes(self.dtype, packed_bytes[elsize * i : elsize * (i + 1)]) for i in range(self.size)]
 
 
 class IndirectDispatchBuffer:
@@ -451,7 +436,8 @@ class IndirectDispatchBuffer:
 
     @BuiltinFuncBuilder
     def set_kernel(self, offset, block_size, size, kernel_id):
-        check_exact_signature([uint, uint3, uint3, uint], [
-                              offset, block_size, size, kernel_id], "set_kernel")
-        return None, lcapi.builder().call(lcapi.CallOp.INDIRECT_SET_DISPATCH_KERNEL,
-                                          [self.expr, offset.expr, block_size.expr, size.expr, kernel_id.expr])
+        check_exact_signature([uint, uint3, uint3, uint], [offset, block_size, size, kernel_id], "set_kernel")
+        return None, lcapi.builder().call(
+            lcapi.CallOp.INDIRECT_SET_DISPATCH_KERNEL,
+            [self.expr, offset.expr, block_size.expr, size.expr, kernel_id.expr],
+        )

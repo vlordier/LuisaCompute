@@ -52,7 +52,8 @@ def raytracing_kernel(image, accel):
         float3(p * float2(1.0, -1.0), 0.0),  # origin
         float3(0.0, 0.0, -1.0),  # direction
         0.0,  # start distance
-        1000.0)  # end distance
+        1000.0,
+    )  # end distance
     _q = accel.query_all(ray, -1)
     hit = accel.trace_closest(ray, -1)
     # if hit.hit_type == 1:
@@ -68,7 +69,7 @@ def raytracing_kernel(image, accel):
 
 
 gui = GUI("Test ray tracing", res)
-time_second = 0.
+time_second = 0.0
 while gui.running():
     # update triangle every frame
     vertices = [
@@ -84,5 +85,5 @@ while gui.running():
 
     raytracing_kernel(image, accel, dispatch_size=(*res, 1))
     gui.set_image(image)
-    time_second += gui.show() / 1000.
+    time_second += gui.show() / 1000.0
 synchronize()

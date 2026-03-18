@@ -26,14 +26,14 @@ class Array:
         return Array(self)
 
     def to_bytes(self):
-        packed_bytes = b''
+        packed_bytes = b""
         for x in self.values:
             packed_bytes += lcapi.to_bytes(x)
         assert len(packed_bytes) == self.arrayType.luisa_type.size()
         return packed_bytes
 
     def __repr__(self):
-        return '[' + ','.join(repr(x) for x in self.values) + ']'
+        return "[" + ",".join(repr(x) for x in self.values) + "]"
 
 
 def array(arr):
@@ -45,7 +45,7 @@ class ArrayType:
         self.size = size
         self.dtype = dtype
         assert type(size) is int and size > 0
-        self.luisa_type = lcapi.Type.from_(f'array<{to_lctype(dtype).description()},{self.size}>')
+        self.luisa_type = lcapi.Type.from_(f"array<{to_lctype(dtype).description()},{self.size}>")
         self.size_bytes = self.luisa_type.size()
 
     def __call__(self, data):
@@ -53,7 +53,7 @@ class ArrayType:
         return Array(data)
 
     def __repr__(self):
-        return f'ArrayType({self.size},{nameof(self.dtype)})'
+        return f"ArrayType({self.size},{nameof(self.dtype)})"
 
     def __eq__(self, other):
         return type(other) is ArrayType and self.dtype == other.dtype and self.size == other.size
@@ -76,7 +76,7 @@ class SharedArrayType:
         self.size = size
         self.dtype = dtype
         assert type(size) is int and size > 0
-        self.luisa_type = lcapi.Type.from_(f'array<{to_lctype(dtype).description()},{self.size}>')
+        self.luisa_type = lcapi.Type.from_(f"array<{to_lctype(dtype).description()},{self.size}>")
         # disable atomic operations if it's not an int buffer
         if dtype in {int, uint, short, ushort}:
             for f in int_atomic_functions:
@@ -86,7 +86,7 @@ class SharedArrayType:
                 setattr(self, f.__name__, f)
 
     def __repr__(self):
-        return f'SharedArrayType({self.size},{nameof(self.dtype)})'
+        return f"SharedArrayType({self.size},{nameof(self.dtype)})"
 
     def __eq__(self, other):
         return type(other) is SharedArrayType and self.dtype == other.dtype and self.size == other.size

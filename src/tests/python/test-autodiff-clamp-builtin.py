@@ -4,7 +4,7 @@ from luisa.autodiff import autodiff, backward, grad, requires_grad
 
 @func
 def f_builtin(x) -> float:
-    return clamp(x, 0., 1.)
+    return clamp(x, 0.0, 1.0)
 
 
 @func
@@ -15,6 +15,7 @@ def df_builtin(x) -> float:
         backward(t, 1.0)
         g = grad(x)
     return g
+
 
 @func
 def test_autodiff_builtin(x):

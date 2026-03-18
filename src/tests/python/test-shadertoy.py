@@ -13,7 +13,7 @@ init(backend_name=backend_name)
 
 @func
 def _palette(d: float):
-    return lerp(float3(0.2, 0.7, 0.9), float3(1., 0., 1.), d)
+    return lerp(float3(0.2, 0.7, 0.9), float3(1.0, 0.0, 1.0), d)
 
 
 @func
@@ -29,30 +29,30 @@ def _map(p: float3, time: float):
         t = time * 0.2
         p = float3(_rotate(p.xz, t), p.y).xzy
         p = float3(_rotate(p.xy, t * 1.89), p.z)
-        p = float3(abs(p.x) -0.5, p.y, abs(p.z) - 0.5)
-    return dot(copysign(1., p), p) * .2
+        p = float3(abs(p.x) - 0.5, p.y, abs(p.z) - 0.5)
+    return dot(copysign(1.0, p), p) * 0.2
 
 
 @func
 def _rm(ro: float3, rd: float3, time: float):
-    t = 0.
+    t = 0.0
     col = float3()
-    d = 0.
+    d = 0.0
     for _ in range(64):
         p = ro + rd * t
-        d = _map(p, time) * .5
+        d = _map(p, time) * 0.5
         if d < 0.02 or d > 100:
             break
-        col += _palette(length(p) * 0.1) / (400. * d)
+        col += _palette(length(p) * 0.1) / (400.0 * d)
         t += d
-    return float4(col, 1. / (d * 100.))
+    return float4(col, 1.0 / (d * 100.0))
 
 
 @func
 def clear_kernel(image):
-    set_block_size(16,16,1)
+    set_block_size(16, 16, 1)
     coord = dispatch_id().xy
-    image.write(coord, float4(0.3, 0.4, 0.5, 1.))
+    image.write(coord, float4(0.3, 0.4, 0.5, 1.0))
 
 
 @func
@@ -60,7 +60,7 @@ def main_kernel(image, time):
     xy = dispatch_id().xy
     resolution = float2(dispatch_size().xy)
     uv = (float2(xy) - resolution * 0.5) / resolution.x
-    ro = float3(_rotate(float2(0.0, -50.), time), 0.0).xzy
+    ro = float3(_rotate(float2(0.0, -50.0), time), 0.0).xzy
     cf = normalize(-ro)
     cs = normalize(cross(cf, float3(0, 1, 0)))
     cu = normalize(cross(cf, cs))

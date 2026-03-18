@@ -24,7 +24,7 @@ def fix_include_line(src_dir, file, line, moved_headers):
         norm_inc = normalize(src_dir, f"{file_dir}/{include[1:-1]}")
         if norm_inc in moved_headers:
             include = f"<luisa/{norm_inc}>"
-    elif include.startswith('<'):
+    elif include.startswith("<"):
         if include[1:-1] in moved_headers:
             include = f"<luisa/{include[1:-1]}>"
     return f"#include {include}\n"
@@ -71,9 +71,9 @@ if __name__ == "__main__":
 
     exclude = ["backends", "py", "tests"]
     include = ["backends/ext"]
-    headers_to_move = [f for f in header_files if
-                       not any(f.startswith(e) for e in exclude) or
-                       any(f.startswith(e) for e in include)]
+    headers_to_move = [
+        f for f in header_files if not any(f.startswith(e) for e in exclude) or any(f.startswith(e) for e in include)
+    ]
 
     for f in source_files + header_files:
         fix_include(src_dir, f, headers_to_move)

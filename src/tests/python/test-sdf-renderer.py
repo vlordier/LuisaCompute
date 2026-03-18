@@ -33,7 +33,7 @@ def intersect_light(pos: float3, d: float3):
 
 @func
 def out_dir(n, sampler):
-    u = ite(abs(n.y) < (1.0 - eps), normalize(cross(n, float3(0., 1., 0.))), float3(1., 0., 0.))
+    u = ite(abs(n.y) < (1.0 - eps), normalize(cross(n, float3(0.0, 1.0, 0.0))), float3(1.0, 0.0, 0.0))
     v = cross(n, u)
     phi = 2.0 * math.pi * sampler.next()
     ay = sqrt(sampler.next())
@@ -45,7 +45,7 @@ def out_dir(n, sampler):
 def make_nested(f):
     freq = 40.0
     f *= freq
-    f = ite(f < 0., ite(int(f) % 2 == 0, 1. - fract(f), fract(f)), f)
+    f = ite(f < 0.0, ite(int(f) % 2 == 0, 1.0 - fract(f), fract(f)), f)
     return (f - 0.2) * (1.0 / freq)
 
 
@@ -65,7 +65,7 @@ def sdf(o):
 
 @func
 def ray_march(p, d):
-    dist = 0.
+    dist = 0.0
     for _ in range(100):
         s = sdf(p + dist * d)
         if s <= 1e-6 or dist >= inf:
@@ -87,11 +87,7 @@ def sdf_normal(p):
     return normalize(n)
 
 
-NextHit = StructType(
-    closest=float,
-    normal=float3,
-    c=float3
-)
+NextHit = StructType(closest=float, normal=float3, c=float3)
 
 
 @func
@@ -100,13 +96,12 @@ def next_hit(data: NextHit, pos, d):
     data.normal = float3()
     data.c = float3()
     ray_march_dist = ray_march(pos, d)
-    if (ray_march_dist < min(dist_limit, data.closest)):
+    if ray_march_dist < min(dist_limit, data.closest):
         data.closest = ray_march_dist
         hit_pos = pos + d * data.closest
         data.normal = sdf_normal(hit_pos)
         t = int((hit_pos.x + 10.0) * 1.1 + 0.5) % 3
-        data.c = float3(0.4) + float3(0.3, 0.2, 0.3) * \
-            ite(t == int3(0, 1, 2), float3(1.0), float3(0.0))
+        data.c = float3(0.4) + float3(0.3, 0.2, 0.3) * ite(t == int3(0, 1, 2), float3(1.0), float3(0.0))
 
 
 @func
@@ -122,10 +117,8 @@ def render_kernel(seed_image, accum_image, frame_index):
     pos = camera_pos
     ux = sampler.next()
     uy = sampler.next()
-    uv = float2(dispatch_id().x + ux, dispatch_size().y -
-                1 - dispatch_id().y + uy)
-    d = float3(2.0 * fov * uv / resolution.y - fov *
-               float2(aspect_ratio, 1.0) - 1e-5, -1.0)
+    uv = float2(dispatch_id().x + ux, dispatch_size().y - 1 - dispatch_id().y + uy)
+    d = float3(2.0 * fov * uv / resolution.y - fov * float2(aspect_ratio, 1.0) - 1e-5, -1.0)
     d = normalize(d)
     throughput = float3(1)
     hit_light = 0.0
@@ -134,10 +127,10 @@ def render_kernel(seed_image, accum_image, frame_index):
         data = NextHit()
         next_hit(data, pos, d)
         dist_to_light = intersect_light(pos, d)
-        if (dist_to_light < data.closest):
+        if dist_to_light < data.closest:
             hit_light = 1.0
             break
-        if (length_squared(data.normal) == 0.0):
+        if length_squared(data.normal) == 0.0:
             break
         hit_pos = pos + data.closest * d
         d = out_dir(data.normal, sampler)
@@ -150,10 +143,7 @@ def render_kernel(seed_image, accum_image, frame_index):
 
 @func
 def linear_to_srgb(x: float3):
-    return clamp(select(1.055 * x ** (1.0 / 2.4) - 0.055,
-                        12.92 * x,
-                        x <= 0.00031308),
-                 0.0, 1.0)
+    return clamp(select(1.055 * x ** (1.0 / 2.4) - 0.055, 12.92 * x, x <= 0.00031308), 0.0, 1.0)
 
 
 @func
@@ -163,10 +153,11 @@ def hdr2ldr_kernel(hdr_image, ldr_image, scale: float):
     ldr = linear_to_srgb(hdr.xyz * scale)
     ldr_image.write(coord, float4(ldr, 1.0))
 
+
 res = (1280, 720)
 seed_image = Image2D(*res, 1, uint, storage="INT")
-accum_image=Image2D(*res, 4, float, storage="FLOAT")
-ldr_image=Image2D(*res, 4, float, storage="BYTE")
+accum_image = Image2D(*res, 4, float, storage="FLOAT")
+ldr_image = Image2D(*res, 4, float, storage="BYTE")
 gui = GUI("Test cornell box", res)
 frame = 0
 while gui.running():

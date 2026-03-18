@@ -17,6 +17,8 @@ def write_texture(tex):
     size = dispatch_size().xy
     uv = (float2(index) + 0.5) / float2(size)
     tex.write(index, float4(uv, 0.5, 1))
+
+
 # Tonemapping
 
 
@@ -48,8 +50,7 @@ res = 1024, 1024
 input_tex = Image2D(16, 16, 4, float, storage="BYTE")
 display_tex = Image2D(*res, 4, float, storage="BYTE")
 address = lcapi.Address.MIRROR
-bindless_array.emplace(
-    55, input_tex, filter=lcapi.Filter.POINT, address=address)
+bindless_array.emplace(55, input_tex, filter=lcapi.Filter.POINT, address=address)
 useless_buffer = Buffer(1, float4)
 bindless_array.emplace(55, useless_buffer)
 

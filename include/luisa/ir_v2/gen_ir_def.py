@@ -1,104 +1,105 @@
 import os
 
-cpp_def = open('ir_v2_defs.h', 'w')  # noqa: SIM115
-fwd_file = open('ir_v2_fwd.h', 'w')  # noqa: SIM115
-c_def = open('ir_v2_api.h', 'w')  # noqa: SIM115
-c_api_impl = open('../../../src/ir_v2/ir_v2_api.cpp', 'w')  # noqa: SIM115
-cpp_api_impl = open('../../../src/ir_v2/ir_v2_defs.cpp', 'w')  # noqa: SIM115
+cpp_def = open("ir_v2_defs.h", "w")  # noqa: SIM115
+fwd_file = open("ir_v2_fwd.h", "w")  # noqa: SIM115
+c_def = open("ir_v2_api.h", "w")  # noqa: SIM115
+c_api_impl = open("../../../src/ir_v2/ir_v2_api.cpp", "w")  # noqa: SIM115
+cpp_api_impl = open("../../../src/ir_v2/ir_v2_defs.cpp", "w")  # noqa: SIM115
 func_table = []
 
 
 MAP_FFI_TYPE_GET = {
-    'bool': 'bool',
-    'uint8_t': 'uint8_t',
-    'uint16_t': 'uint16_t',
-    'uint32_t': 'uint32_t',
-    'uint64_t': 'uint64_t',
-
-    'const Type*': 'const Type *',
-    'luisa::string': 'Slice<const char>',
-    'luisa::vector<uint8_t>': 'Slice<uint8_t>',
-    'luisa::vector<Node*>': 'Slice<Node*>',
-    'luisa::vector<PhiIncoming>': 'Slice<PhiIncoming>',
-    'luisa::vector<SwitchCase>': 'Slice<SwitchCase>',
-    'luisa::vector<Binding>': 'Slice<Binding>',
-    'luisa::vector<Callable*>': 'Slice<Callable*>',
-    'luisa::vector<CallableModule*>': 'Slice<CallableModule*>',
-    'luisa::vector<Module*>': 'Slice<Module*>',
-    'luisa::vector<KernelModule*>': 'Slice<KernelModule*>',
-    'luisa::shared_ptr<CallableModule>': 'CallableModule*',
-    'luisa::shared_ptr<CpuExternFn>': 'CpuExternFn*',
-    'Func': 'const CFunc*',
-    'Node*': 'Node*',
-    'BasicBlock*': 'BasicBlock*',
-    'const BasicBlock*': 'const BasicBlock*',
+    "bool": "bool",
+    "uint8_t": "uint8_t",
+    "uint16_t": "uint16_t",
+    "uint32_t": "uint32_t",
+    "uint64_t": "uint64_t",
+    "const Type*": "const Type *",
+    "luisa::string": "Slice<const char>",
+    "luisa::vector<uint8_t>": "Slice<uint8_t>",
+    "luisa::vector<Node*>": "Slice<Node*>",
+    "luisa::vector<PhiIncoming>": "Slice<PhiIncoming>",
+    "luisa::vector<SwitchCase>": "Slice<SwitchCase>",
+    "luisa::vector<Binding>": "Slice<Binding>",
+    "luisa::vector<Callable*>": "Slice<Callable*>",
+    "luisa::vector<CallableModule*>": "Slice<CallableModule*>",
+    "luisa::vector<Module*>": "Slice<Module*>",
+    "luisa::vector<KernelModule*>": "Slice<KernelModule*>",
+    "luisa::shared_ptr<CallableModule>": "CallableModule*",
+    "luisa::shared_ptr<CpuExternFn>": "CpuExternFn*",
+    "Func": "const CFunc*",
+    "Node*": "Node*",
+    "BasicBlock*": "BasicBlock*",
+    "const BasicBlock*": "const BasicBlock*",
 }
 MAP_FFI_TYPE_SET = {
-     'bool': 'bool',
-    'uint8_t': 'uint8_t',
-    'uint16_t': 'uint16_t',
-    'uint32_t': 'uint32_t',
-    'uint64_t': 'uint64_t',
-
-    'const Type*': 'const Type *',
-    'luisa::string': 'Slice<const char>',
-    'luisa::vector<uint8_t>': 'Slice<uint8_t>',
-    'luisa::vector<Node*>': 'Slice<Node*>',
-    'luisa::vector<PhiIncoming>': 'Slice<PhiIncoming>',
-    'luisa::vector<SwitchCase>': 'Slice<SwitchCase>',
-    'luisa::vector<Binding>': 'Slice<Binding>',
-    'luisa::vector<Callable*>': 'Slice<Callable*>',
-    'luisa::vector<CallableModule*>': 'Slice<CallableModule*>',
-    'luisa::vector<Module*>': 'Slice<Module*>',
-    'luisa::vector<KernelModule*>': 'Slice<KernelModule*>',
-    'luisa::shared_ptr<CallableModule>': 'CallableModule*',
-    'luisa::shared_ptr<CpuExternFn>': 'CpuExternFn*',
-    'Func': 'CFunc',
-    'Node*': 'Node*',
-    'BasicBlock*': 'BasicBlock*',
-    'const BasicBlock*': 'const BasicBlock*',
+    "bool": "bool",
+    "uint8_t": "uint8_t",
+    "uint16_t": "uint16_t",
+    "uint32_t": "uint32_t",
+    "uint64_t": "uint64_t",
+    "const Type*": "const Type *",
+    "luisa::string": "Slice<const char>",
+    "luisa::vector<uint8_t>": "Slice<uint8_t>",
+    "luisa::vector<Node*>": "Slice<Node*>",
+    "luisa::vector<PhiIncoming>": "Slice<PhiIncoming>",
+    "luisa::vector<SwitchCase>": "Slice<SwitchCase>",
+    "luisa::vector<Binding>": "Slice<Binding>",
+    "luisa::vector<Callable*>": "Slice<Callable*>",
+    "luisa::vector<CallableModule*>": "Slice<CallableModule*>",
+    "luisa::vector<Module*>": "Slice<Module*>",
+    "luisa::vector<KernelModule*>": "Slice<KernelModule*>",
+    "luisa::shared_ptr<CallableModule>": "CallableModule*",
+    "luisa::shared_ptr<CpuExternFn>": "CpuExternFn*",
+    "Func": "CFunc",
+    "Node*": "Node*",
+    "BasicBlock*": "BasicBlock*",
+    "const BasicBlock*": "const BasicBlock*",
 }
 
 
 def to_screaming_snake_case(name: str):
-    out = ''
+    out = ""
     for c in name:
-        if c.isupper() and out != '':
-            out += '_'
+        if c.isupper() and out != "":
+            out += "_"
         out += c.upper()
     return out
 
 
-print('#pragma once', file=cpp_def)
-print('''#pragma once
+print("#pragma once", file=cpp_def)
+print(
+    """#pragma once
 // if msvc
 #ifdef _MSC_VER
 #pragma warning( disable : 4190)
 #endif
-''', file=fwd_file)
-print('#include <cstdint>', file=fwd_file)
-print('#include <luisa/core/dll_export.h>', file=fwd_file)
-print('#ifndef BINDGEN', file=fwd_file)
-print('#include <array>', file=fwd_file)
-print('#include <luisa/core/stl/memory.h>', file=fwd_file)
-print('#include <luisa/core/stl/string.h>', file=fwd_file)
-print('#include <luisa/core/stl/vector.h>', file=fwd_file)
-print('#endif', file=fwd_file)
-print('#pragma once', file=c_def)
-print('/// This file is generated by gen_ir_def.py', file=cpp_def)
-print('#include <type_traits>', file=cpp_def)
-print('#include <luisa/ir_v2/ir_v2_fwd.h>', file=cpp_def)
-print('#include <luisa/core/logging.h>', file=cpp_def)
-print('#include <luisa/ast/type.h>', file=cpp_def)
-print('#include <luisa/ast/type_registry.h>', file=cpp_def)
-print('namespace luisa::compute::ir_v2 {', file=cpp_def)
+""",
+    file=fwd_file,
+)
+print("#include <cstdint>", file=fwd_file)
+print("#include <luisa/core/dll_export.h>", file=fwd_file)
+print("#ifndef BINDGEN", file=fwd_file)
+print("#include <array>", file=fwd_file)
+print("#include <luisa/core/stl/memory.h>", file=fwd_file)
+print("#include <luisa/core/stl/string.h>", file=fwd_file)
+print("#include <luisa/core/stl/vector.h>", file=fwd_file)
+print("#endif", file=fwd_file)
+print("#pragma once", file=c_def)
+print("/// This file is generated by gen_ir_def.py", file=cpp_def)
+print("#include <type_traits>", file=cpp_def)
+print("#include <luisa/ir_v2/ir_v2_fwd.h>", file=cpp_def)
+print("#include <luisa/core/logging.h>", file=cpp_def)
+print("#include <luisa/ast/type.h>", file=cpp_def)
+print("#include <luisa/ast/type_registry.h>", file=cpp_def)
+print("namespace luisa::compute::ir_v2 {", file=cpp_def)
+print("namespace luisa::compute { class Type;} namespace luisa::compute::ir_v2 {", file=fwd_file)
+print("#include <luisa/ir_v2/ir_v2_fwd.h>", file=c_def)
+print("#include <luisa/ir_v2/ir_v2_defs.h>", file=c_api_impl)
+print("#include <luisa/ir_v2/ir_v2.h>", file=c_api_impl)
+print("#include <luisa/ir_v2/ir_v2_api.h>", file=c_api_impl)
 print(
-    'namespace luisa::compute { class Type;} namespace luisa::compute::ir_v2 {', file=fwd_file)
-print('#include <luisa/ir_v2/ir_v2_fwd.h>', file=c_def)
-print('#include <luisa/ir_v2/ir_v2_defs.h>', file=c_api_impl)
-print('#include <luisa/ir_v2/ir_v2.h>', file=c_api_impl)
-print('#include <luisa/ir_v2/ir_v2_api.h>', file=c_api_impl)
-print('''
+    """
 namespace luisa::compute::ir_v2 {
 /**
 * <div rustbindgen nodebug></div>
@@ -134,10 +135,13 @@ struct Slice {
 #endif
 };
 }
-''', file=c_def)
-print('namespace luisa::compute::ir_v2 {', file=c_def)
-print('namespace luisa::compute::ir_v2 {', file=c_api_impl)
-print('''
+""",
+    file=c_def,
+)
+print("namespace luisa::compute::ir_v2 {", file=c_def)
+print("namespace luisa::compute::ir_v2 {", file=c_api_impl)
+print(
+    """
 struct Node;
 class BasicBlock;
 struct CallableModule;
@@ -226,13 +230,16 @@ typedef const IrBuilder *IrBuilderRef;
 typedef IrBuilder *IrBuilderRefMut;
 
 
-''', file=fwd_file)
-print('#include <luisa/ir_v2/ir_v2.h>', file=cpp_api_impl)
-print('namespace luisa::compute::ir_v2 {', file=cpp_api_impl)
+""",
+    file=fwd_file,
+)
+print("#include <luisa/ir_v2/ir_v2.h>", file=cpp_api_impl)
+print("namespace luisa::compute::ir_v2 {", file=cpp_api_impl)
+
 
 class Item:
-    def __init__(self, name, base,fields: list[tuple[str, str]], comment=None,no_copy=False) -> None:
-        self.cpp_src = ''
+    def __init__(self, name, base, fields: list[tuple[str, str]], comment=None, no_copy=False) -> None:
+        self.cpp_src = ""
         self.name = name
         self.fields = fields
         self.comment = comment
@@ -242,99 +249,94 @@ class Item:
         self.no_copy = no_copy
 
     def gen(self):
-        out = 'public:\n'
+        out = "public:\n"
         for field in self.fields:
-            out += f'    {field[0]} {field[1]}{{}};\n'
+            out += f"    {field[0]} {field[1]}{{}};\n"
 
-        out += f'    {self.name}() = default;\n'
+        out += f"    {self.name}() = default;\n"
         if len(self.fields) > 0:
-            out += f'    {self.name}('
+            out += f"    {self.name}("
             for i, field in enumerate(self.fields):
                 if i != 0:
-                    out += ', '
-                out += f'{field[0]} {field[1]}'
-            out += ') : '
+                    out += ", "
+                out += f"{field[0]} {field[1]}"
+            out += ") : "
             for i, field in enumerate(self.fields):
                 if i != 0:
-                    out += ', '
-                out += f'{field[1]}(std::move({field[1]}))'
-            out += ' {}\n'
+                    out += ", "
+                out += f"{field[1]}(std::move({field[1]}))"
+            out += " {}\n"
         out += self.cpp_src
         return out
 
     def gen_c_api(self):
         if len(self.fields) == 0:
-            return ''
+            return ""
         # gen xx_field() -> xx
         for f in self.fields:
-            fname = f'{self.name}_{f[1]}'
-            fsig = f'{MAP_FFI_TYPE_GET[f[0]]} (*{fname})({self.name} *self)'
+            fname = f"{self.name}_{f[1]}"
+            fsig = f"{MAP_FFI_TYPE_GET[f[0]]} (*{fname})({self.name} *self)"
             func_table.append((fname, fsig))
-            print(
-                f'static {MAP_FFI_TYPE_GET[f[0]]} {fname}({self.name} *self) {{', file=c_api_impl)
-            if 'shared_ptr' in f[0]:
-                print(
-                    f'    return self->{f[1]}.get();', file=c_api_impl)
-            elif f[0] =='Func':
-                print(f'    return reinterpret_cast<const CFunc*>(&self->{f[1]});', file=c_api_impl)
+            print(f"static {MAP_FFI_TYPE_GET[f[0]]} {fname}({self.name} *self) {{", file=c_api_impl)
+            if "shared_ptr" in f[0]:
+                print(f"    return self->{f[1]}.get();", file=c_api_impl)
+            elif f[0] == "Func":
+                print(f"    return reinterpret_cast<const CFunc*>(&self->{f[1]});", file=c_api_impl)
             else:
-                print(f'    return self->{f[1]};', file=c_api_impl)
-            print('}', file=c_api_impl)
+                print(f"    return self->{f[1]};", file=c_api_impl)
+            print("}", file=c_api_impl)
 
         # set xx_field(xx)
         for f in self.fields:
-            fname = f'{self.name}_set_{f[1]}'
-            fsig = f'void (*{fname})({self.name} *self, {MAP_FFI_TYPE_SET[f[0]]} value)'
+            fname = f"{self.name}_set_{f[1]}"
+            fsig = f"void (*{fname})({self.name} *self, {MAP_FFI_TYPE_SET[f[0]]} value)"
             func_table.append((fname, fsig))
-            print(
-                f'static void {fname}({self.name} *self, {MAP_FFI_TYPE_SET[f[0]]} value) {{', file=c_api_impl)
-            if 'shared_ptr' in f[0]:
+            print(f"static void {fname}({self.name} *self, {MAP_FFI_TYPE_SET[f[0]]} value) {{", file=c_api_impl)
+            if "shared_ptr" in f[0]:
                 print(
-                    f'    self->{f[1]} = luisa::static_pointer_cast<std::decay_t<decltype(self->{f[1]})>::element_type>(value->shared_from_this());', file=c_api_impl)
-            elif f[0].startswith('luisa::vector'):
-                print(
-                    f'    self->{f[1]} = value.to_vector();', file=c_api_impl)
-            elif f[0].startswith('luisa::string'):
-                print(
-                    f'    self->{f[1]} = value.to_string();', file=c_api_impl)
-            elif f[0] == 'Func':
-                print(
-                    f'    self->{f[1]} = std::move(*reinterpret_cast<Func*>(&value));', file=c_api_impl)
+                    f"    self->{f[1]} = luisa::static_pointer_cast<std::decay_t<decltype(self->{f[1]})>::element_type>(value->shared_from_this());",
+                    file=c_api_impl,
+                )
+            elif f[0].startswith("luisa::vector"):
+                print(f"    self->{f[1]} = value.to_vector();", file=c_api_impl)
+            elif f[0].startswith("luisa::string"):
+                print(f"    self->{f[1]} = value.to_string();", file=c_api_impl)
+            elif f[0] == "Func":
+                print(f"    self->{f[1]} = std::move(*reinterpret_cast<Func*>(&value));", file=c_api_impl)
             else:
-                print(f'    self->{f[1]} = value;', file=c_api_impl)
-            print('}', file=c_api_impl)
+                print(f"    self->{f[1]} = value;", file=c_api_impl)
+            print("}", file=c_api_impl)
 
         # gen ctor
-        fname = f'{self.name}_new'
+        fname = f"{self.name}_new"
 
-        fsig = f'C{self.base} (*{fname})(Pool *pool'
+        fsig = f"C{self.base} (*{fname})(Pool *pool"
         for f in self.fields:
-            fsig += f', {MAP_FFI_TYPE_SET[f[0]]} {f[1]}'
-        fsig += ')'
+            fsig += f", {MAP_FFI_TYPE_SET[f[0]]} {f[1]}"
+        fsig += ")"
         func_table.append((fname, fsig))
-        print(f'static C{self.base} {fname}(Pool *pool', end='',
-              file=c_api_impl)
+        print(f"static C{self.base} {fname}(Pool *pool", end="", file=c_api_impl)
         for f in self.fields:
-            print(f', {MAP_FFI_TYPE_SET[f[0]]} {f[1]}', end='', file=c_api_impl)
-        print(') {', file=c_api_impl)
-        print(f'   auto data = luisa::unique_ptr<{self.name}>();', file=c_api_impl)
+            print(f", {MAP_FFI_TYPE_SET[f[0]]} {f[1]}", end="", file=c_api_impl)
+        print(") {", file=c_api_impl)
+        print(f"   auto data = luisa::unique_ptr<{self.name}>();", file=c_api_impl)
         for f in self.fields:
-            print(f'    {self.name}_set_{f[1]}(data.get(), {f[1]});', file=c_api_impl)
-        print(f'   auto tag = {self.name}::static_tag();', file=c_api_impl)
-        print(f'   auto cobj = C{self.base}{{}};', file=c_api_impl)
-        print(f'   auto obj = {self.base}(tag, std::move(data));', file=c_api_impl)
-        print(f'   std::memcpy(&cobj, &obj, sizeof(C{self.base}));', file=c_api_impl)
-        print('   (void)obj.steal();', file=c_api_impl)
-        print('    return cobj;', file=c_api_impl)
-        print('}', file=c_api_impl)
+            print(f"    {self.name}_set_{f[1]}(data.get(), {f[1]});", file=c_api_impl)
+        print(f"   auto tag = {self.name}::static_tag();", file=c_api_impl)
+        print(f"   auto cobj = C{self.base}{{}};", file=c_api_impl)
+        print(f"   auto obj = {self.base}(tag, std::move(data));", file=c_api_impl)
+        print(f"   std::memcpy(&cobj, &obj, sizeof(C{self.base}));", file=c_api_impl)
+        print("   (void)obj.steal();", file=c_api_impl)
+        print("    return cobj;", file=c_api_impl)
+        print("}", file=c_api_impl)
 
 
 class Instruction(Item):
     def __init__(self, name, fields=None, cpp_src=None, **kwargs) -> None:
         if fields is None:
             fields = []
-        super().__init__(name, 'Instruction', fields, **kwargs)
-        self.name += 'Inst'
+        super().__init__(name, "Instruction", fields, **kwargs)
+        self.name += "Inst"
         if cpp_src is not None:
             self.cpp_src = cpp_src
 
@@ -343,10 +345,9 @@ class Func(Item):
     def __init__(self, name, fields=None, side_effects=False, **kwargs) -> None:
         if fields is None:
             fields = []
-        super().__init__(name, 'Func', fields, **kwargs)
-        self.name += 'Fn'
+        super().__init__(name, "Func", fields, **kwargs)
+        self.name += "Fn"
         self.side_effects = side_effects
-
 
 
 class CppType:
@@ -385,119 +386,134 @@ class CppSharedPtr(CppType):
 
 def parse_cpp_type(s: str) -> CppType:
     s = s.strip()
-    if s.startswith('luisa::vector'):
-        s = s[len('luisa::vector'):]
-        assert s.startswith('<')
-        assert s.endswith('>')
+    if s.startswith("luisa::vector"):
+        s = s[len("luisa::vector") :]
+        assert s.startswith("<")
+        assert s.endswith(">")
         return CppList(parse_cpp_type(s[1:-1]))
-    if s == 'luisa::string':
+    if s == "luisa::string":
         return CppString()
-    if s.endswith('*'):
+    if s.endswith("*"):
         return CppPointer(parse_cpp_type(s[:-1]))
     return CppAtom(s)
 
 
 def gen_adt(adt: str, cpp_src: str, variants: list[Item]):
     # gen cpp
-    print(f'struct {adt};', file=fwd_file)
-    print(f'struct {adt}Data;', file=fwd_file)
-    print(f'typedef const C{adt}* {adt}Ref;', file=fwd_file)
-    print(f'typedef C{adt}* {adt}RefMut;', file=fwd_file)
+    print(f"struct {adt};", file=fwd_file)
+    print(f"struct {adt}Data;", file=fwd_file)
+    print(f"typedef const C{adt}* {adt}Ref;", file=fwd_file)
+    print(f"typedef C{adt}* {adt}RefMut;", file=fwd_file)
 
-
-    print(f'    enum class {adt}Tag : unsigned int {{', file=fwd_file)
+    print(f"    enum class {adt}Tag : unsigned int {{", file=fwd_file)
     for variant in variants:
-        print(f'        {variant.tag},', file=fwd_file)
-    print('    };', file=fwd_file)
+        print(f"        {variant.tag},", file=fwd_file)
+    print("    };", file=fwd_file)
 
-    print(f'    enum class Rusty{adt}Tag : unsigned int {{', file=fwd_file)
+    print(f"    enum class Rusty{adt}Tag : unsigned int {{", file=fwd_file)
     for variant in variants:
-        print(f'        {variant.tag_rs},', file=fwd_file)
-    print('    };', file=fwd_file)
+        print(f"        {variant.tag_rs},", file=fwd_file)
+    print("    };", file=fwd_file)
 
-    print(f'    inline const char* tag_name({adt}Tag tag) {{', file=fwd_file)
-    print('        switch(tag) {',  file=fwd_file)
+    print(f"    inline const char* tag_name({adt}Tag tag) {{", file=fwd_file)
+    print("        switch(tag) {", file=fwd_file)
     for variant in variants:
         print(f'        case {adt}Tag::{variant.tag}: return "{variant.name}";', file=fwd_file)
-    print('}', file=fwd_file)
+    print("}", file=fwd_file)
     print('return "unknown";', file=fwd_file)
-    print('}', file=fwd_file)
+    print("}", file=fwd_file)
 
-
-
-    print(f'struct LUISA_IR_API {adt}Data {{ ', file=fwd_file)
-    print('#ifndef BINDGEN', file=fwd_file)
-    print(f'    virtual {adt}Tag tag() const noexcept = 0;', file=fwd_file)
-    print(f'    virtual ~{adt}Data() = default;', file=fwd_file)
-    print('#endif', file=fwd_file)
-    print('};', file=fwd_file)
+    print(f"struct LUISA_IR_API {adt}Data {{ ", file=fwd_file)
+    print("#ifndef BINDGEN", file=fwd_file)
+    print(f"    virtual {adt}Tag tag() const noexcept = 0;", file=fwd_file)
+    print(f"    virtual ~{adt}Data() = default;", file=fwd_file)
+    print("#endif", file=fwd_file)
+    print("};", file=fwd_file)
     for variant in variants:
         if len(variant.fields) > 0:
-            print(f'struct {variant.name};', file=fwd_file)
+            print(f"struct {variant.name};", file=fwd_file)
             if variant.no_copy:
-                print('''/**
+                print(
+                    """/**
 * <div rustbindgen nocopy></div>
-*/''', file=fwd_file)
-            print(f'typedef const {variant.name}* {variant.name}Ref;', file=fwd_file)
+*/""",
+                    file=fwd_file,
+                )
+            print(f"typedef const {variant.name}* {variant.name}Ref;", file=fwd_file)
             if variant.no_copy:
-                print('''/**
+                print(
+                    """/**
 * <div rustbindgen nocopy></div>
-*/''', file=fwd_file)
-            print(f'typedef {variant.name}* {variant.name}RefMut;', file=fwd_file)
-    print(f'struct LUISA_IR_API {adt} {{', file=cpp_def)
-    print(f'    luisa::unique_ptr<{adt}Data> _data;', file=cpp_def)
-    print(f'     {adt}Tag _tag;', file=cpp_def)
-    print('public:', file=cpp_def)
-    print(f'   explicit {adt}({adt}Tag tag) : _data(luisa::unique_ptr<{adt}Data>()), _tag(tag) {{}}', file=cpp_def)
-    print(f'    explicit {adt}({adt}Tag tag, luisa::unique_ptr<{adt}Data> data) : _data(std::move(data)), _tag(tag) {{', file=cpp_def)
+*/""",
+                    file=fwd_file,
+                )
+            print(f"typedef {variant.name}* {variant.name}RefMut;", file=fwd_file)
+    print(f"struct LUISA_IR_API {adt} {{", file=cpp_def)
+    print(f"    luisa::unique_ptr<{adt}Data> _data;", file=cpp_def)
+    print(f"     {adt}Tag _tag;", file=cpp_def)
+    print("public:", file=cpp_def)
+    print(f"   explicit {adt}({adt}Tag tag) : _data(luisa::unique_ptr<{adt}Data>()), _tag(tag) {{}}", file=cpp_def)
+    print(
+        f"    explicit {adt}({adt}Tag tag, luisa::unique_ptr<{adt}Data> data) : _data(std::move(data)), _tag(tag) {{",
+        file=cpp_def,
+    )
     print('        LUISA_ASSERT(tag == _data->tag(), "Mismatched tag!!!");', file=cpp_def)
-    print('    }', file=cpp_def)
-    print(f'    typedef {adt}Tag Tag;', file=cpp_def)
+    print("    }", file=cpp_def)
+    print(f"    typedef {adt}Tag Tag;", file=cpp_def)
     for variant in variants:
         if len(variant.fields) > 0:
-            print(f'    explicit {adt}({variant.name} v);', file=cpp_def)
-            print(f'    {adt}::{adt}({variant.name} v):_data(luisa::make_unique<{variant.name}>(std::move(v))), _tag({variant.name}::static_tag()) {{}}', file=cpp_api_impl)
-    print('    [[nodiscard]] Tag tag() const noexcept {', file=cpp_def)
-    print('        return _tag;', file=cpp_def)
-    print('    }', file=cpp_def)
-    print('    [[nodiscard]] bool isa(Tag tag)const noexcept {{', file=cpp_def)
-    print('        return this->tag() == tag;', file=cpp_def)
-    print('    }', file=cpp_def)
-    print(f'     template<class T> requires std::is_base_of_v<{adt}Data, T>  [[nodiscard]] bool isa()const noexcept {{', file=cpp_def)
-    print('        return this->isa(T::static_tag());', file=cpp_def)
-    print('    }', file=cpp_def)
-    print(f'    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]]  T* as() {{', file=cpp_def)
-    print('        return isa(T::static_tag()) ? static_cast<T*>(_data.get()) : nullptr;', file=cpp_def)
-    print('    }', file=cpp_def)
-    print(f'    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]] const T* as() const {{', file=cpp_def)
-    print('        return isa(T::static_tag()) ? static_cast<const T*>(_data.get()) : nullptr;', file=cpp_def)
-    print('    }', file=cpp_def)
-    print('    ', cpp_src, file=cpp_def)
-    print(f'    [[nodiscard]] {adt}Data * steal() noexcept {{ ', file=cpp_def)
-    print('        return _data.release();', file=cpp_def)
-    print('    }', file=cpp_def)
-    print('};', file=cpp_def)
-    print(f'static_assert(sizeof({adt}) == 16);', file=cpp_def)
-    print(f'static_assert(sizeof(luisa::unique_ptr<{adt}Data>) == 8);', file=cpp_def)
+            print(f"    explicit {adt}({variant.name} v);", file=cpp_def)
+            print(
+                f"    {adt}::{adt}({variant.name} v):_data(luisa::make_unique<{variant.name}>(std::move(v))), _tag({variant.name}::static_tag()) {{}}",
+                file=cpp_api_impl,
+            )
+    print("    [[nodiscard]] Tag tag() const noexcept {", file=cpp_def)
+    print("        return _tag;", file=cpp_def)
+    print("    }", file=cpp_def)
+    print("    [[nodiscard]] bool isa(Tag tag)const noexcept {{", file=cpp_def)
+    print("        return this->tag() == tag;", file=cpp_def)
+    print("    }", file=cpp_def)
+    print(
+        f"     template<class T> requires std::is_base_of_v<{adt}Data, T>  [[nodiscard]] bool isa()const noexcept {{",
+        file=cpp_def,
+    )
+    print("        return this->isa(T::static_tag());", file=cpp_def)
+    print("    }", file=cpp_def)
+    print(f"    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]]  T* as() {{", file=cpp_def)
+    print("        return isa(T::static_tag()) ? static_cast<T*>(_data.get()) : nullptr;", file=cpp_def)
+    print("    }", file=cpp_def)
+    print(
+        f"    template<class T> requires std::is_base_of_v<{adt}Data, T> [[nodiscard]] const T* as() const {{",
+        file=cpp_def,
+    )
+    print("        return isa(T::static_tag()) ? static_cast<const T*>(_data.get()) : nullptr;", file=cpp_def)
+    print("    }", file=cpp_def)
+    print("    ", cpp_src, file=cpp_def)
+    print(f"    [[nodiscard]] {adt}Data * steal() noexcept {{ ", file=cpp_def)
+    print("        return _data.release();", file=cpp_def)
+    print("    }", file=cpp_def)
+    print("};", file=cpp_def)
+    print(f"static_assert(sizeof({adt}) == 16);", file=cpp_def)
+    print(f"static_assert(sizeof(luisa::unique_ptr<{adt}Data>) == 8);", file=cpp_def)
 
     for variant in variants:
         if len(variant.fields) == 0:
             continue
-        print(f'struct LUISA_IR_API {variant.name} : public {adt}Data {{', file=cpp_def)
-        print('public:', file=cpp_def)
-        print(f'    typedef {adt}Tag Tag;', file=cpp_def)
-        print('    [[nodiscard]] Tag tag() const noexcept override {', file=cpp_def)
-        print('        return static_tag();', file=cpp_def)
-        print('    }', file=cpp_def)
-        print('    static constexpr Tag static_tag() noexcept {', file=cpp_def)
-        print(f'        return Tag::{variant.tag};', file=cpp_def)
-        print('    }', file=cpp_def)
-        print('    ', variant.gen(), file=cpp_def)
-        print('};', file=cpp_def)
+        print(f"struct LUISA_IR_API {variant.name} : public {adt}Data {{", file=cpp_def)
+        print("public:", file=cpp_def)
+        print(f"    typedef {adt}Tag Tag;", file=cpp_def)
+        print("    [[nodiscard]] Tag tag() const noexcept override {", file=cpp_def)
+        print("        return static_tag();", file=cpp_def)
+        print("    }", file=cpp_def)
+        print("    static constexpr Tag static_tag() noexcept {", file=cpp_def)
+        print(f"        return Tag::{variant.tag};", file=cpp_def)
+        print("    }", file=cpp_def)
+        print("    ", variant.gen(), file=cpp_def)
+        print("};", file=cpp_def)
 
     # gen c api
-    print(f'/**\n* <div rustbindgen nocopy></div>\n*/\nstruct C{adt} {{ void *data; {adt}Tag tag; }};', file=c_def)
-    print(f'static_assert(sizeof(C{adt}) == 16);', file=c_def)
+    print(f"/**\n* <div rustbindgen nocopy></div>\n*/\nstruct C{adt} {{ void *data; {adt}Tag tag; }};", file=c_def)
+    print(f"static_assert(sizeof(C{adt}) == 16);", file=c_def)
     for variant in variants:
         # print('extern "C" LUISA_IR_API {1} * lc_ir_v2_{0}_as_{1}({0} *self);'.format(
         #     adt, variant.name), file=c_def)
@@ -507,51 +523,52 @@ def gen_adt(adt: str, cpp_src: str, variants: list[Item]):
         #       file=c_api_impl)
         # print('}', file=c_api_impl)
         if len(variant.fields) > 0:
-            fname = f'{adt}_as_{variant.name}'
-            fsig = f'{variant.name} *(*{fname})(C{adt} *self)'
+            fname = f"{adt}_as_{variant.name}"
+            fsig = f"{variant.name} *(*{fname})(C{adt} *self)"
             func_table.append((fname, fsig))
-            print(f'static {variant.name} *{fname}(C{adt} *self) {{',
-                file=c_api_impl)
-            print(f'    return reinterpret_cast<{adt}*>(self)->as<{variant.name}>();',
-                file=c_api_impl)
-            print('}', file=c_api_impl)
+            print(f"static {variant.name} *{fname}(C{adt} *self) {{", file=c_api_impl)
+            print(f"    return reinterpret_cast<{adt}*>(self)->as<{variant.name}>();", file=c_api_impl)
+            print("}", file=c_api_impl)
 
-
-    fname = f'{adt}_tag'
-    fsig = f'Rusty{adt}Tag (*{fname})(const C{adt} *self)'
+    fname = f"{adt}_tag"
+    fsig = f"Rusty{adt}Tag (*{fname})(const C{adt} *self)"
     func_table.append((fname, fsig))
-    print(f'static Rusty{adt}Tag {fname}(const C{adt} *self) {{', file=c_api_impl)
-    print(f'    return static_cast<Rusty{adt}Tag>(reinterpret_cast<const {adt}*>(self)->tag());', file=c_api_impl)
-    print('}', file=c_api_impl)
+    print(f"static Rusty{adt}Tag {fname}(const C{adt} *self) {{", file=c_api_impl)
+    print(f"    return static_cast<Rusty{adt}Tag>(reinterpret_cast<const {adt}*>(self)->tag());", file=c_api_impl)
+    print("}", file=c_api_impl)
     for variant in variants:
         variant.gen_c_api()
 
-    fname = f'{adt}_new'
-    fsig = f'C{adt} (*{fname})(Pool *pool, Rusty{adt}Tag tag)'
+    fname = f"{adt}_new"
+    fsig = f"C{adt} (*{fname})(Pool *pool, Rusty{adt}Tag tag)"
     func_table.append((fname, fsig))
-    print(f'static C{adt} {fname}(Pool *pool, Rusty{adt}Tag tag) {{', file=c_api_impl)
-    print(f'    auto obj = {adt}(static_cast<{adt}Tag>(tag));', file=c_api_impl)
-    print(f'    auto cobj = C{adt}{{}};', file=c_api_impl)
-    print(f'    std::memcpy(&cobj, &obj, sizeof(C{adt}));', file=c_api_impl)
-    print('    (void)obj.steal();', file=c_api_impl)
-    print('    return cobj;', file=c_api_impl)
-    print('}', file=c_api_impl)
+    print(f"static C{adt} {fname}(Pool *pool, Rusty{adt}Tag tag) {{", file=c_api_impl)
+    print(f"    auto obj = {adt}(static_cast<{adt}Tag>(tag));", file=c_api_impl)
+    print(f"    auto cobj = C{adt}{{}};", file=c_api_impl)
+    print(f"    std::memcpy(&cobj, &obj, sizeof(C{adt}));", file=c_api_impl)
+    print("    (void)obj.steal();", file=c_api_impl)
+    print("    return cobj;", file=c_api_impl)
+    print("}", file=c_api_impl)
+
 
 instructions = [
-    Instruction('Buffer'),
-    Instruction('Texture2d'),
-    Instruction('Texture3d'),
-    Instruction('BindlessArray'),
-    Instruction('Accel'),
-    Instruction('Shared'),
-    Instruction('Uniform'),
-    Instruction('Argument', [
-        ('bool', 'by_value'),
-    ]),
-    Instruction('Constant', [
-        ('const Type*', 'ty'),
-        ('luisa::vector<uint8_t>', 'value')
-    ],cpp_src='''
+    Instruction("Buffer"),
+    Instruction("Texture2d"),
+    Instruction("Texture3d"),
+    Instruction("BindlessArray"),
+    Instruction("Accel"),
+    Instruction("Shared"),
+    Instruction("Uniform"),
+    Instruction(
+        "Argument",
+        [
+            ("bool", "by_value"),
+        ],
+    ),
+    Instruction(
+        "Constant",
+        [("const Type*", "ty"), ("luisa::vector<uint8_t>", "value")],
+        cpp_src="""
 [[nodiscard]] uint16_t as_uint16() const noexcept {
     LUISA_ASSERT(ty->is_uint16(), "Type mismatch!");
     return *reinterpret_cast<const uint16_t*>(value.data());
@@ -588,327 +605,289 @@ instructions = [
     LUISA_ASSERT(ty->is_bool(), "Type mismatch!");
     return *reinterpret_cast<const bool*>(value.data());
 }
-'''),
-    Instruction('Call', [
-        ('Func', 'func'),
-        ('luisa::vector<Node*>', 'args'),
-    ]),
-    Instruction('Phi', [('luisa::vector<PhiIncoming>', 'incomings')]),
+""",
+    ),
+    Instruction(
+        "Call",
+        [
+            ("Func", "func"),
+            ("luisa::vector<Node*>", "args"),
+        ],
+    ),
+    Instruction("Phi", [("luisa::vector<PhiIncoming>", "incomings")]),
     Instruction("BasicBlockSentinel", []),
-    Instruction('If', [
-        ('Node*', 'cond'),
-        ('const BasicBlock*', 'true_branch'),
-        ('const BasicBlock*', 'false_branch')
-    ]),
-    Instruction('GenericLoop', [
-        ('const BasicBlock*', 'prepare'),
-        ('Node*', 'cond'),
-        ('const BasicBlock*', 'body'),
-        ('const BasicBlock*', 'update')
-    ]),
-    Instruction('Switch', [
-        ('Node*', 'value'),
-        ('luisa::vector<SwitchCase>', 'cases'),
-        ('const BasicBlock*', 'default_')
-    ]),
-    Instruction('Local', [
-        ('Node*', 'init')
-    ]),
-    Instruction('Break', []),
-    Instruction('Continue', []),
-    Instruction('Return', [
-        ('Node*', 'value')
-    ]),
-    Instruction('Print', [
-        ('luisa::string', 'fmt'),
-        ('luisa::vector<Node*>', 'args')
-    ]),
-    Instruction('Comment', [
-        ('luisa::string', 'comment')
-    ]),
-    Instruction('Update', [
-        ('Node*', 'var'),
-        ('Node*', 'value')
-    ]),
-    Instruction('RayQuery', [
-        ('Node*', 'query'),
-        ('const BasicBlock*', 'on_triangle_hit'),
-        ('const BasicBlock*', 'on_procedural_hit'),
-    ]),
-    Instruction('RevAutodiff', [
-        ('const BasicBlock*', 'body'),
-    ]),
-    Instruction('FwdAutodiff', [
-        ('const BasicBlock*', 'body'),
-    ]),
+    Instruction("If", [("Node*", "cond"), ("const BasicBlock*", "true_branch"), ("const BasicBlock*", "false_branch")]),
+    Instruction(
+        "GenericLoop",
+        [
+            ("const BasicBlock*", "prepare"),
+            ("Node*", "cond"),
+            ("const BasicBlock*", "body"),
+            ("const BasicBlock*", "update"),
+        ],
+    ),
+    Instruction(
+        "Switch", [("Node*", "value"), ("luisa::vector<SwitchCase>", "cases"), ("const BasicBlock*", "default_")]
+    ),
+    Instruction("Local", [("Node*", "init")]),
+    Instruction("Break", []),
+    Instruction("Continue", []),
+    Instruction("Return", [("Node*", "value")]),
+    Instruction("Print", [("luisa::string", "fmt"), ("luisa::vector<Node*>", "args")]),
+    Instruction("Comment", [("luisa::string", "comment")]),
+    Instruction("Update", [("Node*", "var"), ("Node*", "value")]),
+    Instruction(
+        "RayQuery",
+        [
+            ("Node*", "query"),
+            ("const BasicBlock*", "on_triangle_hit"),
+            ("const BasicBlock*", "on_procedural_hit"),
+        ],
+    ),
+    Instruction(
+        "RevAutodiff",
+        [
+            ("const BasicBlock*", "body"),
+        ],
+    ),
+    Instruction(
+        "FwdAutodiff",
+        [
+            ("const BasicBlock*", "body"),
+        ],
+    ),
 ]
 
 funcs = [
-    Func('Undef'),
-    Func('Zero', []),
-    Func('One', []),
-
-    Func('Assume', [
-        ('luisa::string', 'msg')
-    ]),
-    Func('Unreachable', [
-         ('luisa::string', 'msg')
-    ]),
-    Func('Assert', [('luisa::string', 'msg')]),
-    Func('ThreadId', []),
-    Func('BlockId', []),
-    Func('WarpSize', []),
-    Func('WarpLaneId', []),
-    Func('DispatchId', []),
-    Func('DispatchSize', []),
-
-    Func('PropagateGradient', [], side_effects=True),
-    Func('OutputGradient', []),
-
-    Func('RequiresGradient', [], side_effects=True),
-    Func('Backward', [], comment='//Backward(out, out_grad)', side_effects=True),
-    Func('Gradient', []),
-    Func('AccGrad', [], side_effects=True),
-    Func('Detach', []),
-
-    Func('RayTracingInstanceTransform'),
-    Func('RayTracingInstanceVisibilityMask'),
-    Func('RayTracingInstanceUserId'),
-    Func('RayTracingSetInstanceTransform', side_effects=True),
-    Func('RayTracingSetInstanceOpacity', side_effects=True),
-    Func('RayTracingSetInstanceVisibility', side_effects=True),
-    Func('RayTracingSetInstanceUserId', side_effects=True),
-
-    Func('RayTracingTraceClosest', []),
-    Func('RayTracingTraceAny', []),
-    Func('RayTracingQueryAll', []),
-    Func('RayTracingQueryAny', []),
-    Func('RayQueryWorldSpaceRay', []),
-    Func('RayQueryProceduralCandidateHit', []),
-    Func('RayQueryTriangleCandidateHit', []),
-    Func('RayQueryCommittedHit', []),
-    Func('RayQueryCommitTriangle', [], side_effects=True),
-    Func('RayQueryCommitProcedural', [], side_effects=True),
-    Func('RayQueryTerminate', [], side_effects=True),
-
-    Func('Load', []),
-
-    Func('Cast', []),
-    Func('BitCast', []),
-
-    Func('Add'),
-    Func('Sub'),
-    Func('Mul'),
-    Func('Div'),
-    Func('Rem'),
-    Func('BitAnd'),
-    Func('BitOr'),
-    Func('BitXor'),
-    Func('Shl'),
-    Func('Shr'),
-    Func('RotRight'),
-    Func('RotLeft'),
-    Func('Eq'),
-    Func('Ne'),
-    Func('Lt'),
-    Func('Le'),
-    Func('Gt'),
-    Func('Ge'),
-    Func('MatCompMul'),
-
-    Func('Neg'),
-    Func('Not'),
-    Func('BitNot'),
-
-    Func('All', []),
-    Func('Any', []),
-
-    Func('Select'),
-    Func('Clamp'),
-    Func('Lerp'),
-    Func('Step'),
-    Func('Saturate'),
-    Func('SmoothStep'),
-
-    Func('Abs'),
-    Func('Min'),
-    Func('Max'),
-
-    Func('ReduceSum'),
-    Func('ReduceProd'),
-    Func('ReduceMin'),
-    Func('ReduceMax'),
-    Func('Clz'),
-    Func('Ctz'),
-    Func('PopCount'),
-    Func('Reverse'),
-    Func('IsInf'),
-    Func('IsNan'),
-    Func('Acos'),
-    Func('Acosh'),
-    Func('Asin'),
-    Func('Asinh'),
-    Func('Atan'),
-    Func('Atan2'),
-    Func('Atanh'),
-    Func('Cos'),
-    Func('Cosh'),
-    Func('Sin'),
-    Func('Sinh'),
-    Func('Tan'),
-    Func('Tanh'),
-    Func('Exp'),
-    Func('Exp2'),
-    Func('Exp10'),
-    Func('Log'),
-    Func('Log2'),
-    Func('Log10'),
-    Func('Powi'),
-    Func('Powf'),
-    Func('Sqrt'),
-    Func('Rsqrt'),
-    Func('Ceil'),
-    Func('Floor'),
-    Func('Fract'),
-    Func('Trunc'),
-    Func('Round'),
-    Func('Fma'),
-    Func('Copysign'),
-    Func('Cross'),
-    Func('Dot'),
-    Func('OuterProduct'),
-    Func('Length'),
-    Func('LengthSquared'),
-    Func('Normalize'),
-    Func('Faceforward'),
-    Func('Distance'),
-    Func('Reflect'),
-    Func('Determinant'),
-    Func('Transpose'),
-    Func('Inverse'),
-
-    Func('WarpIsFirstActiveLane', side_effects=True),
-    Func('WarpFirstActiveLane', side_effects=True),
-    Func('WarpActiveAllEqual', side_effects=True),
-    Func('WarpActiveBitAnd', side_effects=True),
-    Func('WarpActiveBitOr', side_effects=True),
-    Func('WarpActiveBitXor', side_effects=True),
-    Func('WarpActiveCountBits', side_effects=True),
-    Func('WarpActiveMax', side_effects=True),
-    Func('WarpActiveMin', side_effects=True),
-    Func('WarpActiveProduct', side_effects=True),
-    Func('WarpActiveSum', side_effects=True),
-    Func('WarpActiveAll', side_effects=True),
-    Func('WarpActiveAny', side_effects=True),
-    Func('WarpActiveBitMask', side_effects=True),
-    Func('WarpPrefixCountBits', side_effects=True),
-    Func('WarpPrefixSum', side_effects=True),
-    Func('WarpPrefixProduct', side_effects=True),
-    Func('WarpReadLaneAt', side_effects=True),
-    Func('WarpReadFirstLane', side_effects=True),
-    Func('SynchronizeBlock', side_effects=True),
-
-    Func('AtomicExchange', [], side_effects=True),
-    Func('AtomicCompareExchange', [], side_effects=True),
-    Func('AtomicFetchAdd', [], side_effects=True),
-    Func('AtomicFetchSub', [], side_effects=True),
-    Func('AtomicFetchAnd', [], side_effects=True),
-    Func('AtomicFetchOr', [], side_effects=True),
-    Func('AtomicFetchXor', [], side_effects=True),
-    Func('AtomicFetchMin', [], side_effects=True),
-    Func('AtomicFetchMax', [], side_effects=True),
-
-    Func('BufferWrite', [], side_effects=True),
-    Func('BufferRead', []),
-    Func('BufferSize', []),
-
-    Func('ByteBufferWrite', [], side_effects=True),
-    Func('ByteBufferRead', []),
-    Func('ByteBufferSize', []),
-
-    Func('Texture2dRead'),
-    Func('Texture2dWrite', [], side_effects=True),
-    Func('Texture2dSize'),
-
-    Func('Texture3dRead'),
-    Func('Texture3dWrite', [], side_effects=True),
-    Func('Texture3dSize'),
-
-    Func('BindlessTexture2dSample', []),
-    Func('BindlessTexture2dSampleLevel', []),
-    Func('BindlessTexture2dSampleGrad', []),
-    Func('BindlessTexture2dSampleGradLevel', []),
-    Func('BindlessTexture2dRead', []),
-    Func('BindlessTexture2dReadLevel', []),
-    Func('BindlessTexture2dSize', []),
-    Func('BindlessTexture2dSizeLevel', []),
-
-    Func('BindlessTexture3dSample', []),
-    Func('BindlessTexture3dSampleLevel', []),
-    Func('BindlessTexture3dSampleGrad', []),
-    Func('BindlessTexture3dSampleGradLevel', []),
-    Func('BindlessTexture3dRead', []),
-    Func('BindlessTexture3dReadLevel', []),
-    Func('BindlessTexture3dSize', []),
-    Func('BindlessTexture3dSizeLevel', []),
-
-    Func('BindlessBufferWrite', [], side_effects=True),
-    Func('BindlessBufferRead', []),
-    Func('BindlessBufferSize', []),
-    Func('BindlessBufferType'),
-
-    Func('BindlessByteBufferWrite', [], side_effects=True),
-    Func('BindlessByteBufferRead', []),
-    Func('BindlessByteBufferSize', []),
-
-    Func('Vec', []),
-    Func('Vec2', []),
-    Func('Vec3', []),
-    Func('Vec4', []),
-
-    Func('Permute'),
-
-    Func('GetElementPtr', []),
-    Func('ExtractElement', []),
-    Func('InsertElement', []),
-
-    Func('Array'),
-    Func('Struct'),
-
-    Func('MatFull', []),
-    Func('Mat2', []),
-    Func('Mat3', []),
-    Func('Mat4', []),
-
-    Func('BindlessAtomicExchange', [
-        ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicCompareExchange', [
-        ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchAdd', [
-         ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchSub', [
-         ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchAnd', [
-         ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchOr', [
-        ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchXor', [
-         ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchMin', [
-         ('const Type*', 'ty')], side_effects=True),
-    Func('BindlessAtomicFetchMax', [
-         ('const Type*', 'ty')], side_effects=True),
-
-    Func('Callable', [
-        ('luisa::shared_ptr<CallableModule>', 'module'),
-    ]),
-    Func('CpuExt', [
-        ('luisa::shared_ptr<CpuExternFn>', 'f'),
-    ]),
-    Func('ShaderExecutionReorder')
+    Func("Undef"),
+    Func("Zero", []),
+    Func("One", []),
+    Func("Assume", [("luisa::string", "msg")]),
+    Func("Unreachable", [("luisa::string", "msg")]),
+    Func("Assert", [("luisa::string", "msg")]),
+    Func("ThreadId", []),
+    Func("BlockId", []),
+    Func("WarpSize", []),
+    Func("WarpLaneId", []),
+    Func("DispatchId", []),
+    Func("DispatchSize", []),
+    Func("PropagateGradient", [], side_effects=True),
+    Func("OutputGradient", []),
+    Func("RequiresGradient", [], side_effects=True),
+    Func("Backward", [], comment="//Backward(out, out_grad)", side_effects=True),
+    Func("Gradient", []),
+    Func("AccGrad", [], side_effects=True),
+    Func("Detach", []),
+    Func("RayTracingInstanceTransform"),
+    Func("RayTracingInstanceVisibilityMask"),
+    Func("RayTracingInstanceUserId"),
+    Func("RayTracingSetInstanceTransform", side_effects=True),
+    Func("RayTracingSetInstanceOpacity", side_effects=True),
+    Func("RayTracingSetInstanceVisibility", side_effects=True),
+    Func("RayTracingSetInstanceUserId", side_effects=True),
+    Func("RayTracingTraceClosest", []),
+    Func("RayTracingTraceAny", []),
+    Func("RayTracingQueryAll", []),
+    Func("RayTracingQueryAny", []),
+    Func("RayQueryWorldSpaceRay", []),
+    Func("RayQueryProceduralCandidateHit", []),
+    Func("RayQueryTriangleCandidateHit", []),
+    Func("RayQueryCommittedHit", []),
+    Func("RayQueryCommitTriangle", [], side_effects=True),
+    Func("RayQueryCommitProcedural", [], side_effects=True),
+    Func("RayQueryTerminate", [], side_effects=True),
+    Func("Load", []),
+    Func("Cast", []),
+    Func("BitCast", []),
+    Func("Add"),
+    Func("Sub"),
+    Func("Mul"),
+    Func("Div"),
+    Func("Rem"),
+    Func("BitAnd"),
+    Func("BitOr"),
+    Func("BitXor"),
+    Func("Shl"),
+    Func("Shr"),
+    Func("RotRight"),
+    Func("RotLeft"),
+    Func("Eq"),
+    Func("Ne"),
+    Func("Lt"),
+    Func("Le"),
+    Func("Gt"),
+    Func("Ge"),
+    Func("MatCompMul"),
+    Func("Neg"),
+    Func("Not"),
+    Func("BitNot"),
+    Func("All", []),
+    Func("Any", []),
+    Func("Select"),
+    Func("Clamp"),
+    Func("Lerp"),
+    Func("Step"),
+    Func("Saturate"),
+    Func("SmoothStep"),
+    Func("Abs"),
+    Func("Min"),
+    Func("Max"),
+    Func("ReduceSum"),
+    Func("ReduceProd"),
+    Func("ReduceMin"),
+    Func("ReduceMax"),
+    Func("Clz"),
+    Func("Ctz"),
+    Func("PopCount"),
+    Func("Reverse"),
+    Func("IsInf"),
+    Func("IsNan"),
+    Func("Acos"),
+    Func("Acosh"),
+    Func("Asin"),
+    Func("Asinh"),
+    Func("Atan"),
+    Func("Atan2"),
+    Func("Atanh"),
+    Func("Cos"),
+    Func("Cosh"),
+    Func("Sin"),
+    Func("Sinh"),
+    Func("Tan"),
+    Func("Tanh"),
+    Func("Exp"),
+    Func("Exp2"),
+    Func("Exp10"),
+    Func("Log"),
+    Func("Log2"),
+    Func("Log10"),
+    Func("Powi"),
+    Func("Powf"),
+    Func("Sqrt"),
+    Func("Rsqrt"),
+    Func("Ceil"),
+    Func("Floor"),
+    Func("Fract"),
+    Func("Trunc"),
+    Func("Round"),
+    Func("Fma"),
+    Func("Copysign"),
+    Func("Cross"),
+    Func("Dot"),
+    Func("OuterProduct"),
+    Func("Length"),
+    Func("LengthSquared"),
+    Func("Normalize"),
+    Func("Faceforward"),
+    Func("Distance"),
+    Func("Reflect"),
+    Func("Determinant"),
+    Func("Transpose"),
+    Func("Inverse"),
+    Func("WarpIsFirstActiveLane", side_effects=True),
+    Func("WarpFirstActiveLane", side_effects=True),
+    Func("WarpActiveAllEqual", side_effects=True),
+    Func("WarpActiveBitAnd", side_effects=True),
+    Func("WarpActiveBitOr", side_effects=True),
+    Func("WarpActiveBitXor", side_effects=True),
+    Func("WarpActiveCountBits", side_effects=True),
+    Func("WarpActiveMax", side_effects=True),
+    Func("WarpActiveMin", side_effects=True),
+    Func("WarpActiveProduct", side_effects=True),
+    Func("WarpActiveSum", side_effects=True),
+    Func("WarpActiveAll", side_effects=True),
+    Func("WarpActiveAny", side_effects=True),
+    Func("WarpActiveBitMask", side_effects=True),
+    Func("WarpPrefixCountBits", side_effects=True),
+    Func("WarpPrefixSum", side_effects=True),
+    Func("WarpPrefixProduct", side_effects=True),
+    Func("WarpReadLaneAt", side_effects=True),
+    Func("WarpReadFirstLane", side_effects=True),
+    Func("SynchronizeBlock", side_effects=True),
+    Func("AtomicExchange", [], side_effects=True),
+    Func("AtomicCompareExchange", [], side_effects=True),
+    Func("AtomicFetchAdd", [], side_effects=True),
+    Func("AtomicFetchSub", [], side_effects=True),
+    Func("AtomicFetchAnd", [], side_effects=True),
+    Func("AtomicFetchOr", [], side_effects=True),
+    Func("AtomicFetchXor", [], side_effects=True),
+    Func("AtomicFetchMin", [], side_effects=True),
+    Func("AtomicFetchMax", [], side_effects=True),
+    Func("BufferWrite", [], side_effects=True),
+    Func("BufferRead", []),
+    Func("BufferSize", []),
+    Func("ByteBufferWrite", [], side_effects=True),
+    Func("ByteBufferRead", []),
+    Func("ByteBufferSize", []),
+    Func("Texture2dRead"),
+    Func("Texture2dWrite", [], side_effects=True),
+    Func("Texture2dSize"),
+    Func("Texture3dRead"),
+    Func("Texture3dWrite", [], side_effects=True),
+    Func("Texture3dSize"),
+    Func("BindlessTexture2dSample", []),
+    Func("BindlessTexture2dSampleLevel", []),
+    Func("BindlessTexture2dSampleGrad", []),
+    Func("BindlessTexture2dSampleGradLevel", []),
+    Func("BindlessTexture2dRead", []),
+    Func("BindlessTexture2dReadLevel", []),
+    Func("BindlessTexture2dSize", []),
+    Func("BindlessTexture2dSizeLevel", []),
+    Func("BindlessTexture3dSample", []),
+    Func("BindlessTexture3dSampleLevel", []),
+    Func("BindlessTexture3dSampleGrad", []),
+    Func("BindlessTexture3dSampleGradLevel", []),
+    Func("BindlessTexture3dRead", []),
+    Func("BindlessTexture3dReadLevel", []),
+    Func("BindlessTexture3dSize", []),
+    Func("BindlessTexture3dSizeLevel", []),
+    Func("BindlessBufferWrite", [], side_effects=True),
+    Func("BindlessBufferRead", []),
+    Func("BindlessBufferSize", []),
+    Func("BindlessBufferType"),
+    Func("BindlessByteBufferWrite", [], side_effects=True),
+    Func("BindlessByteBufferRead", []),
+    Func("BindlessByteBufferSize", []),
+    Func("Vec", []),
+    Func("Vec2", []),
+    Func("Vec3", []),
+    Func("Vec4", []),
+    Func("Permute"),
+    Func("GetElementPtr", []),
+    Func("ExtractElement", []),
+    Func("InsertElement", []),
+    Func("Array"),
+    Func("Struct"),
+    Func("MatFull", []),
+    Func("Mat2", []),
+    Func("Mat3", []),
+    Func("Mat4", []),
+    Func("BindlessAtomicExchange", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicCompareExchange", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchAdd", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchSub", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchAnd", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchOr", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchXor", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchMin", [("const Type*", "ty")], side_effects=True),
+    Func("BindlessAtomicFetchMax", [("const Type*", "ty")], side_effects=True),
+    Func(
+        "Callable",
+        [
+            ("luisa::shared_ptr<CallableModule>", "module"),
+        ],
+    ),
+    Func(
+        "CpuExt",
+        [
+            ("luisa::shared_ptr<CpuExternFn>", "f"),
+        ],
+    ),
+    Func("ShaderExecutionReorder"),
 ]
 
-print('''
+print(
+    """
 struct PhiIncoming {
     BasicBlockRef block = nullptr;
     NodeRef value = nullptr;
@@ -928,166 +907,201 @@ struct FuncMetadata {
     bool has_side_effects = false;
 };
 const FuncMetadata* func_metadata();
-''', file=fwd_file)
-gen_adt("Func", '''    [[nodiscard]] const FuncMetadata& metadata() const noexcept;
+""",
+    file=fwd_file,
+)
+gen_adt(
+    "Func",
+    """    [[nodiscard]] const FuncMetadata& metadata() const noexcept;
     [[nodiscard]] bool has_side_effects() const noexcept { return metadata().has_side_effects; }
     Func():Func(Tag::UNDEF){}
-''', funcs)
+""",
+    funcs,
+)
 gen_adt("Instruction", "", instructions)
 
-def gen_func_metadata():
-    print('static FuncMetadata _func_metadata[] = {', file=c_api_impl)
-    for f in funcs:
-        print('    {{ {} }},'.format('true' if f.side_effects else 'false'), file=c_api_impl)
-    print('};', file=c_api_impl)
-    print(f'static_assert(sizeof(_func_metadata) == sizeof(FuncMetadata) * {len(funcs)});', file=c_api_impl)
-    print('const FuncMetadata* func_metadata() { return _func_metadata; }', file=c_api_impl)
 
-    print('const FuncMetadata& Func::metadata() const noexcept {', file=cpp_api_impl)
-    print('    return func_metadata()[static_cast<int>(tag())];', file=cpp_api_impl)
-    print('}', file=cpp_api_impl)
+def gen_func_metadata():
+    print("static FuncMetadata _func_metadata[] = {", file=c_api_impl)
+    for f in funcs:
+        print("    {{ {} }},".format("true" if f.side_effects else "false"), file=c_api_impl)
+    print("};", file=c_api_impl)
+    print(f"static_assert(sizeof(_func_metadata) == sizeof(FuncMetadata) * {len(funcs)});", file=c_api_impl)
+    print("const FuncMetadata* func_metadata() { return _func_metadata; }", file=c_api_impl)
+
+    print("const FuncMetadata& Func::metadata() const noexcept {", file=cpp_api_impl)
+    print("    return func_metadata()[static_cast<int>(tag())];", file=cpp_api_impl)
+    print("}", file=cpp_api_impl)
 
     # add func_metadata to binding table
-    fname = 'func_metadata'
-    fsig = f'const FuncMetadata* (*{fname})()'
+    fname = "func_metadata"
+    fsig = f"const FuncMetadata* (*{fname})()"
     func_table.append((fname, fsig))
+
 
 gen_func_metadata()
 
 bindings = [
-    Item('BufferBinding','Binding', [
-        ('uint64_t', 'handle'),
-        ('uint64_t', 'offset'),
-        ('uint64_t', 'size')
-    ]),
-    Item('TextureBinding', 'Binding',[
-        ('uint64_t', 'handle'),
-        ('uint64_t', 'level'),
-    ]),
-    Item('BindlessArrayBinding', 'Binding',[
-        ('uint64_t', 'handle'),
-    ]),
-    Item('AccelBinding','Binding',[
-        ('uint64_t', 'handle'),
-    ]),
+    Item("BufferBinding", "Binding", [("uint64_t", "handle"), ("uint64_t", "offset"), ("uint64_t", "size")]),
+    Item(
+        "TextureBinding",
+        "Binding",
+        [
+            ("uint64_t", "handle"),
+            ("uint64_t", "level"),
+        ],
+    ),
+    Item(
+        "BindlessArrayBinding",
+        "Binding",
+        [
+            ("uint64_t", "handle"),
+        ],
+    ),
+    Item(
+        "AccelBinding",
+        "Binding",
+        [
+            ("uint64_t", "handle"),
+        ],
+    ),
 ]
-gen_adt('Binding', '', bindings)
+gen_adt("Binding", "", bindings)
+
 
 def gen_extra_bindings():
     def add_func(ret, name, args):
-        fname = f'ir_v2_binding_{name}'
-        fsig = f'{ret} (*{name})({args})'
+        fname = f"ir_v2_binding_{name}"
+        fsig = f"{ret} (*{name})({args})"
         func_table.append((fname, fsig))
-        print(f'{ret} {fname}({args});', file=fwd_file)
-    add_func('const Type*', 'type_extract', 'const Type* ty, uint32_t index')
-    add_func('size_t', 'type_size', 'const Type* ty')
-    add_func('size_t', 'type_alignment', 'const Type* ty')
-    add_func('RustyTypeTag', 'type_tag', 'const Type* ty')
-    add_func('bool', 'type_is_scalar', 'const Type* ty')
-    add_func('bool', 'type_is_bool', 'const Type* ty')
-    add_func('bool', 'type_is_int16', 'const Type* ty')
-    add_func('bool', 'type_is_int32', 'const Type* ty')
-    add_func('bool', 'type_is_int64', 'const Type* ty')
-    add_func('bool', 'type_is_uint16', 'const Type* ty')
-    add_func('bool', 'type_is_uint32', 'const Type* ty')
-    add_func('bool', 'type_is_uint64', 'const Type* ty')
-    add_func('bool', 'type_is_float16', 'const Type* ty')
-    add_func('bool', 'type_is_float32', 'const Type* ty')
+        print(f"{ret} {fname}({args});", file=fwd_file)
 
-    add_func('bool', 'type_is_array', 'const Type* ty')
-    add_func('bool', 'type_is_vector', 'const Type* ty')
-    add_func('bool', 'type_is_struct', 'const Type* ty')
-    add_func('bool', 'type_is_custom', 'const Type* ty')
-    add_func('bool', 'type_is_matrix', 'const Type* ty')
+    add_func("const Type*", "type_extract", "const Type* ty, uint32_t index")
+    add_func("size_t", "type_size", "const Type* ty")
+    add_func("size_t", "type_alignment", "const Type* ty")
+    add_func("RustyTypeTag", "type_tag", "const Type* ty")
+    add_func("bool", "type_is_scalar", "const Type* ty")
+    add_func("bool", "type_is_bool", "const Type* ty")
+    add_func("bool", "type_is_int16", "const Type* ty")
+    add_func("bool", "type_is_int32", "const Type* ty")
+    add_func("bool", "type_is_int64", "const Type* ty")
+    add_func("bool", "type_is_uint16", "const Type* ty")
+    add_func("bool", "type_is_uint32", "const Type* ty")
+    add_func("bool", "type_is_uint64", "const Type* ty")
+    add_func("bool", "type_is_float16", "const Type* ty")
+    add_func("bool", "type_is_float32", "const Type* ty")
 
-    add_func('const Type*', 'type_element', 'const Type* ty')
-    add_func('Slice<const char>', 'type_description', 'const Type* ty')
-    add_func('size_t', 'type_dimension', 'const Type* ty')
-    add_func('Slice<const Type* const>', 'type_members', 'const Type* ty')
+    add_func("bool", "type_is_array", "const Type* ty")
+    add_func("bool", "type_is_vector", "const Type* ty")
+    add_func("bool", "type_is_struct", "const Type* ty")
+    add_func("bool", "type_is_custom", "const Type* ty")
+    add_func("bool", "type_is_matrix", "const Type* ty")
 
-    add_func('const Type*', 'make_struct', 'size_t alignment, const Type** tys, uint32_t count')
-    add_func('const Type*', 'make_array', 'const Type* ty, uint32_t count')
-    add_func('const Type*', 'make_vector', 'const Type* ty, uint32_t count')
-    add_func('const Type*', 'make_matrix', 'uint32_t dim')
-    add_func('const Type*', 'make_custom', 'Slice<const char> name')
-    add_func('const Type*', 'from_desc', 'Slice<const char> desc')
+    add_func("const Type*", "type_element", "const Type* ty")
+    add_func("Slice<const char>", "type_description", "const Type* ty")
+    add_func("size_t", "type_dimension", "const Type* ty")
+    add_func("Slice<const Type* const>", "type_members", "const Type* ty")
 
-    add_func('const Type*', 'type_bool', '')
-    add_func('const Type*', 'type_int16', '')
-    add_func('const Type*', 'type_int32', '')
-    add_func('const Type*', 'type_int64', '')
-    add_func('const Type*', 'type_uint16', '')
-    add_func('const Type*', 'type_uint32', '')
-    add_func('const Type*', 'type_uint64', '')
-    add_func('const Type*', 'type_float16', '')
-    add_func('const Type*', 'type_float32', '')
+    add_func("const Type*", "make_struct", "size_t alignment, const Type** tys, uint32_t count")
+    add_func("const Type*", "make_array", "const Type* ty, uint32_t count")
+    add_func("const Type*", "make_vector", "const Type* ty, uint32_t count")
+    add_func("const Type*", "make_matrix", "uint32_t dim")
+    add_func("const Type*", "make_custom", "Slice<const char> name")
+    add_func("const Type*", "from_desc", "Slice<const char> desc")
 
-    add_func('const Node*', 'node_prev', 'const Node* node')
-    add_func('const Node*', 'node_next', 'const Node* node')
-    add_func('const CInstruction*', 'node_inst', 'const Node* node')
-    add_func('const Type*', 'node_type', 'const Node* node')
-    add_func('int32_t', 'node_get_index', 'const Node* node')
+    add_func("const Type*", "type_bool", "")
+    add_func("const Type*", "type_int16", "")
+    add_func("const Type*", "type_int32", "")
+    add_func("const Type*", "type_int64", "")
+    add_func("const Type*", "type_uint16", "")
+    add_func("const Type*", "type_uint32", "")
+    add_func("const Type*", "type_uint64", "")
+    add_func("const Type*", "type_float16", "")
+    add_func("const Type*", "type_float32", "")
 
-    add_func('const Node*', 'basic_block_first', 'const BasicBlock* block')
-    add_func('const Node*', 'basic_block_last', 'const BasicBlock* block')
+    add_func("const Node*", "node_prev", "const Node* node")
+    add_func("const Node*", "node_next", "const Node* node")
+    add_func("const CInstruction*", "node_inst", "const Node* node")
+    add_func("const Type*", "node_type", "const Node* node")
+    add_func("int32_t", "node_get_index", "const Node* node")
 
-    add_func('void','node_unlink', 'Node* node')
-    add_func('void','node_set_next', 'Node* node, Node* next')
-    add_func('void','node_set_prev', 'Node* node, Node* prev')
-    add_func('void','node_replace', 'Node* node, Node* new_node')
+    add_func("const Node*", "basic_block_first", "const BasicBlock* block")
+    add_func("const Node*", "basic_block_last", "const BasicBlock* block")
 
-    add_func('Pool*', 'pool_new', '')
-    add_func('void', 'pool_drop', 'Pool* pool')
-    add_func('Pool*', 'pool_clone', 'Pool* pool')
+    add_func("void", "node_unlink", "Node* node")
+    add_func("void", "node_set_next", "Node* node, Node* next")
+    add_func("void", "node_set_prev", "Node* node, Node* prev")
+    add_func("void", "node_replace", "Node* node, Node* new_node")
 
-    add_func('IrBuilder*', 'ir_builder_new', 'Pool* pool')
-    add_func('IrBuilder*', 'ir_builder_new_without_bb', 'Pool* pool')
-    add_func('void', 'ir_builder_drop', 'IrBuilder* builder')
-    add_func('void', 'ir_builder_set_insert_point', 'IrBuilder* builder, Node* node')
-    add_func('Node *', 'ir_builder_insert_point', 'IrBuilder* builder')
-    add_func('Node *','ir_build_call', 'IrBuilder* builder, CFunc &&func, Slice<const Node* const> args, const Type* ty')
-    add_func('Node *','ir_build_call_tag', 'IrBuilder* builder, RustyFuncTag tag, Slice<const Node* const> args, const Type* ty')
-    add_func('Node *', 'ir_build_if', 'IrBuilder* builder, const Node* cond, const BasicBlock* true_branch, const BasicBlock* false_branch')
-    add_func('Node *', 'ir_build_generic_loop', 'IrBuilder* builder, const BasicBlock* prepare, const Node* cond, const BasicBlock* body, const BasicBlock* update')
-    add_func('Node *', 'ir_build_switch', 'IrBuilder* builder, const Node* value, Slice<const SwitchCase> cases, const BasicBlock* default_')
-    add_func('Node *', 'ir_build_local', 'IrBuilder* builder, const Node* init')
-    add_func('Node *', 'ir_build_break', 'IrBuilder* builder')
-    add_func('Node *', 'ir_build_continue', 'IrBuilder* builder')
-    add_func('Node *', 'ir_build_return', 'IrBuilder* builder, const Node* value')
-    add_func('const BasicBlock*', 'ir_builder_finish', 'IrBuilder&& builder')
+    add_func("Pool*", "pool_new", "")
+    add_func("void", "pool_drop", "Pool* pool")
+    add_func("Pool*", "pool_clone", "Pool* pool")
 
-    add_func('const CpuExternFnData*', 'cpu_ext_fn_data', 'const CpuExternFn* f')
-    add_func('const CpuExternFn*', 'cpu_ext_fn_new', 'CpuExternFnData')
-    add_func('const CpuExternFn*', 'cpu_ext_fn_clone', 'const CpuExternFn* f')
-    add_func('void', 'cpu_ext_fn_drop', 'const CpuExternFn* f')
+    add_func("IrBuilder*", "ir_builder_new", "Pool* pool")
+    add_func("IrBuilder*", "ir_builder_new_without_bb", "Pool* pool")
+    add_func("void", "ir_builder_drop", "IrBuilder* builder")
+    add_func("void", "ir_builder_set_insert_point", "IrBuilder* builder, Node* node")
+    add_func("Node *", "ir_builder_insert_point", "IrBuilder* builder")
+    add_func(
+        "Node *", "ir_build_call", "IrBuilder* builder, CFunc &&func, Slice<const Node* const> args, const Type* ty"
+    )
+    add_func(
+        "Node *",
+        "ir_build_call_tag",
+        "IrBuilder* builder, RustyFuncTag tag, Slice<const Node* const> args, const Type* ty",
+    )
+    add_func(
+        "Node *",
+        "ir_build_if",
+        "IrBuilder* builder, const Node* cond, const BasicBlock* true_branch, const BasicBlock* false_branch",
+    )
+    add_func(
+        "Node *",
+        "ir_build_generic_loop",
+        "IrBuilder* builder, const BasicBlock* prepare, const Node* cond, const BasicBlock* body, const BasicBlock* update",
+    )
+    add_func(
+        "Node *",
+        "ir_build_switch",
+        "IrBuilder* builder, const Node* value, Slice<const SwitchCase> cases, const BasicBlock* default_",
+    )
+    add_func("Node *", "ir_build_local", "IrBuilder* builder, const Node* init")
+    add_func("Node *", "ir_build_break", "IrBuilder* builder")
+    add_func("Node *", "ir_build_continue", "IrBuilder* builder")
+    add_func("Node *", "ir_build_return", "IrBuilder* builder, const Node* value")
+    add_func("const BasicBlock*", "ir_builder_finish", "IrBuilder&& builder")
+
+    add_func("const CpuExternFnData*", "cpu_ext_fn_data", "const CpuExternFn* f")
+    add_func("const CpuExternFn*", "cpu_ext_fn_new", "CpuExternFnData")
+    add_func("const CpuExternFn*", "cpu_ext_fn_clone", "const CpuExternFn* f")
+    add_func("void", "cpu_ext_fn_drop", "const CpuExternFn* f")
 
 
 gen_extra_bindings()
 
 # generate binding table
-print('struct IrV2BindingTable {', file=c_def)
+print("struct IrV2BindingTable {", file=c_def)
 for f in func_table:
     fname, fsig = f
-    print(f'    {fsig};', file=c_def)
-print('};', file=c_def)
+    print(f"    {fsig};", file=c_def)
+print("};", file=c_def)
 print('extern "C" LUISA_IR_API IrV2BindingTable lc_ir_v2_binding_table();', file=c_def)
 
 # generate binding table impl
-print(
-    'extern "C" LUISA_IR_API IrV2BindingTable lc_ir_v2_binding_table() {', file=c_api_impl)
-print('    return {', file=c_api_impl)
+print('extern "C" LUISA_IR_API IrV2BindingTable lc_ir_v2_binding_table() {', file=c_api_impl)
+print("    return {", file=c_api_impl)
 for f in func_table:
     fname, fsig = f
-    print(f'        {fname},', file=c_api_impl)
-print('    };', file=c_api_impl)
-print('}', file=c_api_impl)
+    print(f"        {fname},", file=c_api_impl)
+print("    };", file=c_api_impl)
+print("}", file=c_api_impl)
 
 
-print('}', file=cpp_def)
-print('}', file=fwd_file)
-print('}', file=c_def)
-print('}', file=c_api_impl)
-print('}', file=cpp_api_impl)
+print("}", file=cpp_def)
+print("}", file=fwd_file)
+print("}", file=c_def)
+print("}", file=c_api_impl)
+print("}", file=cpp_api_impl)
 
 cpp_def.close()
 fwd_file.close()
@@ -1096,20 +1110,18 @@ c_api_impl.close()
 cpp_api_impl.close()
 
 # run clang-format
-os.system('clang-format -i ir_v2_defs.h')
-os.system('clang-format -i ir_v2_fwd.h')
-os.system('clang-format -i ir_v2_api.h')
-os.system('clang-format -i ../../../src/ir_v2/ir_v2_api.cpp')
-os.system('clang-format -i ../../../src/ir_v2/ir_v2_defs.cpp')
+os.system("clang-format -i ir_v2_defs.h")
+os.system("clang-format -i ir_v2_fwd.h")
+os.system("clang-format -i ir_v2_api.h")
+os.system("clang-format -i ../../../src/ir_v2/ir_v2_api.cpp")
+os.system("clang-format -i ../../../src/ir_v2/ir_v2_defs.cpp")
 
 # run bindgen
-os.system('bindgen ir_v2_api.h -o ../../../src/rust/luisa_compute_ir_v2/src/binding.rs --rustified-enum .*Tag --disable-name-namespacing '
-          '--blocklist-type _.* --blocklist-function _.* --blocklist-item _.* --blocklist-function .* '
-          '--blocklist-type TypeTag --blocklist-type InstructionTag --blocklist-type FuncTag --blocklist-type BindingTag '
-          '--new-type-alias .*Ref --new-type-alias .*RefMut '
-          '--with-derive-partialeq --with-derive-eq --with-derive-hash '
-          '-- -I../../ -x c++ -std=c++17 -DLUISA_IR_EXPORT_DLL=1 -DBINDGEN -Wno-pragma-once-outside-header -Wno-return-type-c-linkage')
-
-
-
-
+os.system(
+    "bindgen ir_v2_api.h -o ../../../src/rust/luisa_compute_ir_v2/src/binding.rs --rustified-enum .*Tag --disable-name-namespacing "
+    "--blocklist-type _.* --blocklist-function _.* --blocklist-item _.* --blocklist-function .* "
+    "--blocklist-type TypeTag --blocklist-type InstructionTag --blocklist-type FuncTag --blocklist-type BindingTag "
+    "--new-type-alias .*Ref --new-type-alias .*RefMut "
+    "--with-derive-partialeq --with-derive-eq --with-derive-hash "
+    "-- -I../../ -x c++ -std=c++17 -DLUISA_IR_EXPORT_DLL=1 -DBINDGEN -Wno-pragma-once-outside-header -Wno-return-type-c-linkage"
+)

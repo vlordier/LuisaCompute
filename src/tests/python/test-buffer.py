@@ -14,6 +14,7 @@ buffer = Buffer(32, MyStructType)
 print("buffer byte size(should be 32 * 32 = 1024): " + str(buffer.bytesize))
 # def get_negative_number_with_arg(buffer, atomic_buffer):
 
+
 # ConstantFlag = False
 @func
 def kernel():
@@ -23,7 +24,7 @@ def kernel():
     tmp.my_v1 = cos(tmp.my_v1)
     buffer.write(index, tmp)
     # "Macro Branch" showoff here
-    ConstantFlag = ((1 + 1) == 3) # ConstantFlag is an always-false constant value, simple calculations supported
+    ConstantFlag = (1 + 1) == 3  # ConstantFlag is an always-false constant value, simple calculations supported
     # this "if ConstantFlag" branch will be eliminated before codegen, so this code block can be ridiculously illegal!
 
     # if True:
@@ -45,6 +46,6 @@ synchronize()
 buffer.copy_to(array)
 result_str = ""
 for i in array:
-    result_str += str(i) + ' '
+    result_str += str(i) + " "
 print("result: ")
 print(result_str)

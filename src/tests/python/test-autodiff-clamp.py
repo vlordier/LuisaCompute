@@ -9,7 +9,7 @@ def clampa(x, a, b):
 
 @func
 def f(x) -> float:
-    return clampa(x, 0., 1.)
+    return clampa(x, 0.0, 1.0)
 
 
 @func
@@ -20,6 +20,7 @@ def df(x) -> float:
         backward(t, 1.0)
         g = grad(x)
     return g
+
 
 @func
 def test_autodiff(x):

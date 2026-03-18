@@ -17,7 +17,8 @@ def shader():
     coord = dispatch_id().xy
     size = dispatch_size().xy
     uv = (float2(coord) + 0.5) / float2(size)
-    img.write(coord, float4(uv, 0.5, 1.))
+    img.write(coord, float4(uv, 0.5, 1.0))
+
 
 ####### 16-bit float version
 # @func

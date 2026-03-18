@@ -24,7 +24,7 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             B = np.random.random((k, n)).astype(dtype)
             C = np.matmul(A, B)
 
-            case_name= f"case_{case_id}"
+            case_name = f"case_{case_id}"
             case_path = os.path.join(output_dir, case_name)
             os.makedirs(case_path, exist_ok=True)
 
@@ -38,15 +38,9 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             with open(os.path.join(case_path, "C_expected.json"), "w") as f:
                 json.dump(C.tolist(), f)
 
-            test_cases.append({
-                "id": case_id,
-                "type": "random",
-                "m": m,
-                "n": n,
-                "k": k,
-                "dtype": str(dtype),
-                "name": case_name
-            })
+            test_cases.append(
+                {"id": case_id, "type": "random", "m": m, "n": n, "k": k, "dtype": str(dtype), "name": case_name}
+            )
             case_id += 1
 
     # 2. Identity matrix tests
@@ -69,15 +63,17 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             with open(os.path.join(case_path, "C_expected.json"), "w") as f:
                 json.dump(C.tolist(), f)
 
-            test_cases.append({
-                "id": case_id,
-                "type": "identity_right",
-                "m": m,
-                "n": n,
-                "k": k,
-                "dtype": str(dtype),
-                "name": case_name
-            })
+            test_cases.append(
+                {
+                    "id": case_id,
+                    "type": "identity_right",
+                    "m": m,
+                    "n": n,
+                    "k": k,
+                    "dtype": str(dtype),
+                    "name": case_name,
+                }
+            )
             case_id += 1
 
             # Identity * B = B
@@ -97,15 +93,9 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             with open(os.path.join(case_path, "C_expected.json"), "w") as f:
                 json.dump(C.tolist(), f)
 
-            test_cases.append({
-                "id": case_id,
-                "type": "identity_left",
-                "m": m,
-                "n": n,
-                "k": k,
-                "dtype": str(dtype),
-                "name": case_name
-            })
+            test_cases.append(
+                {"id": case_id, "type": "identity_left", "m": m, "n": n, "k": k, "dtype": str(dtype), "name": case_name}
+            )
             case_id += 1
 
     # 3. Specific pattern matrices
@@ -129,29 +119,23 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             with open(os.path.join(case_path, "C_expected.json"), "w") as f:
                 json.dump(C.tolist(), f)
 
-            test_cases.append({
-                "id": case_id,
-                "type": "ones",
-                "m": m,
-                "n": n,
-                "k": k,
-                "dtype": str(dtype),
-                "name": case_name
-            })
+            test_cases.append(
+                {"id": case_id, "type": "ones", "m": m, "n": n, "k": k, "dtype": str(dtype), "name": case_name}
+            )
             case_id += 1
 
             # Diagonal matrices
             A = np.diag(np.random.random(min(m, k)).astype(dtype))
             if m > k:
-                A = np.vstack([A, np.zeros((m-k, k), dtype=dtype)])
+                A = np.vstack([A, np.zeros((m - k, k), dtype=dtype)])
             elif k > m:
-                A = np.hstack([A, np.zeros((m, k-m), dtype=dtype)])
+                A = np.hstack([A, np.zeros((m, k - m), dtype=dtype)])
 
             B = np.diag(np.random.random(min(k, n)).astype(dtype))
             if k > n:
-                B = np.hstack([B, np.zeros((k, n-n), dtype=dtype)])
+                B = np.hstack([B, np.zeros((k, n - n), dtype=dtype)])
             elif n > k:
-                B = np.vstack([B, np.zeros((n-k, n), dtype=dtype)])
+                B = np.vstack([B, np.zeros((n - k, n), dtype=dtype)])
 
             C = np.matmul(A, B)
 
@@ -167,15 +151,9 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
             with open(os.path.join(case_path, "C_expected.json"), "w") as f:
                 json.dump(C.tolist(), f)
 
-            test_cases.append({
-                "id": case_id,
-                "type": "diagonal",
-                "m": m,
-                "n": n,
-                "k": k,
-                "dtype": str(dtype),
-                "name": case_name
-            })
+            test_cases.append(
+                {"id": case_id, "type": "diagonal", "m": m, "n": n, "k": k, "dtype": str(dtype), "name": case_name}
+            )
             case_id += 1
 
     # 4. Near-zero values test
@@ -198,15 +176,9 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
         with open(os.path.join(case_path, "C_expected.json"), "w") as f:
             json.dump(C.tolist(), f)
 
-        test_cases.append({
-            "id": case_id,
-            "type": "small_values",
-            "m": m,
-            "n": n,
-            "k": k,
-            "dtype": str(dtype),
-            "name": case_name
-        })
+        test_cases.append(
+            {"id": case_id, "type": "small_values", "m": m, "n": n, "k": k, "dtype": str(dtype), "name": case_name}
+        )
         case_id += 1
 
     # Save test case metadata
@@ -215,6 +187,7 @@ def generate_gemm_test_cases(output_dir="gemm_test_cases"):
 
     print(f"Generated {len(test_cases)} GEMM test cases in '{output_dir}'")
     return test_cases
+
 
 def load_test_cases(input_dir="gemm_test_cases"):
     """Load the generated test cases from JSON files."""
@@ -246,19 +219,22 @@ def load_test_cases(input_dir="gemm_test_cases"):
             B = B.astype(np.float64)
             C_expected = C_expected.astype(np.float64)
 
-        loaded_cases.append({
-            "id": case["id"],
-            "type": case["type"],
-            "m": case["m"],
-            "n": case["n"],
-            "k": case["k"],
-            "dtype": case["dtype"],
-            "A": A,
-            "B": B,
-            "C_expected": C_expected
-        })
+        loaded_cases.append(
+            {
+                "id": case["id"],
+                "type": case["type"],
+                "m": case["m"],
+                "n": case["n"],
+                "k": case["k"],
+                "dtype": case["dtype"],
+                "A": A,
+                "B": B,
+                "C_expected": C_expected,
+            }
+        )
 
     return loaded_cases
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate GEMM test cases")

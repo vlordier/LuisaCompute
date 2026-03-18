@@ -1,7 +1,7 @@
 try:
     import sourceinspect
 except ImportError:
-    print('sourceinspect not installed. This may cause issues in interactive mode (REPL).')
+    print("sourceinspect not installed. This may cause issues in interactive mode (REPL).")
     import inspect as sourceinspect
     # need sourceinspect for getting source. see (#10)
 import ast
@@ -46,7 +46,7 @@ def annotation_type_check(funcname, parameters, argtypes):
     def anno_str(anno):
         if anno == inspect._empty:
             return ""
-        if hasattr(anno, '__name__'):
+        if hasattr(anno, "__name__"):
             return ":" + anno.__name__
         return ":" + repr(anno)
 
@@ -56,7 +56,7 @@ def annotation_type_check(funcname, parameters, argtypes):
             break
         anno = parameters[name].annotation
         if anno != inspect._empty and not implicit_convertible(anno, argtypes[idx]):
-            hint = funcname + '(' + ', '.join([n + anno_str(parameters[n].annotation) for n in parameters]) + ')'
+            hint = funcname + "(" + ", ".join([n + anno_str(parameters[n].annotation) for n in parameters]) + ")"
             raise TypeError(f"argument '{name}' expects {anno}, got {argtypes[idx]}. calling {hint}")
 
 
@@ -70,11 +70,7 @@ class FuncInstanceInfo:
         self.call_from_host = call_from_host
         self.argtypes = argtypes
         _closure_vars = inspect.getclosurevars(func.pyfunc)
-        self.closure_variable = {
-            **_closure_vars.globals,
-            **_closure_vars.nonlocals,
-            **_closure_vars.builtins
-        }
+        self.closure_variable = {**_closure_vars.globals, **_closure_vars.nonlocals, **_closure_vars.builtins}
         self.local_variable = {}  # dict: name -> VariableInfo(dtype, expr, is_arg)
         self.default_arg_values = self._capture_default_arg_values(func.pyfunc)
         self.function = None
@@ -88,8 +84,11 @@ class FuncInstanceInfo:
 
     def _capture_default_arg_values(self, pyfunc):
         sig = inspect.signature(pyfunc)
-        return {param.name: param.default for param in sig.parameters.values()
-                if param.default is not inspect.Parameter.empty}
+        return {
+            param.name: param.default
+            for param in sig.parameters.values()
+            if param.default is not inspect.Parameter.empty
+        }
 
     def build_arguments(self, allow_ref: bool, arg_info=None):
         if arg_info is None:
@@ -115,7 +114,10 @@ class FuncInstanceInfo:
 class CompileError(Exception):
     pass
 
+
 type_idx = 0
+
+
 class func:
     # creates a luisa function with given function
     # A luisa function can be run on accelarated device (CPU/GPU).
@@ -133,7 +135,7 @@ class func:
         self.filename = frameinfo.filename
         self.lineno = frameinfo.lineno
 
-    def save(self, argtypes: tuple, name=None, async_build: bool = True, print_cpp_header = False):
+    def save(self, argtypes: tuple, name=None, async_build: bool = True, print_cpp_header=False):
         global type_idx
         self.sourcelines = sourceinspect.getsourcelines(self.pyfunc)[0]
         _uses_autodiff = "autodiff():" in "".join(self.sourcelines)
@@ -142,12 +144,14 @@ class func:
         self.parameters = inspect.signature(self.pyfunc).parameters
         if len(argtypes) > len(self.parameters):
             raise Exception(
-                f"calling {self.__name__} with {len(argtypes)} arguments ({len(self.parameters)} or less expected).")
+                f"calling {self.__name__} with {len(argtypes)} arguments ({len(self.parameters)} or less expected)."
+            )
         # Check for too few arguments (considering default values)
         min_required_args = sum(1 for p in self.parameters.values() if p.default is inspect.Parameter.empty)
         if len(argtypes) < min_required_args:
             raise Exception(
-                f"calling {self.__name__} with {len(argtypes)} arguments ({min_required_args} or more expected).")
+                f"calling {self.__name__} with {len(argtypes)} arguments ({min_required_args} or more expected)."
+            )
         annotation_type_check(self.__name__, self.parameters, argtypes)
         f = FuncInstanceInfo(self, True, argtypes)
 
@@ -176,17 +180,18 @@ class func:
         else:
             get_global_device().impl().save_shader(f.function, name)
         if print_cpp_header:
-            front = '''#pragma once
+            front = """#pragma once
 #include <luisa/core/stl/string.h>
 #include <luisa/runtime/device.h>
 #include <luisa/runtime/shader.h>
-'''
+"""
             type_idx = 0
             type_map = {}
             type_defines = []
             r = ""
             shader_path = Path(name)
             shader_name = shader_path.name.split(".")[0]
+
             def get_value_type_name(dtype, r):
                 global type_idx
                 if dtype in basic_dtypes:
@@ -214,6 +219,7 @@ class func:
                     return name, r
                 else:
                     return None, r
+
             byte_buffer_declared = False
             buffer_declared = False
             volume_declared = False
@@ -291,8 +297,15 @@ class func:
                     type_name += ", "
             func_declare += type_name + ">"
             r += "using Type = " + func_declare + ";\n"
-            r += "inline Type load" + "(luisa::compute::Device &device, luisa::string_view path) {\n    return device.load_shader<" + str(dimension) + ", " + type_name + ">(path);\n}\n"
-            return front + "namespace " + shader_name + ' {\n' +  r + '}// namespace ' + shader_name + '\n'
+            r += (
+                "inline Type load"
+                + "(luisa::compute::Device &device, luisa::string_view path) {\n    return device.load_shader<"
+                + str(dimension)
+                + ", "
+                + type_name
+                + ">(path);\n}\n"
+            )
+            return front + "namespace " + shader_name + " {\n" + r + "}// namespace " + shader_name + "\n"
 
     # compiles an argument-type-specialized callable/kernel
     # returns FuncInstanceInfo
@@ -306,12 +319,14 @@ class func:
         self.parameters = inspect.signature(self.pyfunc).parameters
         if len(argtypes) > len(self.parameters):
             raise Exception(
-                f"calling {self.__name__} with {len(argtypes)} arguments ({len(self.parameters)} or less expected).")
+                f"calling {self.__name__} with {len(argtypes)} arguments ({len(self.parameters)} or less expected)."
+            )
         # Check for too few arguments (considering default values)
         min_required_args = sum(1 for p in self.parameters.values() if p.default is inspect.Parameter.empty)
         if len(argtypes) < min_required_args:
             raise Exception(
-                f"calling {self.__name__} with {len(argtypes)} arguments ({min_required_args} or more expected).")
+                f"calling {self.__name__} with {len(argtypes)} arguments ({min_required_args} or more expected)."
+            )
         annotation_type_check(self.__name__, self.parameters, argtypes)
         f = FuncInstanceInfo(self, call_from_host, argtypes)
 
@@ -366,7 +381,14 @@ class func:
         return self.compiled_results[arg_features]
 
     # dispatch shader to stream
-    def __call__(self, *args, dispatch_size=None, stream=None, dispatch_buffer_offset:int=0, max_dispatch_size:int=(2**32-1)):
+    def __call__(
+        self,
+        *args,
+        dispatch_size=None,
+        stream=None,
+        dispatch_buffer_offset: int = 0,
+        max_dispatch_size: int = (2**32 - 1),
+    ):
         get_global_device()  # check device is initialized
         if stream is None:
             stream = globalvars.vars.stream

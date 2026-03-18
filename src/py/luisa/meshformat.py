@@ -16,7 +16,6 @@ class MeshFormat:
         self.handle = lcapi.MeshFormat()
         for attributes in streams:
             for i in attributes:
-                assert type(i[0]) is lcapi.VertexAttributeType and type(
-                    i[1]) is lcapi.VertexElementFormat
+                assert type(i[0]) is lcapi.VertexAttributeType and type(i[1]) is lcapi.VertexElementFormat
                 self.handle.add_attribute(i[0], i[1])
             self.handle.add_stream()

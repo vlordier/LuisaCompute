@@ -10,8 +10,11 @@ from .types import BuiltinFuncBuilder, element_of, length_of, to_lctype, uint, u
 
 
 def _check_storage(storage_name, dtype):
-    compatible = {float: {'byte', 'short', 'half', 'float'}, int: {'byte', 'short', 'int', 'uint'},
-                  uint: {'byte', 'short', 'int', 'uint'}}
+    compatible = {
+        float: {"byte", "short", "half", "float"},
+        int: {"byte", "short", "int", "uint"},
+        uint: {"byte", "short", "int", "uint"},
+    }
     if storage_name.lower() not in compatible[dtype]:
         raise TypeError(f"{dtype} texture is only compatible with storage: {compatible[dtype]}")
 
@@ -21,9 +24,9 @@ class Image3D:
         if width == 0 or height == 0 or volume == 0:
             raise Exception("Image3D size must be non-zero")
         if dtype not in {int, uint, float}:
-            raise Exception('Image3D only supports int / uint / float')
+            raise Exception("Image3D only supports int / uint / float")
         if channel not in (1, 3, 4):
-            raise Exception('Image3D can only have 1/2/4 channels')
+            raise Exception("Image3D can only have 1/2/4 channels")
         self.width = width
         self.height = height
         self.channel = channel
@@ -70,9 +73,15 @@ class Image3D:
     def copy_to_tex(self, tex, sync=False, stream=None):
         if stream is None:
             stream = globalvars.vars.stream
-        assert self.storage == tex.storage and self.width == tex.width and self.volume == tex.volume and self.height == tex.height
-        cpcmd = lcapi.TextureCopyCommand.create(self.storage, self.handle, tex.handle, 0, 0,
-                                                lcapi.uint3(self.width, self.height, self.volume))
+        assert (
+            self.storage == tex.storage
+            and self.width == tex.width
+            and self.volume == tex.volume
+            and self.height == tex.height
+        )
+        cpcmd = lcapi.TextureCopyCommand.create(
+            self.storage, self.handle, tex.handle, 0, 0, lcapi.uint3(self.width, self.height, self.volume)
+        )
         stream.add(cpcmd)
         if sync:
             stream.synchronize()
@@ -80,9 +89,15 @@ class Image3D:
     def copy_from_tex(self, tex, sync=False, stream=None):
         if stream is None:
             stream = globalvars.vars.stream
-        assert self.storage == tex.storage and self.width == tex.width and self.volume == tex.volume and self.height == tex.height
-        cpcmd = lcapi.TextureCopyCommand.create(self.storage, tex.handle, self.handle, 0, 0,
-                                                lcapi.uint3(self.width, self.height, self.volume))
+        assert (
+            self.storage == tex.storage
+            and self.width == tex.width
+            and self.volume == tex.volume
+            and self.height == tex.height
+        )
+        cpcmd = lcapi.TextureCopyCommand.create(
+            self.storage, tex.handle, self.handle, 0, 0, lcapi.uint3(self.width, self.height, self.volume)
+        )
         stream.add(cpcmd)
         if sync:
             stream.synchronize()
@@ -97,8 +112,9 @@ class Image3D:
         if stream is None:
             stream = globalvars.vars.stream
         assert arr.size * arr.itemsize == self.bytesize
-        ulcmd = lcapi.TextureUploadCommand.create(self.handle, self.storage, 0,
-                                                  lcapi.uint3(self.width, self.height, self.volume), arr)
+        ulcmd = lcapi.TextureUploadCommand.create(
+            self.handle, self.storage, 0, lcapi.uint3(self.width, self.height, self.volume), arr
+        )
         stream.add(ulcmd)
         if sync:
             stream.synchronize()
@@ -107,8 +123,9 @@ class Image3D:
         if stream is None:
             stream = globalvars.vars.stream
         assert arr.size * arr.itemsize == self.bytesize
-        dlcmd = lcapi.TextureDownloadCommand.create(self.handle, self.storage, 0,
-                                                    lcapi.uint3(self.width, self.height, self.volume), arr)
+        dlcmd = lcapi.TextureDownloadCommand.create(
+            self.handle, self.storage, 0, lcapi.uint3(self.width, self.height, self.volume), arr
+        )
         stream.add(dlcmd)
         # stream.add_readback_buffer(arr)
         if sync:
@@ -116,10 +133,11 @@ class Image3D:
 
     def numpy(self):
         import numpy as np
+
         if self.dtype == float:
-            npf = {'BYTE': np.uint8, 'SHORT': np.ushort, 'HALF': np.half, 'FLOAT': np.float32}[self.storage_name]
+            npf = {"BYTE": np.uint8, "SHORT": np.ushort, "HALF": np.half, "FLOAT": np.float32}[self.storage_name]
         else:
-            npf = {'BYTE': np.int8, 'SHORT': np.short, 'INT': np.int32}[self.storage_name]
+            npf = {"BYTE": np.int8, "SHORT": np.short, "INT": np.int32}[self.storage_name]
         arr = np.empty((self.height, self.width, self.channel), dtype=npf)
         self.copy_to(arr, sync=True)
         return arr
@@ -152,6 +170,7 @@ class Texture3DType:
     def get_read_method(dtype):
         dtype4 = vector(element_of(dtype), 4)
         if length_of(dtype) == 4:
+
             @BuiltinFuncBuilder
             def read(self, coord):
                 check_exact_signature([uint3], [coord], "read")
@@ -159,12 +178,14 @@ class Texture3DType:
 
             return read
         elif length_of(dtype) == 2:
+
             @func
             def read(self, coord: uint3):
                 return _builtin_call(dtype4, "TEXTURE_READ", self, (coord)).xy
 
             return read
         elif length_of(dtype) == 1:
+
             @func
             def read(self, coord: uint3):
                 return _builtin_call(dtype4, "TEXTURE_READ", self, (coord)).x
@@ -177,6 +198,7 @@ class Texture3DType:
     @cache
     def get_write_method(dtype):
         if length_of(dtype) == 4:
+
             @BuiltinFuncBuilder
             def write(self, coord, value):
                 check_exact_signature([uint3, dtype], [coord, value], "write")
@@ -192,6 +214,7 @@ class Texture3DType:
             else:
                 zero = element_of(dtype)(0)
             if length_of(dtype) == 2:
+
                 @func
                 def write(self, coord: uint3, value: dtype):
                     tmp = _builtin_call(dtype4, opstr, value, zero, zero)
@@ -199,6 +222,7 @@ class Texture3DType:
 
                 return write
             if length_of(dtype) == 1:
+
                 @func
                 def write(self, coord: uint3, value: dtype):
                     tmp = _builtin_call(dtype4, opstr, value, zero, zero, zero)

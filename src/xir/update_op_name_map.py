@@ -5,11 +5,12 @@ SCRIPT_DIR: str = os.path.dirname(os.path.realpath(__file__))
 
 
 def to_snake_case(name: str) -> str:
-    return functools.reduce(lambda x, y: x + ('_' if y.isupper() else '') + y, name).lower()
+    return functools.reduce(lambda x, y: x + ("_" if y.isupper() else "") + y, name).lower()
 
 
 def find_enum(lines) -> (int, str):
     import re
+
     regex = re.compile("enum (struct|class) (\\w*)Op")
     for i, line in enumerate(lines):
         if matches := regex.match(line):
@@ -42,15 +43,15 @@ def process():
             if enum_index == -1:
                 break
             enum_names.append(enum_name)
-            lines = lines[enum_index + 1:]
+            lines = lines[enum_index + 1 :]
             enum_end = lines.index("};")
             ops = [line.split(",")[0].strip() for line in lines[:enum_end]]
-            lines = lines[enum_end + 1:]
+            lines = lines[enum_end + 1 :]
             cpp_file.write(f"""luisa::string_view to_string({enum_name}Op op) noexcept {{
     using namespace std::string_view_literals;
     switch (op) {{
 """)
-            cpp_file.writelines([f"        case {enum_name}Op::{op}: return \"{op.lower()}\"sv;\n" for op in ops])
+            cpp_file.writelines([f'        case {enum_name}Op::{op}: return "{op.lower()}"sv;\n' for op in ops])
             cpp_file.write(f"""    }}
     LUISA_ERROR_WITH_LOCATION("Unknown {to_snake_case(enum_name)} operation (code = {{}}).", static_cast<uint32_t>(op));
 }}
@@ -59,7 +60,7 @@ def process():
     using namespace std::string_view_literals;
     static const luisa::unordered_map<luisa::string_view, {enum_name}Op> m{{
 """)
-            cpp_file.writelines([f"        {{\"{op.lower()}\"sv, {enum_name}Op::{op}}},\n" for op in ops])
+            cpp_file.writelines([f'        {{"{op.lower()}"sv, {enum_name}Op::{op}}},\n' for op in ops])
             cpp_file.write(f"""    }};
     auto iter = m.find(name);
     LUISA_ASSERT(iter != m.end(), "Unknown {to_snake_case(enum_name)} operation: {{}}.", name);
@@ -74,7 +75,8 @@ def process():
         for enum_name in enum_names:
             inl_file.write(f"[[nodiscard]] LUISA_XIR_API luisa::string_view to_string({enum_name}Op op) noexcept;\n")
             inl_file.write(
-                f"[[nodiscard]] LUISA_XIR_API {enum_name}Op {to_snake_case(enum_name)}_op_from_string(luisa::string_view name) noexcept;\n\n")
+                f"[[nodiscard]] LUISA_XIR_API {enum_name}Op {to_snake_case(enum_name)}_op_from_string(luisa::string_view name) noexcept;\n\n"
+            )
 
 
 if __name__ == "__main__":

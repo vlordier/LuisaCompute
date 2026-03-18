@@ -47,7 +47,7 @@ if __name__ == "__main__":
             print("start to run test")
             for feat in feat_list:
                 print(f"test feature: {feat}")
-                args = ["powershell", os.path.join(config["bin"], "test_all.exe"), "--build",  f"-ts={feat}"]
+                args = ["powershell", os.path.join(config["bin"], "test_all.exe"), "--build", f"-ts={feat}"]
                 for device in device_list:
                     args.append(f"--backend-{device}")
                 print(f"run command: {args}")

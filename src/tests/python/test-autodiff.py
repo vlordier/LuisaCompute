@@ -21,9 +21,11 @@ y_values = np.arange(N * 2, dtype=np.float32).reshape(-1, 2)
 x_buffer.copy_from(x_values)
 y_buffer.copy_from(y_values)
 
+
 @func
 def f(x: float, y: float2):
     return x * x + y.x * y.x + y.y * y.y
+
 
 @func
 def shader():
@@ -43,8 +45,10 @@ def shader():
 def fd():
     x = np.array(x_values, dtype=np.float64)
     y = np.array(y_values, dtype=np.float64)
+
     def f(x, y):
         return x * x + y[:, 0] * y[:, 0] + y[:, 1] * y[:, 1]
+
     eps = 1e-4
     dx = (f(x + eps, y) - f(x - eps, y)) / (2 * eps)
     dy0 = (f(x, [*y, eps, 0]) - f(x, y - [eps, 0])) / (2 * eps)
