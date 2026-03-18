@@ -94,10 +94,10 @@ def point_to_grid():
         weight = w[i].x * w[j].y * w[k].z
         vadd = weight * (p_mass * vp + affine * dpos)
         idx = index(uint3(base + offset))
-        old = grid_v.atomic_fetch_add(idx * 4, vadd.x)
-        old = grid_v.atomic_fetch_add(idx * 4 + 1, vadd.y)
-        old = grid_v.atomic_fetch_add(idx * 4 + 2, vadd.z)
-        old = grid_m.atomic_fetch_add(idx, weight * p_mass)
+        _old = grid_v.atomic_fetch_add(idx * 4, vadd.x)
+        _old = grid_v.atomic_fetch_add(idx * 4 + 1, vadd.y)
+        _old = grid_v.atomic_fetch_add(idx * 4 + 2, vadd.z)
+        _old = grid_m.atomic_fetch_add(idx, weight * p_mass)
 
 
 @func
@@ -218,7 +218,7 @@ def init_value():
 init_value()
 gui = GUI("Test MPM", (resolution, resolution))
 while gui.running():
-    for i in range(n_steps):
+    for _ in range(n_steps):
         substep()
     clear_display(dispatch_size=(resolution, resolution, 1))
     draw_particles(dispatch_size=(n_particles, 1, 1))

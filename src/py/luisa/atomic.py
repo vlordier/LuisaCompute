@@ -163,9 +163,9 @@ def _atomic_access_call(n_dtype, n_op_name, buf, idx, member_nest_level, *args):
     chain.create(buf.expr)
     chain.access(idx.expr)
     assert type(member_nest_level).__name__ == "Constant"
-    for l in range(member_nest_level.value):
-        assert type(args[l]).__name__ == "Constant"
-        chain.member(args[l].value)
+    for level_idx in range(member_nest_level.value):
+        assert type(args[level_idx]).__name__ == "Constant"
+        chain.member(args[level_idx].value)
     return dtype, chain.operate(op, [x.expr for x in args[member_nest_level.value:]])
 
 

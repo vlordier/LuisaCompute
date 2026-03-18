@@ -7,8 +7,8 @@ from .raster import AppData
 
 def save_raster_shader(mesh_format: MeshFormat, vertex: func, pixel: func, vert_argtypes, pixel_argtypes, name: str,
                        async_builder: bool = True):
-    vert_f = vertex.get_compiled(2, False, (AppData,) + vert_argtypes)
-    pixel_f = pixel.get_compiled(2, False, (vert_f.return_type,) + pixel_argtypes)
+    vert_f = vertex.get_compiled(2, False, (AppData, *vert_argtypes))
+    pixel_f = pixel.get_compiled(2, False, (vert_f.return_type, *pixel_argtypes))
     device = get_global_device().impl()
     check_val = device.check_raster_shader(vert_f.function, pixel_f.function)
     if (check_val > 0):

@@ -122,7 +122,7 @@ def builtin_unary_op(op, operand):
         ast.Invert: lcapi.UnaryOp.BIT_NOT
     }.get(op)
     dtype = operand.dtype
-    length = length_of(operand.dtype)
+    _length = length_of(operand.dtype)
     return dtype, lcapi.builder().unary(to_lctype(dtype), lc_op, operand.expr)
 
 
@@ -201,7 +201,7 @@ def builtin_bin_op(op, lhs, rhs):
             dtype = deduce_broadcast(dtype0, dtype1)
         # and / or: bool allowed
     elif op in {ast.And, ast.Or}:
-        assert element_of(lhs.dtype) == element_of(rhs.dtype) == bool, f'operator `{op}` only supports `bool` type.'
+        assert element_of(lhs.dtype) is element_of(rhs.dtype) is bool, f'operator `{op}` only supports `bool` type.'
         dtype = deduce_broadcast(dtype0, dtype1)
         # add / sub / div: int, uint and float allowed
         # relational: int, uint and float allowed
@@ -347,7 +347,7 @@ def make_vector_call(dtype, op, args):
         if implicit_convertible(arg.dtype, convtype):
             exprlist.append(arg.expr)
         else:
-            dtype1, expr1 = builtin_type_cast(convtype, arg)
+            _dtype1, expr1 = builtin_type_cast(convtype, arg)
             exprlist.append(expr1)
     return convtype, lcapi.builder().call(to_lctype(convtype), op, exprlist)
 
@@ -478,7 +478,7 @@ def _make_matrices(name, *args):
                     for arg in args:
                         assert arg.dtype in {int, uint, float, short, ushort, half}
             except AssertionError:
-                raise TypeError(f"Can't make {T}{N}x{N} from {[x.dtype for x in args]}")
+                raise TypeError(f"Can't make {T}{N}x{N} from {[x.dtype for x in args]}") from None
             op = getattr(lcapi.CallOp, name.upper())
             dtype = getattr(lcapi, f'float{N}x{N}')
             return dtype, lcapi.builder().call(to_lctype(dtype), op, [x.expr for x in args])
@@ -620,7 +620,7 @@ _func_map["smoothstep"] = _lerp
 
 
 def _select(name, *args):
-    bool_vec_len = length_of(args[2].dtype)
+    _bool_vec_len = length_of(args[2].dtype)
     assert len(args) == 3 and \
            args[2].dtype in {bool, bool2, bool3, bool4} and \
            args[0].dtype in scalar_and_vector_dtypes and \

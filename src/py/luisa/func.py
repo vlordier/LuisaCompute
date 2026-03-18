@@ -38,7 +38,7 @@ def create_arg_expr(dtype, allow_ref):
     elif lctype.is_accel():
         return lcapi.builder().accel()
     else:
-        assert False
+        raise AssertionError()
 
 
 # annotation can be used (but not required) to specify argument type
@@ -94,13 +94,15 @@ class FuncInstanceInfo:
     def build_arguments(self, allow_ref: bool, arg_info=None):
         if arg_info is None:
             for idx, name in enumerate(self.func.parameters):
-                if idx >= len(self.argtypes): break
+                if idx >= len(self.argtypes):
+                    break
                 dtype = self.argtypes[idx]
                 expr = create_arg_expr(dtype, allow_ref=allow_ref)
                 self.local_variable[name] = VariableInfo(dtype, expr, is_arg=True)
         else:
             for idx, name in enumerate(self.func.parameters):
-                if idx >= len(self.argtypes): break
+                if idx >= len(self.argtypes):
+                    break
                 var_info = arg_info.get(idx)
                 dtype = self.argtypes[idx]
                 if var_info is not None:
@@ -134,7 +136,7 @@ class func:
     def save(self, argtypes: tuple, name=None, async_build: bool = True, print_cpp_header = False):
         global type_idx
         self.sourcelines = sourceinspect.getsourcelines(self.pyfunc)[0]
-        uses_autodiff = "autodiff():" in "".join(self.sourcelines)
+        _uses_autodiff = "autodiff():" in "".join(self.sourcelines)
         self.sourcelines = [textwrap.fill(line, tabsize=4, width=9999) for line in self.sourcelines]
         self.tree = ast.parse(textwrap.dedent("\n".join(self.sourcelines)))
         self.parameters = inspect.signature(self.pyfunc).parameters
@@ -193,7 +195,7 @@ class func:
                     return "luisa::" + dtype.__name__, r
                 elif type(dtype).__name__ == "StructType":
                     name = type_map.get(dtype)
-                    if name == None:
+                    if name is None:
                         name = "Arg" + str(type_idx)
                         type_idx += 1
                         type_map[dtype] = name
@@ -205,7 +207,7 @@ class func:
                     return name, r
                 elif type(dtype).__name__ == "ArrayType":
                     name = type_map.get(dtype)
-                    if name == None:
+                    if name is None:
                         ele_name, r = get_value_type_name(dtype.dtype, r)
                         name = "std::array<" + ele_name + ", " + str(dtype.size) + ">"
                         type_map[dtype] = name
@@ -222,7 +224,7 @@ class func:
                     type_defines.append(name)
                 elif type(arg).__name__ == "Texture2DType":
                     dtype_name, r = get_value_type_name(arg.dtype, r)
-                    if name == None:
+                    if name is None:
                         name = f"Image<{dtype_name}>"
                         type_map[arg] = name
                         if not image_declared:
@@ -231,7 +233,7 @@ class func:
                     type_defines.append("luisa::compute::" + name)
                 elif type(arg).__name__ == "Texture3DType":
                     dtype_name, r = get_value_type_name(arg.dtype, r)
-                    if name == None:
+                    if name is None:
                         name = f"Volume<{dtype_name}>"
                         type_map[arg] = name
                         if not volume_declared:
@@ -240,7 +242,7 @@ class func:
                     type_defines.append("luisa::compute::" + name)
                 elif type(arg).__name__ == "BufferType":
                     dtype_name, r = get_value_type_name(arg.dtype, r)
-                    if name == None:
+                    if name is None:
                         name = f"Buffer<{dtype_name}>"
                         type_map[arg] = name
                         if not buffer_declared:
@@ -248,7 +250,7 @@ class func:
                             buffer_declared = True
                     type_defines.append("luisa::compute::" + name)
                 elif arg.__name__ == "ByteBufferType":
-                    if name == None:
+                    if name is None:
                         name = "ByteBuffer"
                         type_map[arg] = name
                         if not byte_buffer_declared:
@@ -257,36 +259,34 @@ class func:
                     type_defines.append("luisa::compute::" + name)
                 elif arg.__name__ == "BindlessArray":
                     name = type_map.get(arg)
-                    if name == None:
+                    if name is None:
                         name = "BindlessArray"
                         type_map[arg] = name
                         front += "#include <luisa/runtime/bindless_array.h>\n"
                     type_defines.append("luisa::compute::" + name)
                 elif arg.__name__ == "Accel":
                     name = type_map.get(arg)
-                    if name == None:
+                    if name is None:
                         name = "Accel"
                         type_map[arg] = name
                         front += "#include <luisa/runtime/rtx/accel.h>\n"
                     type_defines.append("luisa::compute::" + name)
                 elif arg.__name__ == "IndirectDispatchBuffer":
                     name = type_map.get(arg)
-                    if name == None:
+                    if name is None:
                         name = "IndirectDispatchBuffer"
                         type_map[arg] = name
                         front += "#include <luisa/runtime/dispatch_buffer.h>\n"
                     type_defines.append("luisa::compute::" + name)
                 else:
-                    assert False
+                    raise AssertionError()
 
             dimension = f.builder.dimension()
             func_declare = ""
             func_declare += f"luisa::compute::Shader{dimension}D<"
             type_name = ""
-            sz = 0
-            for i in type_defines:
+            for sz, i in enumerate(type_defines, 1):
                 type_name += f"{i}"
-                sz += 1
                 if sz != len(type_defines):
                     type_name += ", "
             func_declare += type_name + ">"
@@ -300,7 +300,7 @@ class func:
         call_from_host = func_type == 0
         # get python AST & context
         self.sourcelines = sourceinspect.getsourcelines(self.pyfunc)[0]
-        uses_autodiff = "autodiff():" in "".join(self.sourcelines)
+        _uses_autodiff = "autodiff():" in "".join(self.sourcelines)
         self.sourcelines = [textwrap.fill(line, tabsize=4, width=9999) for line in self.sourcelines]
         self.tree = ast.parse(textwrap.dedent("\n".join(self.sourcelines)))
         self.parameters = inspect.signature(self.pyfunc).parameters
@@ -347,11 +347,11 @@ class func:
     # looks up arg_type_tuple; compile if not existing
     # returns FuncInstanceInfo
     def get_compiled(self, func_type: int, allow_ref: bool, argtypes: tuple, arg_info=None, custom_key=None):
-        if custom_key != None and self.fence_idx < custom_key:
+        if custom_key is not None and self.fence_idx < custom_key:
             self.fence_idx = custom_key
             self.compiled_results.clear()
 
-        arg_features = (func_type,) + argtypes
+        arg_features = (func_type, *argtypes)
         if arg_features not in self.compiled_results:
             try:
                 self.compiled_results[arg_features] = self.compile(func_type, allow_ref, argtypes, arg_info)
@@ -374,7 +374,7 @@ class func:
         is_buffer = False
         if type(dispatch_size) is int:
             dispatch_size = (dispatch_size, 1, 1)
-        elif (type(dispatch_size) == tuple or type(dispatch_size) == list) and (len(dispatch_size) in (1, 2, 3)):
+        elif isinstance(dispatch_size, (tuple, list)) and (len(dispatch_size) in (1, 2, 3)):
             dispatch_size = (*dispatch_size, *[1] * (3 - len(dispatch_size)))
         else:
             is_buffer = True
@@ -399,7 +399,7 @@ class func:
             elif lctype.is_accel():
                 command.encode_accel(a.handle)
             else:
-                assert False
+                raise AssertionError()
         # dispatch
         if is_buffer:
             command.set_dispatch_buffer(dispatch_size.handle, dispatch_buffer_offset, max_dispatch_size)

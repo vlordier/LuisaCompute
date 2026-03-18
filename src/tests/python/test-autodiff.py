@@ -43,11 +43,12 @@ def shader():
 def fd():
     x = np.array(x_values, dtype=np.float64)
     y = np.array(y_values, dtype=np.float64)
-    f = lambda x, y: x * x + y[:, 0] * y[:, 0] + y[:, 1] * y[:, 1]
+    def f(x, y):
+        return x * x + y[:, 0] * y[:, 0] + y[:, 1] * y[:, 1]
     eps = 1e-4
     dx = (f(x + eps, y) - f(x - eps, y)) / (2 * eps)
-    dy0 = (f(x, y + [eps, 0]) - f(x, y - [eps, 0])) / (2 * eps)
-    dy1 = (f(x, y + [0, eps]) - f(x, y - [0, eps])) / (2 * eps)
+    dy0 = (f(x, [*y, eps, 0]) - f(x, y - [eps, 0])) / (2 * eps)
+    dy1 = (f(x, [*y, 0, eps]) - f(x, y - [0, eps])) / (2 * eps)
     dy = np.stack([dy0, dy1], axis=1)
     return dx, dy
 

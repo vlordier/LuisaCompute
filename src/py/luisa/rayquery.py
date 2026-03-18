@@ -120,7 +120,7 @@ class RayQueryAllType:
 
 
 
-rayQueryAllType = RayQueryAllType()
+rayQueryAllType = RayQueryAllType()  # noqa: N816
 
 
 class RayQueryAnyType:
@@ -178,7 +178,7 @@ class RayQueryAnyType:
         return Ray, expr
 
 
-rayQueryAnyType = RayQueryAnyType()
+rayQueryAnyType = RayQueryAnyType()  # noqa: N816
 
 
 def is_triangle(): ...

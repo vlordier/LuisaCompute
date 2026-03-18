@@ -147,7 +147,7 @@ class ASTVisitor:
             build(x.value)
         # if it's called as method, call with self (the object)
         if type(node.func) is ast.Attribute and getattr(node.func, 'calling_method', False):
-            args = [node.func.value] + node.args
+            args = [node.func.value, *node.args]
         else:
             args = node.args
         kwargs = {x.arg: x.value for x in node.keywords}
@@ -229,15 +229,15 @@ class ASTVisitor:
     @staticmethod
     def captured_expr(val):
         dtype = dtype_of(val)
-        if dtype == ModuleType:
+        if dtype is ModuleType:
             return dtype, val, None
-        if dtype == type:
+        if dtype is type:
             return dtype, val, None
-        if dtype == CallableType:
+        if dtype is CallableType:
             return dtype, val, None
-        if dtype == BuiltinFuncBuilder:
+        if dtype is BuiltinFuncBuilder:
             return dtype, val, None
-        if dtype == str:
+        if dtype is str:
             return dtype, val, 'r'
         lctype = to_lctype(dtype)
         if lctype.is_basic():
@@ -266,7 +266,7 @@ class ASTVisitor:
             expr = lcapi.builder().local(lctype)
             for idx, x in enumerate(val.values):
                 lhs = lcapi.builder().member(to_lctype(dtype.membertype[idx]), expr, idx)
-                rhs_dtype, rhs_expr, rhs_lr = build.captured_expr(x)
+                rhs_dtype, rhs_expr, _rhs_lr = build.captured_expr(x)
                 assert implicit_convertible(rhs_dtype, dtype.membertype[idx])
                 lcapi.builder().assign(lhs, rhs_expr)
             return dtype, expr, 'r'
@@ -388,7 +388,7 @@ class ASTVisitor:
     def build_AugAssign(node):
         build(node.target)
         build(node.value)
-        dtype, expr = builtin_bin_op(type(node.op), node.target, node.value)
+        _dtype, expr = builtin_bin_op(type(node.op), node.target, node.value)
         lcapi.builder().assign(node.target.expr, expr)
 
     @staticmethod
@@ -463,10 +463,10 @@ class ASTVisitor:
             # rayquery expr
             query_stmt = lcapi.builder().ray_query_(node.subject.expr)
             for c in node.cases:
-                if type(c.pattern) != ast.MatchClass or (
+                if type(c.pattern) is not ast.MatchClass or (
                         (c.pattern.cls.id) != "is_triangle" and (c.pattern.cls.id) != "is_procedural"):
                     raise TypeError("Rayquery condition must be \"case is_triangle():\" or \"case is_procedural():\"")
-                if case_map.get(c.pattern) == True:
+                if case_map.get(c.pattern):
                     raise SyntaxError("Case value can only have one.")
                 case_map[c.pattern] = True
                 if (c.pattern.cls.id) == "is_triangle":
@@ -483,10 +483,10 @@ class ASTVisitor:
         switch_stmt = lcapi.builder().switch_(node.subject.expr)
         with switch_stmt.body():
             for c in node.cases:
-                if type(c.pattern) == ast.MatchValue:
-                    if type(c.pattern.value.value) != int:
+                if type(c.pattern) is ast.MatchValue:
+                    if type(c.pattern.value.value) is not int:
                         raise TypeError(f"Match case condition must be int or uint, got {type(c.pattern.value.value)}")
-                    if case_map.get(c.pattern.value.value) == True:
+                    if case_map.get(c.pattern.value.value):
                         raise SyntaxError("Case value can only have one.")
                     case_map[c.pattern.value.value] = True
                     build(c.pattern.value)
@@ -496,7 +496,7 @@ class ASTVisitor:
                             build(x)
                         lcapi.builder().break_()
                 else:
-                    if case_map.get("default") == True:
+                    if case_map.get("default"):
                         raise SyntaxError("Case value can only have one.")
                     case_map["default"] = True
                     default_stmt = lcapi.builder().default_()
@@ -622,7 +622,7 @@ class ASTVisitor:
                 build(x)
                 node.joined.append(x)
             else:
-                assert False
+                raise AssertionError()
 
     @staticmethod
     def build_List(node):

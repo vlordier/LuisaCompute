@@ -52,7 +52,7 @@ public:
 
 };
 static_assert(sizeof(lc_half) == 2);
-[[nodiscard]] inline lc_short __half_as_short(lc_half x) noexcept { 
+[[nodiscard]] inline lc_short __half_as_short(lc_half x) noexcept {
     return x.bits;
 }
 [[nodiscard]] inline lc_half __short_as_half(lc_short x) noexcept {
@@ -99,7 +99,7 @@ if __name__ == "__main__":
             "ulong": 8,
             "double": 8,
         }
-        for t, native_t in zip(scalar_types, native_types):
+        for t, native_t in zip(scalar_types, native_types, strict=False):
             if t == 'half' and is_cpu:
                 continue
             print(f"using lc_{t} = {native_t};", file=file)
@@ -195,9 +195,9 @@ template<typename T>
 [[nodiscard]] __device__ inline constexpr auto lc_make_{type}2(lc_{type} x, lc_{type} y) noexcept {{ return lc_{type}2{{x, y}}; }}""",
                 file=file)
             for t in scalar_types:
-                for l in range(2, 5):
+                for vec_len in range(2, 5):
                     print(
-                        f"[[nodiscard]] __device__ inline constexpr auto lc_make_{type}2(lc_{t}{l} v) noexcept {{ return lc_{type}2{{static_cast<lc_{type}>(v.x), static_cast<lc_{type}>(v.y)}}; }}",
+                        f"[[nodiscard]] __device__ inline constexpr auto lc_make_{type}2(lc_{t}{vec_len} v) noexcept {{ return lc_{type}2{{static_cast<lc_{type}>(v.x), static_cast<lc_{type}>(v.y)}}; }}",
                         file=file)
             # make type3
             print(
@@ -207,9 +207,9 @@ template<typename T>
 [[nodiscard]] __device__ inline constexpr auto lc_make_{type}3(lc_{type}2 xy, lc_{type} z) noexcept {{ return lc_{type}3{{xy.x, xy.y, z}}; }}""",
                 file=file)
             for t in scalar_types:
-                for l in range(3, 5):
+                for vec_len in range(3, 5):
                     print(
-                        f"[[nodiscard]] __device__ constexpr auto lc_make_{type}3(lc_{t}{l} v) noexcept {{ return lc_{type}3{{static_cast<lc_{type}>(v.x), static_cast<lc_{type}>(v.y), static_cast<lc_{type}>(v.z)}}; }}",
+                        f"[[nodiscard]] __device__ constexpr auto lc_make_{type}3(lc_{t}{vec_len} v) noexcept {{ return lc_{type}3{{static_cast<lc_{type}>(v.x), static_cast<lc_{type}>(v.y), static_cast<lc_{type}>(v.z)}}; }}",
                         file=file)
             # make type4
             print(
@@ -303,8 +303,8 @@ template<typename T>
 
         # matrix types
         for i in range(2, 5):
-            def init(j):
-                return ', '.join(["0.0f", "0.0f", "0.0f", "s", "0.0f", "0.0f", "0.0f"][3 - j:3 + i - j])
+            def init(j, _i=i):
+                return ', '.join(["0.0f", "0.0f", "0.0f", "s", "0.0f", "0.0f", "0.0f"][3 - j:3 + _i - j])
 
 
             print(f"""
@@ -338,8 +338,8 @@ struct lc_float{i}x{i} {{
                   file=file)
 
         for i in range(2, 5):
-            def init(j):
-                return ', '.join(["0.0f", "0.0f", "0.0f", "s", "0.0f", "0.0f", "0.0f"][3 - j:3 + i - j])
+            def init(j, _i=i):
+                return ', '.join(["0.0f", "0.0f", "0.0f", "s", "0.0f", "0.0f", "0.0f"][3 - j:3 + _i - j])
 
 
             print(f"""

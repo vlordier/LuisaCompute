@@ -24,18 +24,18 @@ def convert_ty(ty):
     }
     return m[ty]
 
-f = open('api.h')
-out = open('../rust/luisa_compute_backend/src/api_message.rs', 'w')
+f = open('api.h')  # noqa: SIM115
+out = open('../rust/luisa_compute_backend/src/api_message.rs', 'w')  # noqa: SIM115
 lines = f.readlines()
 out.write('use luisa_compute_api_types as api;\n')
 out.write('use serde::*;\n')
-exclude = set([
+exclude = {
     'luisa_compute_free_c_string',
     'luisa_compute_device_query',
     'luisa_compute_buffer_create',
     'luisa_compute_stream_dispatch',
     'luisa_compute_shader_create'
-])
+}
 funcnames = []
 def parse_line(line):
     line = line.replace('LC', 'api::')

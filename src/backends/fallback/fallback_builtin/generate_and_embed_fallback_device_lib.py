@@ -43,7 +43,7 @@ def generate_and_embed(system_name: str, machine_name: str):
         subprocess.run(["llvm-as", dst_path, "-o", bc_path])
         with open(bc_path, "rb") as f:
             content = f.read()
-    except:
+    except Exception:
         print("Failed to compile to bitcode.")
         content = content.encode("utf-8")
     with open(os.path.join(builtin_dir, f"{file_name}.{system_name}.{machine_name}.inl"), "wb") as f:

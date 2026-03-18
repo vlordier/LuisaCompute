@@ -28,10 +28,10 @@ def test_power():
     val = buffer_in.read(idx)
 
     # Test power of 2 (this always worked)
-    val2 = val ** 2
+    _val2 = val ** 2
 
     # Test power of 3 (this was broken before the fix)
-    val3 = val ** 3
+    _val3 = val ** 3
 
     # Test power of 4 (this was broken before the fix)
     val4 = val ** 4

@@ -25,7 +25,7 @@ def _rotate(p: float2, a: float):
 
 @func
 def _map(p: float3, time: float):
-    for i in range(8):
+    for _ in range(8):
         t = time * 0.2
         p = float3(_rotate(p.xz, t), p.y).xzy
         p = float3(_rotate(p.xy, t * 1.89), p.z)
@@ -38,7 +38,7 @@ def _rm(ro: float3, rd: float3, time: float):
     t = 0.
     col = float3()
     d = 0.
-    for i in range(64):
+    for _ in range(64):
         p = ro + rd * t
         d = _map(p, time) * .5
         if d < 0.02 or d > 100:

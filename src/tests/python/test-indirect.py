@@ -17,7 +17,7 @@ kernel_dispatch_size = 64
 @func
 def dispatch(buffer):
     set_block_size(kernel_dispatch_size, 1, 1)
-    old = buffer.atomic_fetch_add(kernel_id(), dispatch_size().x)
+    _old = buffer.atomic_fetch_add(kernel_id(), dispatch_size().x)
 
 
 dispatch_buffer = IndirectDispatchBuffer(dispatch_count)

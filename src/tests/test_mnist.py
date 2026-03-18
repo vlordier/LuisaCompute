@@ -109,7 +109,7 @@ def test_loop(dataloader, model: NeuralNetwork, loss_fn):
 
 def get_first_test_data(dataloader):
     with torch.no_grad():
-        for X, y in dataloader:
+        for X, _y in dataloader:
             return X.to(device)
 
 # traning

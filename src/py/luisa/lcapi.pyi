@@ -1,3 +1,11 @@
+class ray:
+    def __init__(self, *args, **kwargs): ...
+
+
+class FunctionBuilder:
+    def __init__(self, *args, **kwargs): ...
+
+
 class float2x2:
     def __init__(self, *args, **kwargs): ...
 

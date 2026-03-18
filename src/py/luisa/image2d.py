@@ -113,7 +113,7 @@ class Image2D:
             lcapi.save_ldr_image(path, arr, self.width, self.height)
             del (arr)
         else:
-            raise "Illegal export image format!"
+            raise RuntimeError("Illegal export image format!")
 
     def copy_to_tex(self, tex, sync=False, stream=None):
         if stream is None:
@@ -221,7 +221,7 @@ class Texture2DType:
 
             return read
         else:
-            assert False
+            raise AssertionError()
 
     @staticmethod
     @cache
@@ -255,4 +255,4 @@ class Texture2DType:
                     _builtin_call("TEXTURE_WRITE", self, (coord), tmp)
 
                 return write
-            assert False
+            raise AssertionError()

@@ -49,7 +49,7 @@ class Struct:
             elif lctype.is_array() or lctype.is_structure():
                 packed_bytes += value.to_bytes()
             else:
-                assert False
+                raise AssertionError()
         while len(packed_bytes) % self.structType.alignment != 0:
             packed_bytes += b'\0'
         assert len(packed_bytes) == self.structType.luisa_type.size()

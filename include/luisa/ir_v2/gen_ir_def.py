@@ -1,10 +1,10 @@
 import os
 
-cpp_def = open('ir_v2_defs.h', 'w')
-fwd_file = open('ir_v2_fwd.h', 'w')
-c_def = open('ir_v2_api.h', 'w')
-c_api_impl = open('../../../src/ir_v2/ir_v2_api.cpp', 'w')
-cpp_api_impl = open('../../../src/ir_v2/ir_v2_defs.cpp', 'w')
+cpp_def = open('ir_v2_defs.h', 'w')  # noqa: SIM115
+fwd_file = open('ir_v2_fwd.h', 'w')  # noqa: SIM115
+c_def = open('ir_v2_api.h', 'w')  # noqa: SIM115
+c_api_impl = open('../../../src/ir_v2/ir_v2_api.cpp', 'w')  # noqa: SIM115
+cpp_api_impl = open('../../../src/ir_v2/ir_v2_defs.cpp', 'w')  # noqa: SIM115
 func_table = []
 
 
@@ -100,7 +100,7 @@ print('#include <luisa/ir_v2/ir_v2.h>', file=c_api_impl)
 print('#include <luisa/ir_v2/ir_v2_api.h>', file=c_api_impl)
 print('''
 namespace luisa::compute::ir_v2 {
-/** 
+/**
 * <div rustbindgen nodebug></div>
 */
 template<class T>
@@ -131,8 +131,8 @@ struct Slice {
         static_assert(std::is_same_v<T, char> || std::is_same_v<T, const char>);
         return luisa::string(data, len);
     }
-#endif 
-};    
+#endif
+};
 }
 ''', file=c_def)
 print('namespace luisa::compute::ir_v2 {', file=c_def)
@@ -142,7 +142,7 @@ struct Node;
 class BasicBlock;
 struct CallableModule;
 struct Module;
-struct KernelModule; 
+struct KernelModule;
 class Pool;
 template<class T>
 struct Slice;
@@ -211,7 +211,7 @@ enum class RustyTypeTag {
 
     Custom,//CUSTOM
 };
-      
+
 /**
 * <div rustbindgen nocopy></div>
 */
@@ -225,7 +225,7 @@ typedef const IrBuilder *IrBuilderRef;
 */
 typedef IrBuilder *IrBuilderRefMut;
 
-    
+
 ''', file=fwd_file)
 print('#include <luisa/ir_v2/ir_v2.h>', file=cpp_api_impl)
 print('namespace luisa::compute::ir_v2 {', file=cpp_api_impl)
@@ -915,7 +915,7 @@ struct PhiIncoming {
 };
 struct SwitchCase {
     int32_t value = 0;
-    BasicBlockRef block = nullptr;    
+    BasicBlockRef block = nullptr;
 };
 struct CpuExternFnData {
     void *data = nullptr;
@@ -925,7 +925,7 @@ struct CpuExternFnData {
 };
 struct CpuExternFn;
 struct FuncMetadata {
-    bool has_side_effects = false;    
+    bool has_side_effects = false;
 };
 const FuncMetadata* func_metadata();
 ''', file=fwd_file)

@@ -171,7 +171,7 @@ class Texture3DType:
 
             return read
         else:
-            assert False
+            raise AssertionError()
 
     @staticmethod
     @cache
@@ -205,4 +205,4 @@ class Texture3DType:
                     _builtin_call("TEXTURE_WRITE", self, (coord), tmp)
 
                 return write
-            assert False
+            raise AssertionError()

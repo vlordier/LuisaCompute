@@ -18,7 +18,7 @@ RandomSampler.add_method(_f, "__init__")
 @func
 def make_random_sampler(v0, v1):
     s0 = uint()
-    for i in range(4):
+    for _ in range(4):
         s0 += 0x9e3779b9
         v0 += ((v1 << 4) + 0xa341316c) ^ (v1 + s0) ^ ((v1 >> 5) + 0xc8013ea4)
         v1 += ((v0 << 4) + 0xad90777d) ^ (v0 + s0) ^ ((v0 >> 5) + 0x7e95761e)

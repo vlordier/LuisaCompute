@@ -14,7 +14,7 @@ if __name__ == "__main__":
         # if no `config.json`, copy `_config_<platform>.json` to `config.json` as default test configuration
         default_config_file_path = os.path.join(current_dir, "config/builtin/_config_win.json")
         config_file_path = os.path.join(current_dir, "config.json")
-        if os.path.isfile(config_file_path) == False:
+        if not os.path.isfile(config_file_path):
             print(f"connot find default configuration from {config_file_path}")
             print(f"will copy the default configuration from {default_config_file_path}")
             subprocess.run(["powershell", "Copy-Item", default_config_file_path, config_file_path], shell=True)

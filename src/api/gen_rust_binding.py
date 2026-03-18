@@ -20,8 +20,8 @@ def convert_ty(ty):
     return m[ty]
 
 
-f = open('api.h')
-out = open('../rust/luisa_compute_backend/src/binding.rs', 'w')
+f = open('api.h')  # noqa: SIM115
+out = open('../rust/luisa_compute_backend/src/binding.rs', 'w')  # noqa: SIM115
 lines = f.readlines()
 out.write('use luisa_compute_api_types as api;\n')
 out.write('use std::ffi::*;\n')

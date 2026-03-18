@@ -19,9 +19,7 @@ from .types import from_lctype, to_lctype
 def is_swizzle_name(sw):
     if len(sw) > 4:
         return False
-    for ch in sw:
-        if ch not in {'x', 'y', 'z', 'w'}:
-            return False
+    return all(ch in {'x', 'y', 'z', 'w'} for ch in sw)
     return True
 
 

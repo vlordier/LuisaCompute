@@ -165,12 +165,12 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
 
         # rr
         if enable_aces:
-            l = dot(float3(1. / 3.), beta)
+            luminance = dot(float3(1. / 3.), beta)
         else:
-            l = dot(float3(0.212671, 0.715160, 0.072169), beta)
+            luminance = dot(float3(0.212671, 0.715160, 0.072169), beta)
         if l == 0.0:
             break
-        q = max(l, 0.05)
+        q = max(luminance, 0.05)
         r = sampler.next()
         if r >= q:
             break

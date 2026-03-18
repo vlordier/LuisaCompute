@@ -85,13 +85,13 @@ class KeyCode:
     F: int = 70
     G: int = 71
     H: int = 72
-    I: int = 73
+    I: int = 73  # noqa: E741
     J: int = 74
     K: int = 75
     L: int = 76
     M: int = 77
     N: int = 78
-    O: int = 79
+    O: int = 79  # noqa: E741
     P: int = 80
     Q: int = 81
     R: int = 82

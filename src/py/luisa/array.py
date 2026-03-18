@@ -81,7 +81,7 @@ class SharedArrayType:
         if dtype in {int, uint, short, ushort}:
             for f in int_atomic_functions:
                 setattr(self, f.__name__, f)
-        if dtype == float:
+        if dtype is float:
             for f in float_atomic_functions:
                 setattr(self, f.__name__, f)
 

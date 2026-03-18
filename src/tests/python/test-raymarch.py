@@ -70,7 +70,7 @@ def sdCappedTorus(p, sc, ra, rb):
 
 @func
 def sdHexPrism(p, h):
-    q = abs(p)
+    _q = abs(p)
     k = float3(-0.8660254, 0.5, 0.57735)
     p = abs(p)
     p -= float3(2.0*min(dot(k.xy, p.xy), 0.0)*k.xy, 0)
@@ -225,9 +225,9 @@ def sdCappedCone1(p, a, b, ra, rb):
 @func
 def sdSolidAngle(pos, c, ra):
     p = float2(length(pos.xz), pos.y)
-    l = length(p) - ra
+    line_dist = length(p) - ra
     m = length(p - c*clamp(dot(p, c), 0.0, ra))
-    return max(l, m*sign(c.y*p.x-c.x*p.y))
+    return max(line_dist, m*sign(c.y*p.x-c.x*p.y))
 
 
 @func
@@ -285,9 +285,9 @@ def sdRhombus(p, la, lb, h, ra):
 @func
 def sdHorseshoe(p, c, r, le, w):
     p.x = abs(p.x)
-    l = length(p.xy)
+    line_dist = length(p.xy)
     p = float3(float2x2(-c.x, c.y, c.y, c.x) * p.xy, p.z)
-    p = float3(float2(ite((p.y > 0.0 or p.x > 0.0), p.x, l *
+    p = float3(float2(ite((p.y > 0.0 or p.x > 0.0), p.x, line_dist *
                           sign(-c.x)), ite((p.x > 0.0), p.y, l)), p.z)
     p = float3(float2(p.x, abs(p.y-r))-float2(le, 0.0), p.z)
 
@@ -408,7 +408,7 @@ def raycast(ro, rd):
         tmax = min(tb.y, tmax)
 
         t = tmin
-        for i in range(70):
+        for _ in range(70):
             if t >= tmax:
                 break
             h = map(ro+rd*t)
@@ -428,7 +428,7 @@ def calcSoftshadow(ro, rd, mint, tmax):
 
     res = 1.0
     t = mint
-    for i in range(24):
+    for _ in range(24):
         h = map(ro + rd*t).x
         s = clamp(8.0*h/t, 0.0, 1.0)
         res = min(res, s)

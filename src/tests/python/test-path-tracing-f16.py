@@ -164,10 +164,10 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
         pdf_bsdf = cos_wi * (1 / 3.1415926)
 
         # rr
-        l = dot(half3(0.212671, 0.715160, 0.072169), beta)
-        if l == 0.0:
+        luminance = dot(half3(0.212671, 0.715160, 0.072169), beta)
+        if luminance == 0.0:
             break
-        q = max(l, 0.05)
+        q = max(luminance, 0.05)
         r = sampler.next()
         if r >= q:
             break

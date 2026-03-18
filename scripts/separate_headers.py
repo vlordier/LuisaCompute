@@ -72,8 +72,8 @@ if __name__ == "__main__":
     exclude = ["backends", "py", "tests"]
     include = ["backends/ext"]
     headers_to_move = [f for f in header_files if
-                       not any([f.startswith(e) for e in exclude]) or
-                       any([f.startswith(e) for e in include])]
+                       not any(f.startswith(e) for e in exclude) or
+                       any(f.startswith(e) for e in include)]
 
     for f in source_files + header_files:
         fix_include(src_dir, f, headers_to_move)

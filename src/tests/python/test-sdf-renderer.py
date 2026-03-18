@@ -55,8 +55,8 @@ def sdf(o):
     sphere = distance(o, float3(0.0, 0.35, 0.0)) - 0.36
     q = abs(o - float3(0.8, 0.3, 0.0)) - 0.3
     box = length(max(q, 0.0)) + min(max(max(q.x, q.y), q.z), 0.0)
-    O = o - float3(-0.8, 0.3, 0.0)
-    d = float2(length(float2(O.x, O.z)) - 0.3, abs(O.y) - 0.3)
+    cap_off = o - float3(-0.8, 0.3, 0.0)
+    d = float2(length(float2(cap_off.x, cap_off.z)) - 0.3, abs(cap_off.y) - 0.3)
     cylinder = min(max(d.x, d.y), 0.0) + length(max(d, 0.0))
     geometry = make_nested(min(min(sphere, box), cylinder))
     g = max(geometry, -(0.32 - (o.y * 0.6 + o.z * 0.8)))
@@ -66,7 +66,7 @@ def sdf(o):
 @func
 def ray_march(p, d):
     dist = 0.
-    for j in range(100):
+    for _ in range(100):
         s = sdf(p + dist * d)
         if s <= 1e-6 or dist >= inf:
             break
@@ -130,7 +130,7 @@ def render_kernel(seed_image, accum_image, frame_index):
     throughput = float3(1)
     hit_light = 0.0
     accum_color = float3()
-    for depth in range(max_ray_depth):
+    for _depth in range(max_ray_depth):
         data = NextHit()
         next_hit(data, pos, d)
         dist_to_light = intersect_light(pos, d)

@@ -65,7 +65,7 @@ class Buffer:
     def buffer(arr):
         if type(arr).__name__ == "ndarray":
             return Buffer.from_array(arr)
-        elif type(arr) == list:
+        elif isinstance(arr, list):
             return Buffer.from_list(arr)
         else:
             raise TypeError(f"buffer from unrecognized type: {type(arr)}")
@@ -157,7 +157,7 @@ class Buffer:
     def copy_from(self, arr, sync=False, stream=None):  # arr: numpy array or list
         if type(arr).__name__ == "ndarray":
             self.copy_from_array(arr, sync, stream)
-        elif type(arr) == list:
+        elif isinstance(arr, list):
             self.copy_from_list(arr, sync, stream)
         else:
             raise TypeError(f"copy from unrecognized type: {type(arr)}")
@@ -234,7 +234,7 @@ class BufferType:
         if dtype in {int, uint, short, ushort}:
             for f in int_atomic_functions:
                 setattr(self, f.__name__, f)
-        if dtype == float:
+        if dtype is float:
             for f in float_atomic_functions:
                 setattr(self, f.__name__, f)
 
@@ -267,11 +267,11 @@ class BufferType:
 
 def from_bytes(dtype, packed):
     import struct
-    if dtype == int:
+    if dtype is int:
         return struct.unpack('i', packed)[0]
-    if dtype == float:
+    if dtype is float:
         return struct.unpack('f', packed)[0]
-    if dtype == bool:
+    if dtype is bool:
         return struct.unpack('?', packed)[0]
     if dtype in vector_dtypes or dtype in matrix_dtypes:
         el = element_of(dtype)
@@ -292,7 +292,7 @@ def from_bytes(dtype, packed):
         el = dtype.dtype
         elsize = to_lctype(el).size()
         return dtype([from_bytes(el, packed[i * elsize: (i + 1) * elsize]) for i in range(0, dtype.size)])
-    assert False
+    raise AssertionError(f"from_bytes: unsupported dtype {dtype}")
 
 
 class ByteBufferType:
@@ -342,7 +342,7 @@ class ByteBuffer:
     def buffer(arr):
         if type(arr).__name__ == "ndarray":
             return ByteBuffer.from_array(arr)
-        elif type(arr) == list:
+        elif isinstance(arr, list):
             return ByteBuffer.from_list(arr)
         else:
             raise TypeError(f"buffer from unrecognized type: {type(arr)}")
@@ -398,7 +398,7 @@ class ByteBuffer:
     def copy_from(self, arr, sync=False, stream=None):  # arr: numpy array or list
         if type(arr).__name__ == "ndarray":
             self.copy_from_array(arr, sync, stream)
-        elif type(arr) == list:
+        elif isinstance(arr, list):
             self.copy_from_list(arr, sync, stream)
         else:
             raise TypeError(f"copy from unrecognized type: {type(arr)}")

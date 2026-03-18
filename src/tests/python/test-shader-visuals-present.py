@@ -102,7 +102,7 @@ def render_kernel(image, time):
     trg = (False)
     dist = (0.)
     data = Data()
-    for i in range(80):
+    for _ in range(80):
         dist = scene(p, t, data)
         hit = dist * dist < 1e-6
         glo += .2 / (1. + data.lazors * data.lazors * 20.) * atten
