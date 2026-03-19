@@ -1,0 +1,78 @@
+# EditorConfig — https://editorconfig.org
+# Ensures consistent whitespace/encoding across editors and IDEs.
+# Settings here mirror the project's .clang-format, rustfmt.toml,
+# and pyproject.toml configurations.
+root = true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Universal defaults for all files
+# ──────────────────────────────────────────────────────────────────────────────
+[*]
+charset                  = utf-8
+end_of_line              = lf
+indent_style             = space
+indent_size              = 4
+trim_trailing_whitespace = true
+insert_final_newline     = true
+
+# ──────────────────────────────────────────────────────────────────────────────
+# C / C++ — kept in sync with .clang-format (IndentWidth = 4)
+# ──────────────────────────────────────────────────────────────────────────────
+[*.{c,cpp,cc,cxx,h,hpp,hxx,inl}]
+indent_style = space
+indent_size  = 4
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Rust — kept in sync with src/rust/rustfmt.toml (max_width = 100)
+# ──────────────────────────────────────────────────────────────────────────────
+[*.rs]
+indent_style = space
+indent_size  = 4
+max_line_length = 100
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Python — kept in sync with pyproject.toml (ruff line-length = 120)
+# ──────────────────────────────────────────────────────────────────────────────
+[*.py]
+indent_style    = space
+indent_size     = 4
+max_line_length = 120
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CMake / Lua
+# ──────────────────────────────────────────────────────────────────────────────
+[{CMakeLists.txt,*.cmake,xmake.lua,*.lua}]
+indent_style = space
+indent_size  = 4
+
+# ──────────────────────────────────────────────────────────────────────────────
+# TOML / YAML / JSON
+# ──────────────────────────────────────────────────────────────────────────────
+[*.{toml,yaml,yml,json}]
+indent_style = space
+indent_size  = 2
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Markdown — preserve intentional trailing spaces (line-break syntax)
+# ──────────────────────────────────────────────────────────────────────────────
+[*.md]
+trim_trailing_whitespace = false
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Shell scripts
+# ──────────────────────────────────────────────────────────────────────────────
+[*.{sh,bash}]
+indent_style = space
+indent_size  = 4
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Windows batch / PowerShell — CRLF line endings required on Windows
+# ──────────────────────────────────────────────────────────────────────────────
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Makefiles require real tabs
+# ──────────────────────────────────────────────────────────────────────────────
+[Makefile]
+indent_style = tab
