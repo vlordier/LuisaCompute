@@ -1,11 +1,13 @@
-from luisa import *
-from luisa.types import *
-from luisa.builtin import *
-from luisa.util import *
 import math
-import numpy as np
 import random
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.builtin import *
+from luisa.types import *
+from luisa.util import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -38,7 +40,7 @@ def kernel(prev, curr):
     p = int2(uv)
     for dy in range(-1, 2):
         for dx in range(-1, 2):
-            if (dx != 0 or dy != 0):
+            if dx != 0 or dy != 0:
                 q = p + int2(dx, dy) + int2(size)
                 neighbor = read_state(prev, uint2(q) % size)
                 count += neighbor
@@ -50,13 +52,14 @@ def kernel(prev, curr):
 res = (128, 128)
 super_sampling = 8
 
+
 @func
 def display_kernel(in_tex, out_tex):
     set_block_size(16, 16, 1)
     uv = dispatch_id().xy
     coord = uv // super_sampling
     value = in_tex.read(coord)
-    out_tex.write(uv, float4(value) / 255.)
+    out_tex.write(uv, float4(value) / 255.0)
 
 
 image_pair = ImagePair(*res, 4, "BYTE")
@@ -66,7 +69,7 @@ for i in range(len(host_image)):
     x = 0
     if random.random() < 0.25:
         x = 255
-    host_image[i] = x * 0x00010101 | 0xff000000
+    host_image[i] = x * 0x00010101 | 0xFF000000
 image_pair.prev.copy_from(host_image)
 synchronize()
 window_size = (res[0] * super_sampling, res[1] * super_sampling)

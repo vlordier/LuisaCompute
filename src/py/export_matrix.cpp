@@ -107,5 +107,6 @@ void export_matrix(py::module &m) {
     m.def("determinant", [](float2x2 a){return determinant(a);});
     m.def("determinant", [](float3x3 a){return determinant(a);});
     m.def("determinant", [](float4x4 a){return determinant(a);});
-    // TODO export matrix operators
+    // Note: Matrix arithmetic operators (*, +, etc.) are not yet exported to Python.
+    //       Add them here using pybind11 .def() with the C++ operator overloads from basic_types.h.
 }

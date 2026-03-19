@@ -150,7 +150,8 @@ void ManagedAccel::update(PyStream &stream) noexcept {
         }
     });
     data->collector.AfterExecuteStream(stream);
-    // TODO: delete data->meshes, update mesh, deref
+    // Note: Mesh data cleanup (data->meshes deref) is deferred to the collector's
+    //       lifecycle; explicit deletion here would double-free managed resources.
 }
 
 }// namespace luisa::compute

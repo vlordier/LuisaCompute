@@ -445,7 +445,9 @@ public:
     }
 };
 
-// TODO: External callable
+// Note: ExternalCallable — allow calling externally-defined functions from kernels.
+//       Currently the class body is implemented but resource arguments (buffers, images,
+//       volumes) are not yet supported due to usage-tracking limitations.
 template<typename T>
 class ExternalCallable {
     static_assert(always_false_v<T>);
@@ -467,7 +469,9 @@ private:
     luisa::shared_ptr<ExternalFunction> _func;
 
 private:
-    // FIXME: support for resources
+    // Note: Resource arguments (buffers, images, volumes) are not yet tracked here;
+    //        they always report READ usage. Full resource support requires plumbing
+    //        usage information through ExternalFunction and the backend compilers.
     template<typename T>
     struct UsageOf {
         static constexpr auto value = Usage::READ;

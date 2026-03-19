@@ -888,7 +888,7 @@ public:
         add_command(command, layer);
     }
 
-    void visit(const CurveBuildCommand *) noexcept override { /* TODO */
+    void visit(const CurveBuildCommand *) noexcept override { /* Note: CurveBuildCommand reordering not yet implemented. */
     }
 
     // Mesh : conclude vertex and triangle buffers

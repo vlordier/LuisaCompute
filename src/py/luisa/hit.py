@@ -1,7 +1,7 @@
-from .struct import StructType
 from .func import func
-from .types import uint
 from .mathtypes import *
+from .struct import StructType
+from .types import uint
 
 CommittedHit = StructType(inst=uint, prim=uint, bary=float2, hit_type=uint, ray_t=float)
 TriangleHit = StructType(inst=uint, prim=uint, bary=float2, ray_t=float)

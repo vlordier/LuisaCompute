@@ -419,7 +419,7 @@ impl AccelImpl {
                 let mut instance = self.instances[m.index as usize].write();
                 let geometry = instance.geometry;
                 assert!(!geometry.is_null());
-                // TODO: check if this should work
+                // Note: rtcSetGeometryUserData expects a pointer-sized value; casting user_id (u32) to u64 then to *mut c_void is intentional.
                 sys::rtcSetGeometryUserData(geometry, m.user_id as u64 as *mut c_void);
                 instance.user_id = m.user_id;
                 instance.dirty = true;

@@ -1,31 +1,38 @@
-from os.path import realpath, dirname
+from os.path import dirname, realpath
+
 
 def generate(file, dim):
     entries = ["x", "y", "z", "w"][:dim]
     for ix, x in enumerate(entries):
         for iy, y in enumerate(entries):
-            print(f"[[nodiscard]] auto {x}{y}() const noexcept {{ " +
-                  f"return dsl::def<Vector<T, 2>>(" +
-                  f"detail::FunctionBuilder::current()->swizzle(" +
-                  f"Type::of<Vector<T, 2>>(), this->expression(), 2u, 0x{iy}{ix}u)); }}",
-                  file=file)
+            print(
+                f"[[nodiscard]] auto {x}{y}() const noexcept {{ "
+                + "return dsl::def<Vector<T, 2>>("
+                + "detail::FunctionBuilder::current()->swizzle("
+                + f"Type::of<Vector<T, 2>>(), this->expression(), 2u, 0x{iy}{ix}u)); }}",
+                file=file,
+            )
     for ix, x in enumerate(entries):
         for iy, y in enumerate(entries):
             for iz, z in enumerate(entries):
-                print(f"[[nodiscard]] auto {x}{y}{z}() const noexcept {{ " +
-                      f"return dsl::def<Vector<T, 3>>(" +
-                      f"detail::FunctionBuilder::current()->swizzle(" +
-                      f"Type::of<Vector<T, 3>>(), this->expression(), 3u, 0x{iz}{iy}{ix}u)); }}",
-                      file=file)
+                print(
+                    f"[[nodiscard]] auto {x}{y}{z}() const noexcept {{ "
+                    + "return dsl::def<Vector<T, 3>>("
+                    + "detail::FunctionBuilder::current()->swizzle("
+                    + f"Type::of<Vector<T, 3>>(), this->expression(), 3u, 0x{iz}{iy}{ix}u)); }}",
+                    file=file,
+                )
     for ix, x in enumerate(entries):
         for iy, y in enumerate(entries):
             for iz, z in enumerate(entries):
                 for iw, w in enumerate(entries):
-                    print(f"[[nodiscard]] auto {x}{y}{z}{w}() const noexcept {{ " +
-                          f"return def<Vector<T, 4>>(" +
-                          f"detail::FunctionBuilder::current()->swizzle(" +
-                          f"Type::of<Vector<T, 4>>(), this->expression(), 4u, 0x{iw}{iz}{iy}{ix}u)); }}",
-                          file=file)
+                    print(
+                        f"[[nodiscard]] auto {x}{y}{z}{w}() const noexcept {{ "
+                        + "return def<Vector<T, 4>>("
+                        + "detail::FunctionBuilder::current()->swizzle("
+                        + f"Type::of<Vector<T, 4>>(), this->expression(), 4u, 0x{iw}{iz}{iy}{ix}u)); }}",
+                        file=file,
+                    )
 
 
 if __name__ == "__main__":

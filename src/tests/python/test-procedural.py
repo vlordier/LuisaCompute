@@ -1,9 +1,11 @@
-from luisa import *
-from luisa.types import *
-from luisa.builtin import *
-import numpy as np
 import math
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.builtin import *
+from luisa.types import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -15,7 +17,7 @@ pi = math.pi
 
 @func
 def radians(deg):
-    return deg * pi / 180.
+    return deg * pi / 180.0
 
 
 def lcg():
@@ -23,13 +25,10 @@ def lcg():
     lcg_a = 1664525
     lcg_c = 1013904223
     state = lcg_a * state + lcg_c
-    return float(state & 0x00ffffff) * (1. / float(0x01000000))
+    return float(state & 0x00FFFFFF) * (1.0 / float(0x01000000))
 
 
-AABB = StructType(
-    min=ArrayType(3, float),
-    max=ArrayType(3, float)
-)
+AABB = StructType(min=ArrayType(3, float), max=ArrayType(3, float))
 
 
 @func
@@ -48,14 +47,14 @@ AABB.add_method(_get_max, "get_max")
 res = 1280, 720
 image = Image2D(*res, 4, float, storage="BYTE")
 aabb_count = 1024
-radius = .2
+radius = 0.2
 aabbs = np.empty(aabb_count * 6, dtype=np.float32)
 # initialize bounding boxes
 for i in range(aabb_count):
-    pos = [lcg() * 2. - 1., lcg() * 2. - 1., lcg() * 2. - 1.]
+    pos = [lcg() * 2.0 - 1.0, lcg() * 2.0 - 1.0, lcg() * 2.0 - 1.0]
     for j in range(3):
-        aabbs[i * 6 + j] = pos[j] * 10. - radius
-        aabbs[i * 6 + j + 3] = pos[j] * 10. + radius
+        aabbs[i * 6 + j] = pos[j] * 10.0 - radius
+        aabbs[i * 6 + j + 3] = pos[j] * 10.0 + radius
 acc = Accel()
 # add aabb to accel
 aabb_buffer = Buffer(aabb_count, AABB)
@@ -82,12 +81,12 @@ def kernel(pos):
     coord = dispatch_id().xy
     size = dispatch_size().xy
     aspect = float(size.x) / float(size.y)
-    p = float2(coord) / float2(size) * 2. - 1.
+    p = float2(coord) / float2(size) * 2.0 - 1.0
     fov = radians(45.8)
-    ray = make_ray(pos, normalize(float3(p * tan(.5 * fov) * float2(aspect, 1.), -1.)), 1e-3, 1e3)
+    ray = make_ray(pos, normalize(float3(p * tan(0.5 * fov) * float2(aspect, 1.0), -1.0)), 1e-3, 1e3)
     q = acc.query_all(ray, -1)
     # REAL rayquery mode: use real rayquery API, but may not be supported by all backends
-        # while(q.proceed()):
+    # while(q.proceed()):
     #     if q.is_triangle_candidate():
     #         q.commit_triangle()
     #     else:
@@ -110,20 +109,20 @@ def kernel(pos):
     #                     normal = normalize(
     #                         ray_origin + direction * dist - origin)
     #                     sphere_color = normal * .5 + .5
-    #                     q.commit_procedural(dist)        
+    #                     q.commit_procedural(dist)
     match q:
         case is_triangle():
             q.commit_triangle()
         case is_procedural():
             h = q.procedural_candidate()
             aabb = aabb_buffer.read(h.prim)
-            origin = (aabb.get_min() + aabb.get_max()) * .5
+            origin = (aabb.get_min() + aabb.get_max()) * 0.5
             candidate_ray = q.world_space_ray()
             ray_origin = candidate_ray.get_origin()
             direction = candidate_ray.get_dir()
             L = origin - ray_origin
             cos_theta = dot(direction, normalize(L))
-            if cos_theta > 0.:
+            if cos_theta > 0.0:
                 d_oc = length(L)
                 tc = d_oc * cos_theta
                 d = sqrt(d_oc * d_oc - tc * tc)
@@ -131,22 +130,21 @@ def kernel(pos):
                     t1c = sqrt(radius * radius - d * d)
                     dist = tc - t1c
                     if dist <= candidate_ray.t_max:
-                        normal = normalize(
-                            ray_origin + direction * dist - origin)
-                        sphere_color = normal * .5 + .5
+                        normal = normalize(ray_origin + direction * dist - origin)
+                        sphere_color = normal * 0.5 + 0.5
                         q.commit_procedural(dist)
 
     hit = q.committed_hit()
     if hit.hit_procedural():
-        image.write(coord, float4(sphere_color, 1.))
+        image.write(coord, float4(sphere_color, 1.0))
     elif hit.hit_triangle():
-        image.write(coord, float4(hit.bary, 0., 1.))
+        image.write(coord, float4(hit.bary, 0.0, 1.0))
     else:
-        image.write(coord, make_float4(0, 0, 0, 1.))
+        image.write(coord, make_float4(0, 0, 0, 1.0))
 
 
 gui = GUI("Test procedural", res)
-pos = float3(0., 0., 18.0)
+pos = float3(0.0, 0.0, 18.0)
 while gui.running():
     kernel(pos, dispatch_size=(*res, 1))
     gui.set_image(image)

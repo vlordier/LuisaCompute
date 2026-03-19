@@ -1,7 +1,8 @@
-from . import func, StructType
+import math
+
+from . import StructType, func
 from .mathtypes import *
 from .types import *
-import math
 
 RandomSampler = StructType(state=int)
 
@@ -17,10 +18,10 @@ RandomSampler.add_method(_f, "__init__")
 @func
 def make_random_sampler(v0, v1):
     s0 = uint()
-    for i in range(4):
-        s0 += 0x9e3779b9
-        v0 += ((v1 << 4) + 0xa341316c) ^ (v1 + s0) ^ ((v1 >> 5) + 0xc8013ea4)
-        v1 += ((v0 << 4) + 0xad90777d) ^ (v0 + s0) ^ ((v0 >> 5) + 0x7e95761e)
+    for _ in range(4):
+        s0 += 0x9E3779B9
+        v0 += ((v1 << 4) + 0xA341316C) ^ (v1 + s0) ^ ((v1 >> 5) + 0xC8013EA4)
+        v1 += ((v0 << 4) + 0xAD90777D) ^ (v0 + s0) ^ ((v0 >> 5) + 0x7E95761E)
     return RandomSampler(v0)
 
 
@@ -31,17 +32,17 @@ def make_random_sampler3d(p):
     PRIME32_4 = 668265263
     PRIME32_5 = 374761393
     h32 = p.z + PRIME32_5 + p.x * PRIME32_3
-    h32 = PRIME32_4 * ((h32 << 17) | 0x0001ffff & (h32 >> (32 - 17)))
+    h32 = PRIME32_4 * ((h32 << 17) | 0x0001FFFF & (h32 >> (32 - 17)))
     h32 += p.y * PRIME32_3
-    h32 = PRIME32_4 * ((h32 << 17) | 0x0001ffff & (h32 >> (32 - 17)))
-    h32 = PRIME32_2 * (h32 ^ ((h32 >> 15) & 0x0001ffff))
-    h32 = PRIME32_3 * (h32 ^ ((h32 >> 13) & 0x0007ffff))
-    return RandomSampler(h32 ^ ((h32 >> 16) & 0x0000ffff))
+    h32 = PRIME32_4 * ((h32 << 17) | 0x0001FFFF & (h32 >> (32 - 17)))
+    h32 = PRIME32_2 * (h32 ^ ((h32 >> 15) & 0x0001FFFF))
+    h32 = PRIME32_3 * (h32 ^ ((h32 >> 13) & 0x0007FFFF))
+    return RandomSampler(h32 ^ ((h32 >> 16) & 0x0000FFFF))
 
 
 @func
 def sign(x):
-    return copysign(1., x)
+    return copysign(1.0, x)
 
 
 @func
@@ -59,7 +60,7 @@ def _f(self):
     lcg_a = 1664525
     lcg_c = 1013904223
     self.state = lcg_a * self.state + lcg_c
-    return float(self.state & 0x00ffffff) * (1.0 / 0x01000000)
+    return float(self.state & 0x00FFFFFF) * (1.0 / 0x01000000)
 
 
 RandomSampler.add_method(_f, "next")
@@ -88,23 +89,17 @@ def ite(a, b, c):
 
 @func
 def make_float2x2_eye(v: float):
-    return float2x2(v, 0,
-                    0, v)
+    return float2x2(v, 0, 0, v)
 
 
 @func
 def make_float3x3_eye(v: float):
-    return float3x3(v, 0, 0,
-                    0, v, 0,
-                    0, 0, v)
+    return float3x3(v, 0, 0, 0, v, 0, 0, 0, v)
 
 
 @func
 def make_float4x4_eye(v: float):
-    return float4x4(v, 0, 0, 0,
-                    0, v, 0, 0,
-                    0, 0, v, 0,
-                    0, 0, 0, v)
+    return float4x4(v, 0, 0, 0, 0, v, 0, 0, 0, 0, v, 0, 0, 0, 0, v)
 
 
 @func
@@ -119,9 +114,9 @@ def distance_squared(a, b):
 
 @func
 def radians(x):
-    return x * (math.pi / 180.)
+    return x * (math.pi / 180.0)
 
 
 @func
 def degree(x):
-    return x * (180. / math.pi)
+    return x * (180.0 / math.pi)

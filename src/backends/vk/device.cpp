@@ -273,7 +273,7 @@ ResourceCreationInfo Device::create_procedural_primitive(
 }
 
 uint Device::compute_warp_size() const noexcept {
-    return 32;// TODO
+    return 32;// Note: warp size is hardcoded to 32 for Vulkan; query VkPhysicalDeviceProperties for the real subgroup size.
 }
 uint64_t Device::memory_granularity() const noexcept {
     return sparse_buffer_size;

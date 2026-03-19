@@ -1,6 +1,7 @@
-import lmdb
-from sys import argv
 from os import makedirs
+from sys import argv
+
+import lmdb
 
 
 def dump(path):

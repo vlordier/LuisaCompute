@@ -456,7 +456,8 @@ void Stream::dispatch(DeviceInterface *dev, CommandList &cmd_list) {
                 mark_handle(c->handle(), Usage::WRITE, Range{});
             } break;
         }
-        // TODO: resources record
+        // Note: Per-command resource-usage recording for validation is not yet implemented.
+        //       Track read/write resource accesses here to enable overlap detection.
     }
 }
 

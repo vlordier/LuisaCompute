@@ -1,8 +1,10 @@
+import sys
+
+import numpy as np
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
-import numpy as np
-import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -11,6 +13,7 @@ MyStructType = StructType(my_v0=float3, my_v1=float4)
 buffer = Buffer(32, MyStructType)
 print("buffer byte size(should be 32 * 32 = 1024): " + str(buffer.bytesize))
 # def get_negative_number_with_arg(buffer, atomic_buffer):
+
 
 # ConstantFlag = False
 @func
@@ -21,9 +24,9 @@ def kernel():
     tmp.my_v1 = cos(tmp.my_v1)
     buffer.write(index, tmp)
     # "Macro Branch" showoff here
-    ConstantFlag = ((1 + 1) == 3) # ConstantFlag is an always-false constant value, simple calculations supported
+    ConstantFlag = (1 + 1) == 3  # ConstantFlag is an always-false constant value, simple calculations supported
     # this "if ConstantFlag" branch will be eliminated before codegen, so this code block can be ridiculously illegal!
-    
+
     # if True:
     if ConstantFlag:
         ridiculous.wtf_is_this(nothing)
@@ -43,6 +46,6 @@ synchronize()
 buffer.copy_to(array)
 result_str = ""
 for i in array:
-    result_str += str(i) + ' '
+    result_str += str(i) + " "
 print("result: ")
 print(result_str)

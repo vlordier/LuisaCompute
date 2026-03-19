@@ -167,7 +167,7 @@ private:
         : Resource(
               device,
               Tag::RASTER_SHADER,
-              // TODO
+              // Note: load_raster_shader is called here to initialize the resource handle.
               raster_ext->load_raster_shader(
                 detail::shader_argument_types<Args...>(),
                 file_path)),

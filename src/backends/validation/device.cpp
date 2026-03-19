@@ -215,7 +215,8 @@ void Device::destroy_texture(uint64_t handle) noexcept {
 // bindless array
 ResourceCreationInfo Device::create_bindless_array(size_t size, BindlessSlotType type) noexcept {
     auto arr = _native->create_bindless_array(size, type);
-    // TODO: bindless range check maybe?
+    // Note: Bindless array bounds check skipped here; range validation could be added
+    //       once the validation layer tracks per-array slot counts.
     new BindlessArray{arr.handle};
     return arr;
 }
@@ -348,7 +349,8 @@ ShaderCreationInfo Device::create_shader(const ShaderOption &option, Function ke
 }
 ShaderCreationInfo Device::create_shader(const ShaderOption &option, const ir::KernelModule *kernel) noexcept {
     auto shader = _native->create_shader(option, kernel);
-    // TODO: IR binding test
+    // Note: IR kernel argument binding validation is not yet implemented.
+    //       Add shader argument type/usage checks here once IR binding metadata is stabilized.
     //
     return shader;
 }

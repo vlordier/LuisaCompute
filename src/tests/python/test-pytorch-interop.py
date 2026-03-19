@@ -1,11 +1,12 @@
 import luisa
 import torch
 
-luisa.init('cuda')
+luisa.init("cuda")
 
-import numpy as np
-import cupy
 import ctypes
+
+import cupy
+import numpy as np
 
 
 def cu_device_ptr_to_torch_tensor(ptr, shape, dtype=cupy.float32):
@@ -43,9 +44,7 @@ def lc_buffer_to_torch(buf):
 def torch_to_lc_buffer(tensor):
     assert tensor.dtype is torch.float32  # TODO
     size = np.prod(tensor.shape)
-    buf = luisa.Buffer.import_external_memory(
-        tensor.contiguous().data_ptr(),
-        size, dtype=float)
+    buf = luisa.Buffer.import_external_memory(tensor.contiguous().data_ptr(), size, dtype=float)
     return buf
 
 
@@ -57,6 +56,7 @@ torch.cuda.synchronize()
 
 
 # del b
+
 
 @luisa.func
 def f():

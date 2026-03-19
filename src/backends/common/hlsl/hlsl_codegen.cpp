@@ -655,9 +655,6 @@ void StringStateVisitor::VisitFunction(
     if (sharedVariables) {
         size_t shared_size{};
         for (auto &&v : func.shared_variables()) {
-            // FIXME: redundant creation of string
-            vstd::StringBuilder typeName;
-            util->GetTypeName(*v.type(), typeName, f.variable_usage(v.uid()));
             sharedVariables->emplace(f, v);
             shared_size += v.type()->size();
         }

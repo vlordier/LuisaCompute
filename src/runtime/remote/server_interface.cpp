@@ -136,7 +136,9 @@ void ServerInterface::destroy_stream(std::byte const *&ptr, luisa::vector<std::b
     _impl->destroy_stream(handle);
 }
 void ServerInterface::dispatch(std::byte const *&ptr, luisa::vector<std::byte> &result) noexcept {
-    // TODO
+    // Note: Command-list deserialization is not yet implemented. Requires matching
+    //       the serialization performed in ClientInterface::dispatch() and dispatching
+    //       the resulting CommandList to _impl->dispatch().
 }
 void ServerInterface::create_swap_chain(std::byte const *&ptr, luisa::vector<std::byte> &result) noexcept {}
 void ServerInterface::create_shader_ast(std::byte const *&ptr, luisa::vector<std::byte> &result) noexcept {}

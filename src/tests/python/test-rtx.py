@@ -1,10 +1,12 @@
+import math
+import sys
+from sys import argv
+
+import numpy as np
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
-from sys import argv
-import numpy as np
-import math
-import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -50,8 +52,9 @@ def raytracing_kernel(image, accel):
         float3(p * float2(1.0, -1.0), 0.0),  # origin
         float3(0.0, 0.0, -1.0),  # direction
         0.0,  # start distance
-        1000.0)  # end distance
-    q = accel.query_all(ray, -1)
+        1000.0,
+    )  # end distance
+    _q = accel.query_all(ray, -1)
     hit = accel.trace_closest(ray, -1)
     # if hit.hit_type == 1:
     # if not hit.miss():
@@ -66,7 +69,7 @@ def raytracing_kernel(image, accel):
 
 
 gui = GUI("Test ray tracing", res)
-time_second = 0.
+time_second = 0.0
 while gui.running():
     # update triangle every frame
     vertices = [
@@ -82,5 +85,5 @@ while gui.running():
 
     raytracing_kernel(image, accel, dispatch_size=(*res, 1))
     gui.set_image(image)
-    time_second += gui.show() / 1000.
+    time_second += gui.show() / 1000.0
 synchronize()

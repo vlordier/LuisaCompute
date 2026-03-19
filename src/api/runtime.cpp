@@ -23,7 +23,9 @@ void forget(T &&value) noexcept {
 }// namespace luisa
 #define LUISA_RC_TOMBSTONE 0xdeadbeef
 
-// TODO: rewrite with runtime constructs, e.g., Stream, Event, BindlessArray...
+// Note: This C API implementation should eventually be rewritten using the public
+//       runtime constructs (Stream, Event, BindlessArray, etc.) instead of the
+//       lower-level DeviceInterface directly.
 
 using namespace luisa;
 using namespace luisa::compute;

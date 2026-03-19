@@ -283,11 +283,11 @@ FallbackTextureView FallbackTexture::view(uint level) const noexcept {
 //     return select(sum / sum_w, make_float4(0.f), sum_w <= 0.f);
 // }
 //
-// [[nodiscard]] inline auto texture_sample_ewa(FallbackTextureView view, Sampler::Address address,
-//                                              float3 uvw, float3 ddx, float3 ddy) noexcept {
-//     // FIXME: anisotropic filtering
-//     return texture_sample_linear(view, address, uvw);
-// }
+// // [[nodiscard]] inline auto texture_sample_ewa(FallbackTextureView view, Sampler::Address address,
+// //                                              float3 uvw, float3 ddx, float3 ddy) noexcept {
+// //     // Note: EWA anisotropic filtering not yet implemented; falls back to trilinear.
+// //     return texture_sample_linear(view, address, uvw);
+// // }
 
 //float4 FallbackTexture::sample2d(Sampler sampler, float2 uv) const noexcept {
 //    return sampler.filter() == Sampler::Filter::POINT ?

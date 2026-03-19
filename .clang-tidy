@@ -1,4 +1,4 @@
-# Generated from CLion Inspection settings
+# Generated from CLion Inspection settings; enhanced for CI enforcement.
 ---
 Checks: '-*,
 bugprone-argument-comment,
@@ -8,6 +8,7 @@ bugprone-branch-clone,
 bugprone-copy-constructor-init,
 bugprone-dangling-handle,
 bugprone-dynamic-static-initializers,
+bugprone-exception-escape,
 bugprone-fold-init-type,
 bugprone-forward-declaration-namespace,
 bugprone-forwarding-reference-overload,
@@ -60,6 +61,7 @@ cert-flp30-c,
 cert-msc50-cpp,
 cert-msc51-cpp,
 cert-str34-c,
+concurrency-mt-unsafe,
 cppcoreguidelines-interfaces-global-init,
 cppcoreguidelines-narrowing-conversions,
 cppcoreguidelines-pro-type-member-init,
@@ -75,6 +77,7 @@ misc-non-copyable-objects,
 misc-throw-by-value-catch-by-reference,
 misc-unconventional-assign-operator,
 misc-uniqueptr-reset-release,
+misc-use-anonymous-namespace,
 modernize-avoid-bind,
 modernize-concat-nested-namespaces,
 modernize-deprecated-headers,
@@ -143,3 +146,11 @@ readability-static-definition-in-anonymous-namespace,
 readability-string-compare,
 readability-uniqueptr-delete-release,
 readability-use-anyofallof'
+
+# Treat every enabled check as an error (not merely a warning).
+# This is enforced both in CI and when running clang-tidy locally via IDEs.
+WarningsAsErrors: '*'
+
+# Restrict header diagnostics to first-party public and internal headers only.
+# Vendored third-party headers under src/ext/ are excluded automatically.
+HeaderFilterRegex: '.*(include/luisa|src/(ast|backends(?!/cuda/cuda_builtin|/clangcxx)|core|dsl|gui|ir|py|runtime|tensor|tests|xir))/.*\.(h|hpp)$'

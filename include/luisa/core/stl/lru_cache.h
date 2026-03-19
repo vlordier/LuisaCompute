@@ -52,7 +52,7 @@ private:
 public:
     explicit lru_cache(size_t capacity) noexcept
         : _capacity{std::max<size_t>(capacity, 1u)} {}
-    void setDeleteCallback(luisa::function<void(const Value &)> callback) noexcept {
+    void set_delete_callback(luisa::function<void(const Value &)> callback) noexcept {
         _delete_callback = std::move(callback);
     }
     [[nodiscard]] auto at(const Key &key) noexcept -> luisa::optional<Value> {
@@ -93,7 +93,9 @@ using lru_cache = eastl::lru_cache<
         EASTLAllocatorType>>;
 #endif
 
-// TODO: support allocator & comparator
+// Note: The LRUCache wrapper currently uses the default allocator and std::equal_to
+//       comparator. Templating on allocator/comparator would require threading them
+//       through to the underlying luisa::lru_cache and eastl types.
 template<typename Key, typename Value>
 class LRUCache {
 
@@ -114,7 +116,7 @@ public:
 
     template<typename F>
     void set_delete_callback(F &&f) noexcept {
-        _cache.setDeleteCallback(std::forward<F>(f));
+        _cache.set_delete_callback(std::forward<F>(f));
     }
 
     [[nodiscard]] auto fetch(const Key &key) noexcept -> luisa::optional<Value> {

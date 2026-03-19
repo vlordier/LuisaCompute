@@ -1,9 +1,11 @@
+import sys
+
+import numpy as np
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
 from luisa.util import *
-import numpy as np
-import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -15,7 +17,7 @@ kernel_dispatch_size = 64
 @func
 def dispatch(buffer):
     set_block_size(kernel_dispatch_size, 1, 1)
-    old = buffer.atomic_fetch_add(kernel_id(), dispatch_size().x)
+    _old = buffer.atomic_fetch_add(kernel_id(), dispatch_size().x)
 
 
 dispatch_buffer = IndirectDispatchBuffer(dispatch_count)
@@ -31,8 +33,8 @@ def clear_indirect():
 def emplace_indirect():
     set_block_size(dispatch_count, 1, 1)
     dispatch_buffer.set_kernel(
-        dispatch_id().x,
-        uint3(kernel_dispatch_size, 1, 1), uint3(dispatch_id().x, 1, 1), dispatch_id().x)
+        dispatch_id().x, uint3(kernel_dispatch_size, 1, 1), uint3(dispatch_id().x, 1, 1), dispatch_id().x
+    )
 
 
 buffer = Buffer(16, uint)

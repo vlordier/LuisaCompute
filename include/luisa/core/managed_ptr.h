@@ -7,7 +7,7 @@
 #include <luisa/core/stl/memory.h>
 
 #ifndef NDEBUG
-#define LUISA_MANAGED_OBJECT_CANARY 0xDEADBEEF
+inline constexpr uint32_t LUISA_MANAGED_OBJECT_CANARY = 0xDEADBEEFu;
 #endif
 
 namespace luisa {
@@ -23,13 +23,13 @@ class ManagedObject {
 
 private:
     std::atomic<int32_t> _ref_count;
-#ifdef LUISA_MANAGED_OBJECT_CANARY
+#ifndef NDEBUG
     volatile uint32_t _canary{LUISA_MANAGED_OBJECT_CANARY};
 #endif
 
 public:
     ManagedObject() noexcept : _ref_count{1} {}
-#ifdef LUISA_MANAGED_OBJECT_CANARY
+#ifndef NDEBUG
     virtual ~ManagedObject() noexcept { _canary = 0u; }
     void validate_canary() const noexcept {
         assert(_canary == LUISA_MANAGED_OBJECT_CANARY &&
@@ -255,7 +255,7 @@ public:
         return get() == rhs.get();
     }
 
-    [[nodiscard]] bool operator==(std::nullptr_t) const { return !is_engaged(); }
+    [[nodiscard]] bool operator==(std::nullptr_t) const noexcept { return !is_engaged(); }
 
     template<typename U>
         requires requires(T *p) { static_cast<const U *>(p); }

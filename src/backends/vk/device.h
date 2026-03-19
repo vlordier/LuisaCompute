@@ -64,7 +64,7 @@ class Device : public DeviceInterface, public vstd::IOperatorNewBase {
     vstd::optional<VkAllocator> _allocator;
     BinaryIO const *_binary_io{};
     vstd::unique_ptr<DefaultBinaryIO> _default_file_io;
-    bool inqueue_limit = true;// TODO
+    bool inqueue_limit = true;// Note: in-queue submission limit; set to false to allow unlimited queue depth.
     void _init_device(VkPhysicalDevice external_physical_device, VkDevice external_device, uint32_t selectedDevice);
 public:
     struct HeapAlloc {

@@ -1,12 +1,11 @@
-from .dylibs import lcapi
-from .types import to_lctype
-from .func import func
-from .struct import StructType
-from .mathtypes import *
-from .builtin import check_exact_signature
-from .types import BuiltinFuncBuilder
-from .hit import TriangleHit, CommittedHit, ProceduralHit
 from .array import ArrayType
+from .builtin import check_exact_signature
+from .dylibs import lcapi
+from .func import func
+from .hit import CommittedHit, ProceduralHit, TriangleHit
+from .mathtypes import *
+from .struct import StructType
+from .types import BuiltinFuncBuilder, to_lctype
 
 Ray = StructType(16, _origin=ArrayType(3, float), t_min=float, _dir=ArrayType(3, float), t_max=float)
 
@@ -59,23 +58,19 @@ class RayQueryAllType:
 
     @BuiltinFuncBuilder
     def procedural_candidate(self):
-        expr = lcapi.builder().call(to_lctype(ProceduralHit),
-                                    lcapi.CallOp.RAY_QUERY_PROCEDURAL_CANDIDATE_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(
+            to_lctype(ProceduralHit), lcapi.CallOp.RAY_QUERY_PROCEDURAL_CANDIDATE_HIT, [self.expr]
+        )
         return ProceduralHit, expr
 
     @BuiltinFuncBuilder
     def triangle_candidate(self):
-        expr = lcapi.builder().call(to_lctype(TriangleHit),
-                                    lcapi.CallOp.RAY_QUERY_TRIANGLE_CANDIDATE_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(TriangleHit), lcapi.CallOp.RAY_QUERY_TRIANGLE_CANDIDATE_HIT, [self.expr])
         return TriangleHit, expr
 
     @BuiltinFuncBuilder
     def committed_hit(self):
-        expr = lcapi.builder().call(to_lctype(CommittedHit),
-                                    lcapi.CallOp.RAY_QUERY_COMMITTED_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(CommittedHit), lcapi.CallOp.RAY_QUERY_COMMITTED_HIT, [self.expr])
         return CommittedHit, expr
 
     @BuiltinFuncBuilder
@@ -96,32 +91,26 @@ class RayQueryAllType:
 
     @BuiltinFuncBuilder
     def world_space_ray(self):
-        expr = lcapi.builder().call(to_lctype(Ray),
-                                    lcapi.CallOp.RAY_QUERY_WORLD_SPACE_RAY,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(Ray), lcapi.CallOp.RAY_QUERY_WORLD_SPACE_RAY, [self.expr])
         return Ray, expr
+
     @BuiltinFuncBuilder
     def proceed(self):
-        expr = lcapi.builder().call(to_lctype(bool),
-                                    lcapi.CallOp.RAY_QUERY_PROCEED,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(bool), lcapi.CallOp.RAY_QUERY_PROCEED, [self.expr])
         return bool, expr
+
     @BuiltinFuncBuilder
     def is_triangle_candidate(self):
-        expr = lcapi.builder().call(to_lctype(bool),
-                                    lcapi.CallOp.RAY_QUERY_IS_TRIANGLE_CANDIDATE,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(bool), lcapi.CallOp.RAY_QUERY_IS_TRIANGLE_CANDIDATE, [self.expr])
         return bool, expr
+
     @BuiltinFuncBuilder
     def is_procedural_candidate(self):
-        expr = lcapi.builder().call(to_lctype(bool),
-                                    lcapi.CallOp.RAY_QUERY_IS_PROCEDURAL_CANDIDATE,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(bool), lcapi.CallOp.RAY_QUERY_IS_PROCEDURAL_CANDIDATE, [self.expr])
         return bool, expr
-        
 
 
-rayQueryAllType = RayQueryAllType()
+rayQueryAllType = RayQueryAllType()  # noqa: N816
 
 
 class RayQueryAnyType:
@@ -136,23 +125,19 @@ class RayQueryAnyType:
 
     @BuiltinFuncBuilder
     def procedural_candidate(self):
-        expr = lcapi.builder().call(to_lctype(ProceduralHit),
-                                    lcapi.CallOp.RAY_QUERY_PROCEDURAL_CANDIDATE_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(
+            to_lctype(ProceduralHit), lcapi.CallOp.RAY_QUERY_PROCEDURAL_CANDIDATE_HIT, [self.expr]
+        )
         return ProceduralHit, expr
 
     @BuiltinFuncBuilder
     def triangle_candidate(self):
-        expr = lcapi.builder().call(to_lctype(TriangleHit),
-                                    lcapi.CallOp.RAY_QUERY_TRIANGLE_CANDIDATE_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(TriangleHit), lcapi.CallOp.RAY_QUERY_TRIANGLE_CANDIDATE_HIT, [self.expr])
         return TriangleHit, expr
 
     @BuiltinFuncBuilder
     def committed_hit(self):
-        expr = lcapi.builder().call(to_lctype(CommittedHit),
-                                    lcapi.CallOp.RAY_QUERY_COMMITTED_HIT,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(CommittedHit), lcapi.CallOp.RAY_QUERY_COMMITTED_HIT, [self.expr])
         return CommittedHit, expr
 
     @BuiltinFuncBuilder
@@ -173,13 +158,11 @@ class RayQueryAnyType:
 
     @BuiltinFuncBuilder
     def world_space_ray(self):
-        expr = lcapi.builder().call(to_lctype(Ray),
-                                    lcapi.CallOp.RAY_QUERY_WORLD_SPACE_RAY,
-                                    [self.expr])
+        expr = lcapi.builder().call(to_lctype(Ray), lcapi.CallOp.RAY_QUERY_WORLD_SPACE_RAY, [self.expr])
         return Ray, expr
 
 
-rayQueryAnyType = RayQueryAnyType()
+rayQueryAnyType = RayQueryAnyType()  # noqa: N816
 
 
 def is_triangle(): ...

@@ -392,7 +392,9 @@ const TypeImpl *TypeRegistry::_decode(luisa::string_view desc) noexcept {
                 info->member_attributes.resize(info->members.size());
                 info->member_attributes.emplace_back(luisa::string{attr_key}, luisa::string{attr_value});
             }
-            // TODO: match attribute
+            // Note: Additional struct-member attributes (e.g. padding, layout qualifiers)
+            //       could be parsed and attached here. The attribute key/value are already
+            //       parsed above; extend info->member_attributes to store them.
             info->members.emplace_back(_decode(split()));
         }
         if (!info->member_attributes.empty()) {

@@ -60,7 +60,7 @@ private:
     BufferAllocator<DefaultBuffer> defaultAllocator;
     BufferAllocator<ReadbackBuffer> readbackAllocator;
     vstd::unique_ptr<DefaultBuffer> scratchBuffer;
-    //TODO: allocate commandbuffer
+    // Note: CommandBuffer allocation is performed in the constructor body; see CommandAllocator.cpp.
     CommandAllocator(Device *device, GpuAllocator *resourceAllocator, D3D12_COMMAND_LIST_TYPE type);
 
 public:

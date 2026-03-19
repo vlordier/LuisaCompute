@@ -8,7 +8,7 @@
 #if LUISA_ENABLE_WAYLAND
 #define GLFW_EXPOSE_NATIVE_WAYLAND
 #endif
-#define GLFW_EXPOSE_NATIVE_X11// TODO: other window compositors
+#define GLFW_EXPOSE_NATIVE_X11// Note: Only X11 is exposed; add GLFW_EXPOSE_NATIVE_WAYLAND for Wayland-only builds.
 #endif
 
 #ifndef GLFW_INCLUDE_NONE
@@ -285,7 +285,8 @@ public:
                                         nullptr, nullptr);
         LUISA_ASSERT(_main_window != nullptr, "Failed to create GLFW window.");
         glfwSetWindowUserPointer(_main_window, this);
-        // TODO: imgui
+        // Note: ImGui mouse/keyboard forwarding is disabled; enable ImGui_ImplGlfw callbacks
+        //       and guard with ImGui::GetIO().WantCaptureMouse/WantCaptureKeyboard when integrating ImGui input.
         glfwSetMouseButtonCallback(_main_window, [](GLFWwindow *window, int button, int action, int mods) noexcept {
             // if (ImGui::GetIO().WantCaptureMouse) {// ImGui is handling the mouse
             //     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
@@ -394,7 +395,8 @@ public:
             };
         });
 
-        // TODO: install user GLFW callbacks?
+        // Note: User GLFW callbacks (e.g. for drag-and-drop or custom key handling) are not yet installed.
+        //       Use glfwSetDropCallback / glfwSetKeyCallback after this point if needed.
 
         // imgui config
         _with_context([this, &config] {
@@ -537,7 +539,7 @@ private:
         auto pixels = static_cast<unsigned char *>(nullptr);
         auto width = 0, height = 0;
         io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-        // TODO: mipmaps?
+        // Note: ImGui font texture is created without mipmaps; add mip generation if text appears blurry at non-native DPI.
         if (!_font_texture || any(_font_texture.size() != make_uint2(width, height))) {
             if (_font_texture) { _stream << synchronize(); }
             _font_texture = _device.create_image<float>(PixelStorage::BYTE4, width, height, 1);

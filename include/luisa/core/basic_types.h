@@ -273,7 +273,9 @@ using basic_types = std::tuple<
     bool3, float3, int3, uint3, short3, ushort3, byte3, ubyte3, slong3, ulong3, half3, double3,
     bool4, float4, int4, uint4, short4, ushort4, byte4, ubyte4, slong4, ulong4, half4, double4,
     float2x2, float3x3, float4x4
-    // TODO: should half matrix and double matrix become builtin-type? May break all backends
+    // Note: Consider promoting half and double matrix types to builtin-type status.
+    //       Adding them would require updating all backends (CUDA, DX, Metal, CPU, Vulkan).
+    //       half matrix ops may not be natively supported on all GPU architectures.
     // ,half2x2, half3x3, half4x4,
     // double2x2, double3x3, double4x4
     >;

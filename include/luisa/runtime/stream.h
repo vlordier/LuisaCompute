@@ -98,7 +98,8 @@ public:
     // compound commands
     template<typename... T>
     decltype(auto) operator<<(std::tuple<T...> &&args) noexcept {
-        // FIXME: Delegate{this} << without a temporary definition may boom GCC
+        // Note: Delegate{this} << args without a named temporary may miscompile on GCC
+        // due to the sequence of destructor calls. Naming the temporary ensures correct ordering.
         Delegate delegate{this};
         return std::move(delegate) << std::move(args);
     }

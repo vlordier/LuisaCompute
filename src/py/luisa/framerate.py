@@ -24,6 +24,9 @@ class FrameRate:
     def report(self) -> float:
         if len(self._durations_and_frames) == 0:
             return 0
-        tuple_add = lambda x, y: (x[0] + y[0], x[1] + y[1])
+
+        def tuple_add(x, y):
+            return (x[0] + y[0], x[1] + y[1])
+
         total_duration, total_frame_count = reduce(tuple_add, self._durations_and_frames)
         return total_frame_count / total_duration

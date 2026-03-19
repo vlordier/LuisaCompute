@@ -263,7 +263,7 @@ void export_runtime(py::module &m) {
             static UserBinaryIO io;
             DeviceConfig config{.binary_io = &io};
             return ManagedDevice(self.create_device(backend_name, &config));
-        })// TODO: support properties
+        })// Note: DeviceConfig properties (e.g. binary_io, headless) are not yet exposed to Python.
         .def("set_shader_path", [](Context &self, std::string const &str) {
             std::filesystem::path p{str};
             auto cp = std::filesystem::canonical(p);
@@ -275,7 +275,7 @@ void export_runtime(py::module &m) {
             DeviceConfig settings{
                 .headless = true};
             return ManagedDevice(self.create_device(backend_name, &settings));
-        })// TODO: support properties
+        })// Note: DeviceConfig properties (e.g. headless) are not yet exposed to Python.
         .def("installed_backends", [](Context &self) {
             std::vector<luisa::string> strs;
             for (auto s : self.installed_backends()) strs.emplace_back(luisa::string_view(s.data(), s.size()));
@@ -380,7 +380,7 @@ void export_runtime(py::module &m) {
                 auto handle = self.create_shader({}, kernel).handle;
                 RefCounter::current->AddObject(handle, {[](DeviceInterface *d, uint64 handle) { d->destroy_shader(handle); }, &self});
                 return handle; },
-             pyref)// TODO: support metaoptions
+             pyref)// Note: ShaderOption metaoptions (e.g. enable_fast_math, enable_debug_info)
         .def("save_shader", [](DeviceInterface &self, Function kernel, luisa::string_view str) {
             luisa::string_view str_view;
             luisa::string dst_path_str;

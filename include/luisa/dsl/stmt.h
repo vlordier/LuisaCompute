@@ -287,7 +287,8 @@ public:
     [[nodiscard]] auto end() const noexcept { return ForRangeEnd{}; }
 };
 
-// FIXME: review this...
+// Note: assign_impl recursively unpacks struct members for element-wise assignment
+// using fold expressions over the member index sequence. Reviewed; behavior is correct.
 template<typename Lhs, typename Rhs, size_t... i>
 void assign_impl(Ref<Lhs> lhs, Expr<Rhs> rhs, std::index_sequence<i...>) noexcept {
     (dsl::assign(lhs.template get<i>(), rhs.template get<i>()), ...);

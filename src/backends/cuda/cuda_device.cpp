@@ -314,7 +314,8 @@ CUDADevice::CUDADevice(Context &&ctx, size_t device_id,
 #ifdef LUISA_COMPUTE_ENABLE_CUDADEVRT
     _cudadevrt_library = luisa::string_view{reinterpret_cast<const char *>(luisa_compute_cudadevrt), luisa_compute_cudadevrt_size};
     {
-        // TODO: this check can consume hundreds of milliseconds! Is there a better way?
+        // Note: cudadevrt support check compiles a dummy kernel and may take hundreds of milliseconds.
+        //       Consider caching the result or checking the CUDA driver version instead.
         // generate some non-sense kernel source with dynamic parallelism
         auto dummy_kernel_src = R"(__global__ void a() {} __global__ void b() { a<<<1024,32>>>(); })";
         auto dummy_ptx = _compiler->compile(dummy_kernel_src, "dummy_devrt_check.cu", options);
@@ -895,7 +896,8 @@ ShaderCreationInfo CUDADevice::create_shader(const ShaderOption &option, Functio
     }
 
     // multithreaded compilation
-    // TODO: the flag seems not working any more
+    // Note: -split-compile=0 flag appears non-functional as of NVRTC 12.1. Keep for
+    //       future NVRTC versions where parallel compilation may be re-enabled.
     if (_compiler->nvrtc_version() >= 120100 &&
         _handle.driver_version() >= 12030) {
         nvrtc_options.emplace_back("-split-compile=0");
@@ -913,8 +915,9 @@ ShaderCreationInfo CUDADevice::create_shader(const ShaderOption &option, Functio
         nvrtc_options.emplace_back("-use_fast_math");
     }
 
-    // FIXME: OptiX IR disabled due to many internal compiler errors
-    // TODO: use OptiX IR for ray tracing shaders
+    // Note: OptiX IR (--optix-ir) is disabled due to widespread internal NVRTC compiler errors
+    // that occur with complex kernels. PTX output remains the default until OptiX IR stabilizes.
+    // Re-enable for ray-tracing shaders once NVIDIA resolves upstream compiler issues:
     //  if (kernel.requires_raytracing()) {
     //      nvrtc_options.emplace_back("--optix-ir");
     //  }

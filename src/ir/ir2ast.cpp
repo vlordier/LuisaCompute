@@ -594,8 +594,8 @@ const Expression *IR2AST::_convert_instr_call(const ir::Node *node) noexcept {
         case ir::Func::Tag::AccGrad: return builtin_func(2, CallOp::ACCUMULATE_GRADIENT);
         case ir::Func::Tag::Detach: return builtin_func(1, CallOp::DETACH);
         case ir::Func::Tag::Backward: return builtin_func(0, CallOp::BACKWARD);
-        case ir::Func::Tag::PropagateGrad: LUISA_NOT_IMPLEMENTED();// TODO
-        case ir::Func::Tag::OutputGrad: LUISA_NOT_IMPLEMENTED();   // TODO
+        case ir::Func::Tag::PropagateGrad: LUISA_NOT_IMPLEMENTED();// Note: PropagateGrad and OutputGrad are not yet lowered to AST callables; implement when autodiff IR is stabilized.
+        case ir::Func::Tag::OutputGrad: LUISA_NOT_IMPLEMENTED();   // Note: see PropagateGrad above.
         case ir::Func::Tag::RayTracingInstanceTransform: return builtin_func(2, CallOp::RAY_TRACING_INSTANCE_TRANSFORM);
         case ir::Func::Tag::RayTracingInstanceUserId: return builtin_func(2, CallOp::RAY_TRACING_INSTANCE_USER_ID);
         case ir::Func::Tag::RayTracingInstanceVisibilityMask: return builtin_func(2, CallOp::RAY_TRACING_INSTANCE_VISIBILITY_MASK);

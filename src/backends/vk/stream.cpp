@@ -1226,7 +1226,7 @@ void CommandBuffer::execute(vstd::span<const luisa::unique_ptr<Command>> cmds) {
                                 resource_barrier->record(get_resource_view(i.resource), i.stage, i.access, i.texture_layout);
                             }
                         } break;
-                        //TODO: other commands
+                        // Note: Other command types are not yet implemented for Vulkan; LUISA_ERROR is triggered below.
                         default: {
                             LUISA_ERROR("Command type not supported.");
                         } break;
@@ -1818,7 +1818,7 @@ void CommandBuffer::execute(vstd::span<const luisa::unique_ptr<Command>> cmds) {
                 case Command::Tag::ECustomCommand: {
                     auto c = static_cast<CustomCommand const *>(cmd);
                     switch (c->custom_cmd_uuid()) {
-                        // TODO
+                        // Note: Dispatch on supported custom command UUIDs; unsupported UUIDs fall through to LUISA_ERROR.
                         case to_underlying(CustomCommandUUID::RASTER_CLEAR_DEPTH): {
                             auto cmd = static_cast<ClearDepthCommand const *>(c);
                             auto tex = reinterpret_cast<Texture *>(cmd->handle());
@@ -1912,7 +1912,7 @@ void CommandBuffer::execute(vstd::span<const luisa::unique_ptr<Command>> cmds) {
                                 resolution = tex->size().xy();
                                 VkClearValue clear_value;
                                 std::memset(&clear_value, 0, sizeof(VkClearValue));
-                                clear_value.depthStencil.depth = 0.f;// TODO: may set depth_buffer default value
+                                clear_value.depthStencil.depth = 0.f;// Note: depth clear value defaults to 0.0; use the render pass's configured depth clear value instead.
                             }
 
                             VkFramebufferCreateInfo framebuffer_create_info{
@@ -2030,7 +2030,7 @@ void CommandBuffer::execute(vstd::span<const luisa::unique_ptr<Command>> cmds) {
                                 _cmdbuffer,
                                 _state->_desc_pool);
                         } break;
-                        //TODO: other commands
+                        // Note: Other command types are not yet implemented for Vulkan; LUISA_ERROR is triggered below.
                         default: {
                             LUISA_ERROR("Command type not supported.");
                         } break;

@@ -293,7 +293,8 @@ TEST_SUITE("ir") {
                                     return cross(make_float3(x, y, z), make_float3(u, v, w)).x;
                                 }) == 0);
 
-    // TODO: cross is crushed until 2023-08-03
+    // Note: float3_cross_y/z autodiff tests are disabled due to a compiler crash observed before 2023-08-03.
+    //       Re-enable once the upstream cross() gradient fix is verified on the target compiler version.
     // LUISA_TEST_CASE_WITH_DEVICE("autodiff::float3_cross_y",
     //                             luisa::test::test_ad_helper<6>("float3_cross_y", device, [](auto x, auto y, auto z, auto u, auto v, auto w) {
     //                                 return cross(make_float3(x, y, z), make_float3(u, v, w)).y;

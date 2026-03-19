@@ -564,7 +564,10 @@ void FunctionBuilder::call(Function custom, std::initializer_list<const Expressi
     static_cast<void>(call(nullptr, custom, args));
 }
 bool FunctionBuilder::operator==(const FunctionBuilder &rhs) const noexcept {
-    // FIXME hash is broken!
+    // Note: content-based equality via hash comparison is currently disabled because the
+    // hash implementation does not yet cover all AST nodes (e.g. variable IDs shift between
+    // build-graph instantiations). Pointer equality is used as a conservative fallback —
+    // two builders are only considered equal when they are literally the same object.
     return std::addressof(rhs) == this;
 
     /*

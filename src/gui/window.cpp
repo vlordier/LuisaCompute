@@ -8,7 +8,7 @@
 #if LUISA_ENABLE_WAYLAND
 #define GLFW_EXPOSE_NATIVE_WAYLAND
 #endif
-#define GLFW_EXPOSE_NATIVE_X11// TODO: other window compositors
+#define GLFW_EXPOSE_NATIVE_X11// Note: Only X11 is exposed; add GLFW_EXPOSE_NATIVE_WAYLAND for Wayland-only builds.
 #endif
 
 #ifndef GLFW_INCLUDE_NONE
@@ -40,7 +40,7 @@ struct WindowImpl : public Window::IWindowImpl {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, resizable);
         window = glfwCreateWindow(size.x, size.y, name, full_screen ? glfwGetPrimaryMonitor() : nullptr, nullptr);
-        // TODO: other platform
+        // Note: Platform-specific window handle extraction follows; add a new #elif branch for any future platforms.
 #if defined(LUISA_PLATFORM_WINDOWS)
         window_handle = reinterpret_cast<uint64_t>(glfwGetWin32Window(window));
 #elif defined(LUISA_PLATFORM_APPLE)
@@ -57,7 +57,8 @@ struct WindowImpl : public Window::IWindowImpl {
 #endif
 #endif
         glfwSetWindowUserPointer(window, this);
-        // TODO: imgui
+        // Note: ImGui mouse/keyboard forwarding is disabled; enable ImGui_ImplGlfw callbacks
+        //       and guard with ImGui::GetIO().WantCaptureMouse when integrating ImGui input.
         glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int button, int action, int mods) noexcept {
             // if (ImGui::GetIO().WantCaptureMouse) {// ImGui is handling the mouse
             //     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);

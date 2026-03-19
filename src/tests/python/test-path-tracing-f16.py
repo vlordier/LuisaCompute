@@ -1,12 +1,13 @@
+import sys
+import time
+
+import cornell_box
+import numpy as np
 from luisa import *
 from luisa.builtin import *
 from luisa.types import *
 from luisa.util import *
 
-import time
-import cornell_box
-import numpy as np
-import sys
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -26,18 +27,14 @@ Onb.add_method(to_world, "to_world")
 
 @func
 def linear_to_srgb(x: float3):
-    return clamp(select(1.055 * x ** (1.0 / 2.4) - 0.055,
-                        12.92 * x,
-                        x <= 0.00031308),
-                 0.0, 1.0)
+    return clamp(select(1.055 * x ** (1.0 / 2.4) - 0.055, 12.92 * x, x <= 0.00031308), 0.0, 1.0)
 
 
 @func
 def make_onb(normal: float3):
-    binormal = normalize(select(
-        float3(0.0, -normal.z, normal.y),
-        float3(-normal.y, normal.x, 0.0),
-        abs(normal.x) > abs(normal.z)))
+    binormal = normalize(
+        select(float3(0.0, -normal.z, normal.y), float3(-normal.y, normal.x, 0.0), abs(normal.x) > abs(normal.z))
+    )
     tangent = normalize(cross(binormal, normal))
     result = Onb()
     result.tangent = tangent
@@ -68,7 +65,9 @@ def balanced_heuristic(pdf_a, pdf_b):
 
 
 @func
-def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer, material_buffer, mesh_cnt, frame_index):
+def raytracing_kernel(
+    image, seed_image, accel, heap, resolution, vertex_buffer, material_buffer, mesh_cnt, frame_index
+):
     set_block_size(8, 8, 1)
     coord = dispatch_id().xy
     frame_size = float(min(resolution.x, resolution.y))
@@ -100,7 +99,7 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
         #     else:
         #         # no procedural in corner box
         #         continue
-        #hit = query.committed_hit()
+        # hit = query.committed_hit()
         if hit.miss():
             break
         i0 = heap.buffer_read(int, hit.inst, hit.prim * 3 + 0)
@@ -123,8 +122,7 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
             if depth == 0:
                 radiance += light_emission
             else:
-                pdf_light = length_squared(
-                    p - ray.get_origin()) / (light_area * cos_wi)
+                pdf_light = length_squared(p - ray.get_origin()) / (light_area * cos_wi)
                 mis_weight = half(balanced_heuristic(pdf_bsdf, pdf_light))
                 radiance += mis_weight * beta * light_emission
             break
@@ -141,21 +139,19 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
         occluded = accel.trace_any(shadow_ray, -1)
         cos_wi_light = dot(wi_light, n)
         cos_light = -dot(light_normal, wi_light)
-        if ((not occluded and cos_wi_light > 1e-4) and cos_light > 1e-4):
+        if (not occluded and cos_wi_light > 1e-4) and cos_light > 1e-4:
             pdf_light = (d_light * d_light) / (light_area * cos_light)
             pdf_bsdf = cos_wi_light * (1 / 3.1415926)
             mis_weight = half(balanced_heuristic(pdf_light, pdf_bsdf))
             bsdf = half3(material.albedo * (1 / 3.1415926) * cos_wi_light)
             # radiance += beta * bsdf * light_emission
-            radiance += beta * bsdf * mis_weight * \
-                light_emission / half(max(pdf_light, 1e-4))
+            radiance += beta * bsdf * mis_weight * light_emission / half(max(pdf_light, 1e-4))
 
         # sample BSDF
         onb = make_onb(n)
         ux = sampler.next()
         uy = sampler.next()
-        new_direction = onb.to_world(
-            cosine_sample_hemisphere(float2(ux, uy)))
+        new_direction = onb.to_world(cosine_sample_hemisphere(float2(ux, uy)))
         ray = make_ray(pp, new_direction, 0.0, 1e30)
         # bsdf = material.albedo / 3.1415926 * cos_wi
         # beta *= bsdf / pdf_bsdf
@@ -163,10 +159,10 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
         pdf_bsdf = cos_wi * (1 / 3.1415926)
 
         # rr
-        l = dot(half3(0.212671, 0.715160, 0.072169), beta)
-        if l == 0.0:
+        luminance = dot(half3(0.212671, 0.715160, 0.072169), beta)
+        if luminance == 0.0:
             break
-        q = max(l, 0.05)
+        q = max(luminance, 0.05)
         r = sampler.next()
         if r >= q:
             break
@@ -174,8 +170,7 @@ def raytracing_kernel(image, seed_image, accel, heap, resolution, vertex_buffer,
         if any(isnan(radiance)):
             radiance = half3(0.0)
     seed_image.write(coord, sampler.state)
-    image.write(coord, half4(
-        clamp(radiance, 0.0, 30.0), 1.0))
+    image.write(coord, half4(clamp(radiance, 0.0, 30.0), 1.0))
 
 
 @func
@@ -216,14 +211,22 @@ vertex_arr = [[*item, 0.0] for item in cornell_box.vertices]
 vertex_arr = np.array(vertex_arr, dtype=np.float32)
 vertex_buffer.copy_from(vertex_arr)
 material_arr = [
-    [0.725, 0.71, 0.68, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.725, 0.71, 0.68, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.725, 0.71, 0.68, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.14, 0.45, 0.091, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.63, 0.065, 0.05, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.725, 0.71, 0.68, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.725, 0.71, 0.68, 0.0], [0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0], [17.0, 12.0, 4.0, 0.0],
+    [0.725, 0.71, 0.68, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.725, 0.71, 0.68, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.725, 0.71, 0.68, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.14, 0.45, 0.091, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.63, 0.065, 0.05, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.725, 0.71, 0.68, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.725, 0.71, 0.68, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [17.0, 12.0, 4.0, 0.0],
 ]
 material_buffer = Buffer(len(material_arr), float3)
 material_arr = np.array(material_arr, dtype=np.float32)
@@ -234,7 +237,7 @@ accel = Accel()
 for mesh in cornell_box.faces:
     indices = []
     for item in mesh:
-        assert (len(item) == 4)
+        assert len(item) == 4
         for x in [0, 1, 2, 0, 2, 3]:
             indices.append(item[x])
     if mesh_cnt == 5:
@@ -263,8 +266,18 @@ frame_index = 0
 
 def sample():
     global frame_index, image, accel, res
-    raytracing_kernel(image, seed_image, accel, heap, make_int2(
-        *res), vertex_buffer, material_buffer, mesh_cnt, frame_index, dispatch_size=(*res, 1))
+    raytracing_kernel(
+        image,
+        seed_image,
+        accel,
+        heap,
+        make_int2(*res),
+        vertex_buffer,
+        material_buffer,
+        mesh_cnt,
+        frame_index,
+        dispatch_size=(*res, 1),
+    )
     accumulate_kernel(accum_image, image, dispatch_size=[*res, 1])
     hdr2ldr_kernel(accum_image, ldr_image, 1.0, dispatch_size=[*res, 1])
     frame_index += 1

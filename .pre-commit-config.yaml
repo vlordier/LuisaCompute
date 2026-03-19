@@ -1,0 +1,89 @@
+# pre-commit hook configuration for LuisaCompute
+#
+# Install once per checkout:
+#   pip install pre-commit
+#   pre-commit install          # activates the commit-msg / pre-commit hooks
+#   pre-commit install --hook-type pre-push   # optional: also run on push
+#
+# Run against all files manually:
+#   pre-commit run --all-files
+#
+# Update hook revisions:
+#   pre-commit autoupdate
+
+default_language_version:
+  python: python3
+
+repos:
+  # ────────────────────────────────────────────────────────────────────────────
+  # General file hygiene (trailing whitespace, EOF newline, YAML/TOML syntax…)
+  # ────────────────────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'          # Markdown allows intentional trailing spaces
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: '\.(bat|cmd|ps1)$'
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=5120]      # warn on files > 5 MB
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Python — ruff (linter + formatter, replaces flake8/isort/black/pyupgrade)
+  # ────────────────────────────────────────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.2
+    hooks:
+      - id: ruff              # linter
+        args: [--fix]
+      - id: ruff-format       # formatter (equivalent to black)
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # C / C++ — clang-format
+  # Mirrors the CI check in .github/workflows/lint.yml (clang-format-20).
+  # Falls back to whatever clang-format is on PATH locally; CI always uses v20.
+  # ────────────────────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v20.1.0
+    hooks:
+      - id: clang-format
+        types_or: [c, c++]
+        exclude: |
+          (?x)^(
+            src/ext/|
+            src/backends/cuda/cuda_builtin/|
+            src/backends/clangcxx/
+          )
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Rust — rustfmt
+  # Mirrors the stable-toolchain config in src/rust/rustfmt.toml.
+  # ────────────────────────────────────────────────────────────────────────────
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: [--manifest-path, src/rust/Cargo.toml, --]
+      - id: cargo-check
+        args: [--manifest-path, src/rust/Cargo.toml]
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # CMake — cmake-format (optional: only runs if cmake-format is installed)
+  # ────────────────────────────────────────────────────────────────────────────
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        exclude: |
+          (?x)^(
+            scripts/options\.cmake|
+            scripts/options\.cmake\.template
+          )

@@ -553,7 +553,7 @@ texture_sample_point(TextureView view, LCSamplerAddress address, lc_float3 uvw) 
 
 [[nodiscard]] inline auto texture_sample_ewa(TextureView view, LCSamplerAddress address,
                                              lc_float3 uvw, lc_float3 ddx, lc_float3 ddy) noexcept {
-    // FIXME: anisotropic filtering
+    // Note: EWA anisotropic filtering not yet implemented; falls back to trilinear.
     return texture_sample_linear(view, address, uvw);
 }
 

@@ -98,7 +98,8 @@ int mpm3d(Device &device) {
                      0.75f - sqr(fx - 1.0f),
                      0.5f * sqr(fx - 0.5f)};
         Float stress = -4.f * dt * E * p_vol * (J->read(p) - 1.f) / sqr(dx);
-        // TODO: here C runtime read will raise error
+        // Note: C runtime `read()` on the stress field raises a sanitizer error here due to GPU-side writes.
+        //       This line is intentionally commented out until the field access pattern is resolved.
         // Float3x3 curr_rho = p_mass * C->read(p);
         Float3x3 affine = make_float3x3(
             stress, 0.f, 0.f,

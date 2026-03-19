@@ -1,8 +1,8 @@
 pub mod convert;
 use crate::ir::{Binding, KernelModule, Primitive};
 
-use serde::{Deserialize, Serialize};
 use half::f16;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SerializedKernelModule {
@@ -143,7 +143,7 @@ pub enum SerializedInstruction {
     },
     AdScope {
         body: SerializedBlockRef,
-        forward:bool,
+        forward: bool,
     },
     AdDetach(SerializedBlockRef),
     RayQuery {
@@ -157,7 +157,6 @@ pub enum SerializedInstruction {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub enum SerializedFunc {
-
     ZeroInitializer,
 
     Assume,

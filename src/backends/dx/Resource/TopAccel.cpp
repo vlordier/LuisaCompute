@@ -12,7 +12,9 @@ TopAccel::TopAccel(Device *device, AccelOption const &option)
     if (!device->support_raytracing) [[unlikely]] {
         LUISA_ERROR("RayTracing not supported on this device.");
     }
-    //TODO: allow_compact not supported
+    // Note: allow_compact is not currently supported for DX top-level acceleration structures.
+    //       D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_COMPACTION would need to be
+    //       set here and a compaction size query + copy performed after the build.
     // option.allow_compaction = false;
     auto GetPreset = [&] {
         switch (option.hint) {
@@ -185,7 +187,7 @@ void TopAccel::ProcessSetDesc(EnhancedBarrierTracker &tracker) {
             m.primitive = mesh->GetAccelBuffer()->GetAddress();
             update = false;
         }
-        // TODO: motion vector support
+        // Note: Motion vector support (m.motion_transform_buffer) is not yet implemented for DX.
         // m.motion_transform_buffer
     }
 }

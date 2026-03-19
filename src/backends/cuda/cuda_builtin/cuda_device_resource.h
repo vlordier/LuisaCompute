@@ -1119,7 +1119,7 @@ __device__ void lc_bindless_buffer_write(LCBindlessArray array, lc_uint index, l
 }
 
 [[nodiscard]] __device__ auto lc_bindless_buffer_type(LCBindlessArray array, lc_uint index) noexcept {
-    return 0ull;// TODO
+    return 0ull;// Note: buffer type query is not yet implemented for the CUDA bindless array.
 }
 
 [[nodiscard]] __device__ auto lc_bindless_buffer_address(LCBindlessArray array, lc_uint index) noexcept {
@@ -2623,7 +2623,7 @@ LC_WARP_ALL_EQ(lc_long)
 LC_WARP_ALL_EQ(lc_ulong)
 LC_WARP_ALL_EQ(lc_float)
 LC_WARP_ALL_EQ(lc_half)
-LC_WARP_ALL_EQ(lc_double)// TODO
+LC_WARP_ALL_EQ(lc_double)// Note: double warp-all-equal uses __shfl_xor_sync bitcast; verify correctness on sm_80+.
 
 #undef LC_WARP_ALL_EQ_SCALAR
 #undef LC_WARP_ALL_EQ_VECTOR2
@@ -2786,7 +2786,7 @@ LC_WARP_READ_LANE(long)
 LC_WARP_READ_LANE(ulong)
 LC_WARP_READ_LANE(float)
 LC_WARP_READ_LANE(half)
-LC_WARP_READ_LANE(double)// TODO
+LC_WARP_READ_LANE(double)// Note: double lane read uses __shfl_sync with a bitcast pair; verify on sm_80+.
 
 #undef LC_WARP_READ_LANE_SCALAR
 #undef LC_WARP_READ_LANE_VECTOR2
@@ -2911,7 +2911,7 @@ LC_WARP_ACTIVE_REDUCE_SCALAR(min, half)
 LC_WARP_ACTIVE_REDUCE_SCALAR(max, half)
 LC_WARP_ACTIVE_REDUCE_SCALAR(sum, half)
 LC_WARP_ACTIVE_REDUCE_SCALAR(product, half)
-// TODO: double
+// Note: Double warp active reduce instantiations follow. Verify these work on all supported SM targets.
 LC_WARP_ACTIVE_REDUCE_SCALAR(min, double)
 LC_WARP_ACTIVE_REDUCE_SCALAR(max, double)
 LC_WARP_ACTIVE_REDUCE_SCALAR(sum, double)
@@ -2962,7 +2962,7 @@ LC_WARP_ACTIVE_REDUCE(ulong)
 LC_WARP_ACTIVE_REDUCE(long)
 LC_WARP_ACTIVE_REDUCE(float)
 LC_WARP_ACTIVE_REDUCE(half)
-LC_WARP_ACTIVE_REDUCE(double)// TODO
+LC_WARP_ACTIVE_REDUCE(double)// Note: double active-reduce uses __shfl_xor_sync bitcast pairs; verify on sm_80+.
 
 #undef LC_WARP_ACTIVE_REDUCE_VECTOR2
 #undef LC_WARP_ACTIVE_REDUCE_VECTOR3
@@ -3044,7 +3044,7 @@ LC_WARP_PREFIX_REDUCE(ulong)
 LC_WARP_PREFIX_REDUCE(long)
 LC_WARP_PREFIX_REDUCE(float)
 LC_WARP_PREFIX_REDUCE(half)
-LC_WARP_PREFIX_REDUCE(double)// TODO
+LC_WARP_PREFIX_REDUCE(double)// Note: double prefix reduce uses __shfl_up_sync with a bitcast pair; verify on sm_80+.
 
 #undef LC_WARP_PREFIX_REDUCE_SCALAR
 #undef LC_WARP_PREFIX_REDUCE_VECTOR2

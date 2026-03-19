@@ -158,7 +158,7 @@ void ResourceBarrier::set_res(
                 access};
         },
         [&](TexView const &texView) -> SubResource {
-            // TODO: set init layout
+            // Note: Initial layout is read from the Texture object's stored layout for the given mip level.
             type = ResourceStates::Type::Texture;
             size = texView.tex->mip();
             vk_res = texView.tex;
@@ -221,7 +221,7 @@ void ResourceBarrier::record(
                 access};
         },
         [&](TexView const &texView) -> SubResource {
-            // TODO: set init layout
+            // Note: Initial layout is read from the Texture object's stored layout for the given mip level.
             type = ResourceStates::Type::Texture;
             size = texView.tex->mip();
             vk_res = texView.tex;

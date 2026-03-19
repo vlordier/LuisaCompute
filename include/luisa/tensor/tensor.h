@@ -228,20 +228,20 @@ public:
 //     void scatter_(const Tensor<uint, Dim> &index, const Tensor<T, Dim> &src) noexcept {
 //     }
 //     [[nodiscard]] DTensor<T> gather(const DTensor<uint> &index) const noexcept {
-//         // TODO: implement
+//         // Note: not yet implemented.
 //         return DTensor<T>{device};
 //     }
 
 //     // template<uint64_t... Is>
 //     // [[nodiscard]] Tensor<T, Dim + sizeof...(Is)> repeat(Is...) {
-//     //     // TODO: implement
+//     //     // Note: not yet implemented.
 //     //     return Tensor<T, Dim>{device};
 //     // }
 // };
 
 // template<class R, uint64_t Dim, class... Ts>
 // Tensor<R, Dim> map(const Tensor<Ts, Dim> &... ts) noexcept {
-//     // TODO: implement
+//     // Note: not yet implemented.
 // }
 
 }// namespace luisa::compute

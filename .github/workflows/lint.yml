@@ -1,0 +1,281 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+
+# Cancel in-progress runs for the same branch/PR to save CI resources
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+# All jobs in this workflow are read-only; restrict the GITHUB_TOKEN accordingly.
+permissions:
+  contents: read
+
+jobs:
+
+  # -----------------------------------------------------------------------
+  # clang-format: verify all first-party C++ files are correctly formatted
+  # -----------------------------------------------------------------------
+  clang-format:
+    name: "clang-format"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false   # formatting check does not need submodules
+
+      - name: Install clang-format-20
+        run: |
+          sudo apt-get update -q
+          wget -q https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 20 all
+
+      - name: Check first-party C++ formatting
+        run: |
+          # Collect first-party sources, excluding third-party sub-trees.
+          FILES=$(find include/luisa src \
+            \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
+            ! -path '*/ext/*' \
+            ! -path '*/cuda_builtin/*' \
+            ! -path '*/clangcxx/*' \
+            | sort)
+          echo "Checking $(echo "$FILES" | wc -l) file(s) with clang-format-20..."
+          # --dry-run prints a diff; --Werror turns any diff into a non-zero exit code.
+          echo "$FILES" | xargs clang-format-20 --dry-run --Werror
+          echo "clang-format: all files are correctly formatted."
+
+  # -----------------------------------------------------------------------
+  # clang-tidy: static analysis of first-party sources
+  # -----------------------------------------------------------------------
+  clang-tidy:
+    name: "clang-tidy"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          wget -q https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 20 all
+          sudo apt-get -y install \
+            build-essential cmake ninja-build jq \
+            uuid-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libembree-dev libvulkan-dev
+
+      - name: Setup Vulkan SDK
+        uses: johnnynunez/setup-vulkan-sdk@v1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+
+      - name: Configure project (generate compile_commands.json)
+        # Use the same clang version we lint with; disable GPU/Rust backends to
+        # avoid hardware/SDK dependencies that are not available in the lint runner.
+        run: |
+          cmake -S . -B build -G Ninja \
+            -D CMAKE_BUILD_TYPE=Release \
+            -D CMAKE_C_COMPILER=clang-20 \
+            -D CMAKE_CXX_COMPILER=clang++-20 \
+            -D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -D LUISA_COMPUTE_ENABLE_RUST=OFF \
+            -D LUISA_COMPUTE_ENABLE_CUDA=OFF \
+            -D LUISA_COMPUTE_ENABLE_DX=OFF \
+            -D LUISA_COMPUTE_ENABLE_METAL=OFF \
+            -D LUISA_COMPUTE_ENABLE_HIP=OFF \
+            -D LUISA_COMPUTE_ENABLE_CPU=OFF \
+            -D LUISA_COMPUTE_ENABLE_REMOTE=ON \
+            -D LUISA_COMPUTE_ENABLE_VULKAN=ON \
+            -D LUISA_COMPUTE_ENABLE_GUI=ON \
+            -D LUISA_COMPUTE_ENABLE_FALLBACK=ON \
+            -D LUISA_COMPUTE_ENABLE_CLANG_CXX=OFF \
+            -D LUISA_COMPUTE_BUILD_TESTS=ON
+
+      - name: Filter compile_commands.json to first-party sources only
+        # Exclude:
+        #   src/ext/       — vendored third-party libraries
+        #   cuda_builtin/  — CUDA device-side intrinsics (not standard C++)
+        #   clangcxx/      — Clang tooling plugin (uses Clang internals API)
+        run: |
+          jq '[.[] | select(
+            .file | (
+              test("/src/ext/")         or
+              test("/cuda_builtin/")    or
+              test("/clangcxx/")
+            ) | not
+          )]' build/compile_commands.json \
+          > /tmp/compile_commands_filtered.json
+
+          TOTAL=$(jq 'length' build/compile_commands.json)
+          KEPT=$(jq 'length' /tmp/compile_commands_filtered.json)
+          echo "compile_commands.json: ${TOTAL} entries total, ${KEPT} first-party entries kept."
+
+          # Symlink so that run-clang-tidy can find it via -p
+          mkdir -p /tmp/lint_build
+          cp /tmp/compile_commands_filtered.json /tmp/lint_build/compile_commands.json
+
+      - name: Run clang-tidy on first-party sources
+        run: |
+          # Locate run-clang-tidy (installed by llvm.sh as run-clang-tidy-20)
+          RUNTIDY=$(command -v run-clang-tidy-20 2>/dev/null \
+                    || find /usr/lib/llvm-20 -name 'run-clang-tidy.py' 2>/dev/null | head -1)
+          echo "Using: $RUNTIDY"
+
+          python3 "$RUNTIDY" \
+            -p /tmp/lint_build \
+            -clang-tidy-binary clang-tidy-20 \
+            -header-filter="$(pwd)/(include/luisa|src)/.*" \
+            -warnings-as-errors='*' \
+            -j "$(nproc)"
+
+  # -----------------------------------------------------------------------
+  # clang-analyzer: Clang Static Analyzer via scan-build (UB / memory bugs)
+  # -----------------------------------------------------------------------
+  clang-analyzer:
+    name: "clang static analyzer"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          wget -q https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 20 all
+          sudo apt-get -y install \
+            build-essential cmake ninja-build \
+            uuid-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libembree-dev libvulkan-dev
+
+      - name: Setup Vulkan SDK
+        uses: johnnynunez/setup-vulkan-sdk@v1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+
+      - name: Configure project for scan-build
+        # Use CC/CXX overrides from scan-build; configure with Debug to maximise
+        # analysis coverage.
+        run: |
+          scan-build-20 \
+            cmake -S . -B build -G Ninja \
+              -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_C_COMPILER=clang-20 \
+              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D LUISA_COMPUTE_ENABLE_RUST=OFF \
+              -D LUISA_COMPUTE_ENABLE_CUDA=OFF \
+              -D LUISA_COMPUTE_ENABLE_DX=OFF \
+              -D LUISA_COMPUTE_ENABLE_METAL=OFF \
+              -D LUISA_COMPUTE_ENABLE_HIP=OFF \
+              -D LUISA_COMPUTE_ENABLE_CPU=OFF \
+              -D LUISA_COMPUTE_ENABLE_REMOTE=ON \
+              -D LUISA_COMPUTE_ENABLE_VULKAN=ON \
+              -D LUISA_COMPUTE_ENABLE_GUI=OFF \
+              -D LUISA_COMPUTE_ENABLE_FALLBACK=ON \
+              -D LUISA_COMPUTE_ENABLE_CLANG_CXX=OFF \
+              -D LUISA_COMPUTE_BUILD_TESTS=OFF
+
+      - name: Build with scan-build
+        # --status-bugs causes a non-zero exit if any analyzer bugs are found.
+        # -o writes an HTML report for later inspection.
+        run: |
+          scan-build-20 \
+            --status-bugs \
+            -o scan-results \
+            cmake --build build -j "$(nproc)"
+
+      - name: Upload scan-build HTML report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-analyzer-report
+          path: scan-results/
+
+  # -----------------------------------------------------------------------
+  # rust-lint: rustfmt formatting check + Clippy static analysis
+  # -----------------------------------------------------------------------
+  rust-lint:
+    name: "rust lint (rustfmt + clippy)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false   # Rust workspace has no C++ submodule dependencies
+
+      - name: Install stable Rust toolchain with rustfmt and clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check Rust formatting
+        working-directory: src/rust
+        run: cargo fmt --all --check
+
+      - name: Run Clippy (deny all warnings, enable pedantic lints)
+        working-directory: src/rust
+        # -D warnings     — turn every Clippy warning into a hard error
+        # clippy::pedantic — enable the full pedantic lint group which catches
+        #                    subtle bugs (integer cast truncation, etc.)
+        # The individual -A flags silence lints that are intentionally
+        # suppressed for this research-oriented codebase:
+        #   module_name_repetitions — common in layered library APIs
+        #   missing_errors_doc      — Rust docs not yet complete
+        #   missing_panics_doc      — Rust docs not yet complete
+        #   must_use_candidate      — too noisy for internal helpers
+        run: |
+          cargo clippy --all --all-features -- \
+            -D warnings \
+            -W clippy::pedantic \
+            -A clippy::module_name_repetitions \
+            -A clippy::missing_errors_doc \
+            -A clippy::missing_panics_doc \
+            -A clippy::must_use_candidate
+
+  # -----------------------------------------------------------------------
+  # python-lint: ruff (style + format) + mypy (type checking)
+  # -----------------------------------------------------------------------
+  python-lint:
+    name: "python lint (ruff + mypy)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install linting tools
+        # Install ruff and mypy; also install the project's own runtime
+        # dependencies so mypy can resolve imports.
+        run: |
+          pip install --upgrade pip
+          pip install ruff mypy
+          # Install stubs for packages that have them
+          pip install types-setuptools numpy
+
+      - name: ruff — check style and correctness
+        # Uses the [tool.ruff] / [tool.ruff.lint] config in pyproject.toml.
+        run: ruff check .
+
+      - name: ruff — check formatting
+        # Uses the [tool.ruff] config in pyproject.toml.
+        run: ruff format --check .
+
+      - name: mypy — static type checking
+        # Uses the [tool.mypy] config in pyproject.toml.
+        run: mypy --config-file pyproject.toml

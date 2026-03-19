@@ -575,7 +575,7 @@ impl<'a> FunctionEmitter<'a> {
             Func::Log => Some("lc_log"),
             Func::Log2 => Some("lc_log2"),
             Func::Log10 => Some("lc_log10"),
-            Func::Powi => Some("lc_powi"), // TODO: powi
+            Func::Powi => Some("lc_powi"), // Note: lc_powi is mapped here; verify integer-exponent behavior matches GLSL/HLSL powi semantics.
             Func::Powf => Some("lc_pow"),
 
             Func::Sqrt => Some("lc_sqrt"),
@@ -1313,7 +1313,7 @@ impl<'a> FunctionEmitter<'a> {
                 self.atomic_chain_op(var, node_ty_s, args, args_v, "lc_atomic_fetch_xor", 1);
                 true
             }
-            Func::External(_)=>{
+            Func::External(_) => {
                 panic!("Use CpuFn/CpuCallable to pass closures to kernel directly instead of ExternalCallable on cpu backend!.");
                 true
             }
@@ -1553,9 +1553,7 @@ impl<'a> FunctionEmitter<'a> {
                     "const {0} {1} = {2};",
                     node_ty_s,
                     var,
-                    decode_const_data(bytes.as_ref(), t, &|ty|{
-                        self.type_gen.gen_c_type(ty)
-                    })
+                    decode_const_data(bytes.as_ref(), t, &|ty| { self.type_gen.gen_c_type(ty) })
                 )
                 .unwrap();
                 // let gen_def = |dst: &mut String, qualifier| {

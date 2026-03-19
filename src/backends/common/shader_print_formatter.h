@@ -68,7 +68,7 @@ public:
             } else if (c == '}') {
                 if (!f.empty()) {// end of format group
                     f.push_back('}');
-                    LUISA_ASSERT(f == "{}", "Unsupported format string '{}'.", f);// TODO: support more formats?
+                    LUISA_ASSERT(f == "{}", "Unsupported format string '{}'.", f);// Note: only '{}' format specifier is currently supported.
                     LUISA_ASSERT(!args.empty(), "Not enough arguments for shader printer.");
                     auto arg = args.front();
                     args = args.subspan(1u);

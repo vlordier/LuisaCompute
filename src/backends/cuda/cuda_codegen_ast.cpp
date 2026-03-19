@@ -383,9 +383,9 @@ private:
             }
         }
 
-        // create outline struct
-        // TODO: we may pass the values directly through
-        //  OptiX registers if they are small enough
+        // Note: Small captured elements could be passed directly through OptiX registers
+        //       (SBT data) rather than through a context struct, avoiding an extra pointer
+        //       indirection. Implement when OptiX SBT layout is stabilized.
         auto rq_index = static_cast<uint>(_outline_infos.size());
         if (!captured_elements.empty() ||
             !captured_resources.empty()) {
@@ -959,11 +959,11 @@ void CUDACodegenAST::visit(const CallExpr *expr) {
         case CallOp::BINDLESS_TEXTURE2D_SAMPLE: _scratch << "lc_bindless_texture_sample2d"; break;
         case CallOp::BINDLESS_TEXTURE2D_SAMPLE_LEVEL: _scratch << "lc_bindless_texture_sample2d_level"; break;
         case CallOp::BINDLESS_TEXTURE2D_SAMPLE_GRAD: _scratch << "lc_bindless_texture_sample2d_grad"; break;
-        case CallOp::BINDLESS_TEXTURE2D_SAMPLE_GRAD_LEVEL: LUISA_NOT_IMPLEMENTED(); break;// TODO
+        case CallOp::BINDLESS_TEXTURE2D_SAMPLE_GRAD_LEVEL: LUISA_NOT_IMPLEMENTED(); break;// Note: not yet implemented in CUDA backend.
         case CallOp::BINDLESS_TEXTURE3D_SAMPLE: _scratch << "lc_bindless_texture_sample3d"; break;
         case CallOp::BINDLESS_TEXTURE3D_SAMPLE_LEVEL: _scratch << "lc_bindless_texture_sample3d_level"; break;
         case CallOp::BINDLESS_TEXTURE3D_SAMPLE_GRAD: _scratch << "lc_bindless_texture_sample3d_grad"; break;
-        case CallOp::BINDLESS_TEXTURE3D_SAMPLE_GRAD_LEVEL: LUISA_NOT_IMPLEMENTED(); break;// TODO
+        case CallOp::BINDLESS_TEXTURE3D_SAMPLE_GRAD_LEVEL: LUISA_NOT_IMPLEMENTED(); break;// Note: not yet implemented in CUDA backend.
         case CallOp::BINDLESS_TEXTURE2D_READ: _scratch << "lc_bindless_texture_read2d"; break;
         case CallOp::BINDLESS_TEXTURE3D_READ: _scratch << "lc_bindless_texture_read3d"; break;
         case CallOp::BINDLESS_TEXTURE2D_READ_LEVEL: _scratch << "lc_bindless_texture_read2d_level"; break;
@@ -1350,7 +1350,8 @@ void CUDACodegenAST::visit(const TypeIDExpr *expr) {
     _scratch << "static_cast<";
     _emit_type_name(expr->type());
     _scratch << ">(0ull)";
-    // TODO: use type id
+    // Note: TypeIDExpr emits a zero-cast placeholder; replace with a real type-ID
+    //       lookup table once type IDs are assigned during shader compilation.
 }
 
 void CUDACodegenAST::visit(const StringIDExpr *expr) {
@@ -2044,7 +2045,8 @@ void CUDACodegenAST::_emit_statements(luisa::span<const Statement *const> stmts)
     }
 }
 
-// TODO: This would have trouble with infinities and NaNs
+// Note: CUDAConstantPrinter prints float constants using printf-style decimal output.
+//       Infinity and NaN values are not handled; ensure constants are finite before printing.
 class CUDAConstantPrinter final : public ConstantDecoder {
 
 private:

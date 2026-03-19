@@ -1,5 +1,5 @@
 from luisa import *
-from luisa.autodiff import requires_grad, autodiff, backward, grad
+from luisa.autodiff import autodiff, backward, grad, requires_grad
 
 
 @func
@@ -9,7 +9,7 @@ def clampa(x, a, b):
 
 @func
 def f(x) -> float:
-    return clampa(x, 0., 1.)
+    return clampa(x, 0.0, 1.0)
 
 
 @func
@@ -21,6 +21,7 @@ def df(x) -> float:
         g = grad(x)
     return g
 
+
 @func
 def test_autodiff(x):
     eps = 1e-3
@@ -30,6 +31,7 @@ def test_autodiff(x):
 
 
 import sys
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]

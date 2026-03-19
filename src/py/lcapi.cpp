@@ -66,7 +66,9 @@ PYBIND11_MODULE(lcapi, m) {
     export_vector2(m);
     export_vector3(m);
     export_vector4(m);
-    // TODO export vector operators
+    // Note: Arithmetic and comparison operators for vector types (+, -, *, /, ==, etc.)
+    //       are not yet exported to Python. Add them here using pybind11 .def() with
+    //       the corresponding C++ operator overloads from basic_types.h.
     export_matrix(m);
 
     // util function for uniform encoding

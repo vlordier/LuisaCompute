@@ -1,5 +1,5 @@
 from os import listdir, makedirs
-from os.path import realpath, relpath, dirname, abspath, isdir, normpath, basename
+from os.path import abspath, dirname, isdir, normpath, realpath, relpath
 from shutil import move
 
 
@@ -24,7 +24,7 @@ def fix_include_line(src_dir, file, line, moved_headers):
         norm_inc = normalize(src_dir, f"{file_dir}/{include[1:-1]}")
         if norm_inc in moved_headers:
             include = f"<luisa/{norm_inc}>"
-    elif include.startswith('<'):
+    elif include.startswith("<"):
         if include[1:-1] in moved_headers:
             include = f"<luisa/{include[1:-1]}>"
     return f"#include {include}\n"
@@ -34,7 +34,7 @@ def fix_include(src_dir, file, moved_headers):
     print(f"Fixing {file}...")
     fixed_lines = []
     abs_path = f"{src_dir}/{file}"
-    with open(abs_path, "r", encoding="utf8") as f:
+    with open(abs_path, encoding="utf8") as f:
         lines = f.readlines()
     for line in lines:
         if line.strip().startswith("#include"):
@@ -71,9 +71,9 @@ if __name__ == "__main__":
 
     exclude = ["backends", "py", "tests"]
     include = ["backends/ext"]
-    headers_to_move = [f for f in header_files if
-                       not any([f.startswith(e) for e in exclude]) or
-                       any([f.startswith(e) for e in include])]
+    headers_to_move = [
+        f for f in header_files if not any(f.startswith(e) for e in exclude) or any(f.startswith(e) for e in include)
+    ]
 
     for f in source_files + header_files:
         fix_include(src_dir, f, headers_to_move)

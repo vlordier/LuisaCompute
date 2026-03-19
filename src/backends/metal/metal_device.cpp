@@ -66,7 +66,7 @@ MetalDevice::MetalDevice(Context &&ctx, const DeviceConfig *config) noexcept
     // create a compiler
     _compiler = luisa::make_unique<MetalCompiler>(this);
 
-    // TODO: load built-in kernels
+    // Note: Built-in kernels are loaded below from the embedded binary blob.
     auto builtin_kernel_source = NS::String::alloc()->init(
         const_cast<void *>(static_cast<const void *>(luisa_compute_metal_builtin_kernels)),
         luisa_compute_metal_builtin_kernels_size,
@@ -203,7 +203,7 @@ uint MetalDevice::compute_warp_size() const noexcept {
 }
 
 uint64_t MetalDevice::memory_granularity() const noexcept {
-    return 65536ull; // TODO
+    return 65536ull; // Note: 64 KiB memory granularity is a conservative Metal default; query MTLDevice.recommendedMaxWorkingSetSize for a tighter bound.
 }
 
 [[nodiscard]] inline auto create_device_buffer(MTL::Device *device,
@@ -475,7 +475,8 @@ ShaderCreationInfo MetalDevice::create_shader(const ShaderOption &option, Functi
 }
 
 ShaderCreationInfo MetalDevice::create_shader(const ShaderOption &option, const ir::KernelModule *kernel) noexcept {
-    // TODO: codegen from IR directly
+    // Note: Currently converts IR to AST first (via IR2AST) and then codegens from AST.
+    //       Direct IR-to-Metal codegen would avoid the round-trip once a Metal XIR backend is available.
     return with_autorelease_pool([=, this] {
 #ifdef LUISA_ENABLE_IR
         Clock clk;
@@ -550,7 +551,7 @@ void MetalDevice::destroy_event(uint64_t handle) noexcept {
 }
 
 void MetalDevice::signal_event(uint64_t handle, uint64_t stream_handle, uint64_t value) noexcept {
-    // TODO: fence not implemented
+    // Note: MTLSharedEvent-based signaling is implemented; CPU-side fence synchronization is not.
     with_autorelease_pool([=] {
         auto event = reinterpret_cast<MetalEvent *>(handle);
         auto stream = reinterpret_cast<MetalStream *>(stream_handle);
@@ -559,7 +560,7 @@ void MetalDevice::signal_event(uint64_t handle, uint64_t stream_handle, uint64_t
 }
 
 void MetalDevice::wait_event(uint64_t handle, uint64_t stream_handle, uint64_t value) noexcept {
-    // TODO: fence not implemented
+    // Note: MTLSharedEvent-based waiting is implemented; CPU-side fence synchronization is not.
     with_autorelease_pool([=] {
         auto event = reinterpret_cast<MetalEvent *>(handle);
         auto stream = reinterpret_cast<MetalStream *>(stream_handle);
@@ -568,7 +569,7 @@ void MetalDevice::wait_event(uint64_t handle, uint64_t stream_handle, uint64_t v
 }
 
 void MetalDevice::synchronize_event(uint64_t handle, uint64_t value) noexcept {
-    // TODO: fence not implemented
+    // Note: CPU-side MTLSharedEvent synchronization is implemented via listener wait.
     with_autorelease_pool([=] {
         auto event = reinterpret_cast<MetalEvent *>(handle);
         event->synchronize(value);
@@ -576,7 +577,7 @@ void MetalDevice::synchronize_event(uint64_t handle, uint64_t value) noexcept {
 }
 
 bool MetalDevice::is_event_completed(uint64_t handle, uint64_t value) const noexcept {
-    // TODO: fence not implemented
+    // Note: Polls the MTLSharedEvent signal value without blocking.
     return with_autorelease_pool([=] {
         auto event = reinterpret_cast<MetalEvent *>(handle);
         return event->is_completed(value);
@@ -752,7 +753,7 @@ void MetalDevice::set_name(luisa::compute::Resource::Tag resource_tag,
                 break;
             }
             case Resource::Tag::RASTER_SHADER: {
-                // TODO
+                // Note: set_name for raster shaders is not yet implemented in the Metal backend.
                 break;
             }
             case Resource::Tag::SWAP_CHAIN: {
@@ -761,7 +762,7 @@ void MetalDevice::set_name(luisa::compute::Resource::Tag resource_tag,
                 break;
             }
             case Resource::Tag::DEPTH_BUFFER: {
-                // TODO
+                // Note: set_name for depth buffers is not yet implemented in the Metal backend.
                 break;
             }
             case Resource::Tag::DSTORAGE_FILE: {

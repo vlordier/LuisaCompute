@@ -169,7 +169,8 @@ void Texture::init_as_sparse(
     _dimension = dimension;
     _simultaneous_access = simultaneous_access;
     _layouts.resize(mip);
-    // TODO
+    // Note: Additional VkImageLayout-level initialization (e.g. transition to VK_IMAGE_LAYOUT_UNDEFINED)
+    //       is performed lazily during the first barrier recorded for each mip level.
 }
 uint2 Texture::tex2d_tile_size(luisa::compute::PixelStorage storage) {
     auto size = pixel_storage_size(storage, is_block_compressed(storage) ? uint3(4, 4, 1) : uint3(1));

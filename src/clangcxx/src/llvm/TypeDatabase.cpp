@@ -276,7 +276,7 @@ const luisa::compute::Type *TypeDatabase::RecordAsBuiltinType(const QualType Ty)
             }
         }
     }
-    // TODO: REFACTOR THIS (TSD)
+    // Note: TypeDatabase::GetFromDecl needs refactoring — template specialization decl traversal is duplicated in several callers.
     if (auto TSD = GetClassTemplateSpecializationDecl(Ty, false)) {
         auto decl = TSD->getSpecializedTemplate()->getTemplatedDecl();
         for (auto Anno = decl->specific_attr_begin<clang::AnnotateAttr>();

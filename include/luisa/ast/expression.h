@@ -423,7 +423,9 @@ protected:
     [[nodiscard]] uint64_t _compute_hash() const noexcept override;
 
 public:
-    // FIXME: too hacky
+    // Note: _unsafe_set_custom is a post-construction mutator needed because the callee
+    // may not be known at CallExpr construction time (e.g. forward-declared callables).
+    // Ideally this would be set via the constructor; tracked as a known design limitation.
     void _unsafe_set_custom(CustomCallee callee) const noexcept;
 
 public:
@@ -564,7 +566,11 @@ private:
     void *_user_data;
 
 protected:
-    // TODO
+    // Note: _mark() and _compute_hash() are intentionally unimplemented stubs.
+    //       Proper usage-tracking and hash computation for CPU custom ops require
+    //       analysis of the user_data pointer and callback, which is not feasible
+    //       without a richer custom-op descriptor. Implement when custom ops are
+    //       fully integrated into the analysis pipeline.
     void _mark(Usage usage) const noexcept override {}
     [[nodiscard]] uint64_t _compute_hash() const noexcept override { return 0; }
 
@@ -587,7 +593,10 @@ private:
     const Expression *_arg;
 
 protected:
-    // TODO
+    // Note: _mark() and _compute_hash() are intentionally unimplemented stubs.
+    //       GPU custom ops embed raw GLSL/MSL/HLSL source strings; usage tracking
+    //       and hashing would require parsing that source. Implement when a
+    //       structured GPU custom-op IR is introduced.
     void _mark(Usage usage) const noexcept override {}
     [[nodiscard]] uint64_t _compute_hash() const noexcept override { return 0; }
 

@@ -1,12 +1,13 @@
-from luisa import *
-from luisa.types import *
-from luisa.builtin import *
-from luisa.util import *
-import numpy as np
-import random as rand
 import math
-
+import random as rand
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.builtin import *
+from luisa.types import *
+from luisa.util import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -15,14 +16,14 @@ n_grid = 32
 n_steps = 25
 
 n_particles = n_grid * n_grid * n_grid // 4
-dx = 1. / n_grid
+dx = 1.0 / n_grid
 dt = 8e-5
-p_rho = 1.
-p_vol = (dx * .5) * (dx * .5) * (dx * .5)
+p_rho = 1.0
+p_vol = (dx * 0.5) * (dx * 0.5) * (dx * 0.5)
 p_mass = p_rho * p_vol
 gravity = 9.8
 bound = 3
-E = 400.
+E = 400.0
 resolution = 1024
 
 Float3Array3 = ArrayType(3, float3)
@@ -46,7 +47,8 @@ def outer_product(a, b):
     return float3x3(
         float3(a[0] * b[0], a[1] * b[0], a[2] * b[0]),
         float3(a[0] * b[1], a[1] * b[1], a[2] * b[1]),
-        float3(a[0] * b[2], a[1] * b[2], a[2] * b[2]))
+        float3(a[0] * b[2], a[1] * b[2], a[2] * b[2]),
+    )
 
 
 @func
@@ -58,11 +60,11 @@ def trace(m):
 def clear_grid():
     set_block_size(16, 16, 1)
     idx = index(dispatch_id())
-    grid_v.write(idx * 4, 0.)
-    grid_v.write(idx * 4 + 1, 0.)
-    grid_v.write(idx * 4 + 2, 0.)
-    grid_v.write(idx * 4 + 3, 0.)
-    grid_m.write(idx, 0.)
+    grid_v.write(idx * 4, 0.0)
+    grid_v.write(idx * 4 + 1, 0.0)
+    grid_v.write(idx * 4 + 2, 0.0)
+    grid_v.write(idx * 4 + 3, 0.0)
+    grid_m.write(idx, 0.0)
 
 
 @func
@@ -81,7 +83,7 @@ def point_to_grid():
     w[0] = float3(0.5) * sqr(float3(1.5) - fx)
     w[1] = float3(0.75) - sqr(fx - float3(1.0))
     w[2] = float3(0.5) * sqr(fx - float3(0.5))
-    stress = -4. * dt * E * p_vol * (J.read(p) - 1.) / sqr(dx)
+    stress = -4.0 * dt * E * p_vol * (J.read(p) - 1.0) / sqr(dx)
     affine = make_float3x3_eye(stress) + p_mass * C.read(p)
     vp = v.read(p)
     for ii in range(27):
@@ -93,10 +95,10 @@ def point_to_grid():
         weight = w[i].x * w[j].y * w[k].z
         vadd = weight * (p_mass * vp + affine * dpos)
         idx = index(uint3(base + offset))
-        old = grid_v.atomic_fetch_add(idx * 4, vadd.x)
-        old = grid_v.atomic_fetch_add(idx * 4 + 1, vadd.y)
-        old = grid_v.atomic_fetch_add(idx * 4 + 2, vadd.z)
-        old = grid_m.atomic_fetch_add(idx, weight * p_mass)
+        _old = grid_v.atomic_fetch_add(idx * 4, vadd.x)
+        _old = grid_v.atomic_fetch_add(idx * 4 + 1, vadd.y)
+        _old = grid_v.atomic_fetch_add(idx * 4 + 2, vadd.z)
+        _old = grid_m.atomic_fetch_add(idx, weight * p_mass)
 
 
 @func
@@ -104,17 +106,15 @@ def simulate_grid():
     set_block_size(16, 16, 1)
     coord = dispatch_id().xyz
     i = index(coord)
-    v = float3(grid_v.read(i * 4), grid_v.read(i * 4 + 1),
-               grid_v.read(i * 4 + 2))
+    v = float3(grid_v.read(i * 4), grid_v.read(i * 4 + 1), grid_v.read(i * 4 + 2))
     m = grid_m.read(i)
-    v = ite(m > float3(0.), v / m, v)
+    v = ite(m > float3(0.0), v / m, v)
     v.y -= dt * gravity
-    v = ite((coord < bound and v < float3(0.)) or (
-        coord > n_grid - bound and v > float3(0.)), float3(0.), v)
+    v = ite((coord < bound and v < float3(0.0)) or (coord > n_grid - bound and v > float3(0.0)), float3(0.0), v)
     grid_v.write(i * 4, v.x)
     grid_v.write(i * 4 + 1, v.y)
     grid_v.write(i * 4 + 2, v.z)
-    grid_v.write(i * 4 + 3, 0.)
+    grid_v.write(i * 4 + 3, 0.0)
 
 
 @func
@@ -138,29 +138,27 @@ def grid_to_point():
         dpos = (float3(offset) - fx) * dx
         weight = w[i].x * w[j].y * w[k].z
         idx = index(uint3(base + offset))
-        g_v = float3(grid_v.read(idx * 4),
-                     grid_v.read(idx * 4 + 1),
-                     grid_v.read(idx * 4 + 2))
+        g_v = float3(grid_v.read(idx * 4), grid_v.read(idx * 4 + 1), grid_v.read(idx * 4 + 2))
         new_v += weight * g_v
-        new_C = new_C + 4. * weight * outer_product(g_v, dpos) / sqr(dx)
+        new_C = new_C + 4.0 * weight * outer_product(g_v, dpos) / sqr(dx)
     v.write(p, new_v)
     x.write(p, x.read(p) + new_v * dt)
-    J.write(p, J.read(p) * (1. + dt * trace(new_C)))
+    J.write(p, J.read(p) * (1.0 + dt * trace(new_C)))
     C.write(p, new_C)
 
 
 @func
 def clear_display():
     set_block_size(16, 16, 1)
-    display.write(dispatch_id().xy, float4(.2, .2, .2, 1.))
+    display.write(dispatch_id().xy, float4(0.2, 0.2, 0.2, 1.0))
 
 
 def radians(deg):
-    return deg * math.pi / 180.
+    return deg * math.pi / 180.0
 
 
-phi = radians(28.)
-theta = radians(32.)
+phi = radians(28.0)
+theta = radians(32.0)
 
 
 @func
@@ -183,9 +181,8 @@ def draw_particles():
     for i in range(-1, 2):
         for j in range(-1, 2):
             pos = int2(basepos * float(resolution)) + int2(i, j)
-            if (pos.x >= 0 and pos.x < resolution and pos.y >= 0 and pos.y < resolution):
-                display.write(uint2(pos.x, resolution - 1 -
-                              pos.y), float4(1., 1., 1., 1.))
+            if pos.x >= 0 and pos.x < resolution and pos.y >= 0 and pos.y < resolution:
+                display.write(uint2(pos.x, resolution - 1 - pos.y), float4(1.0, 1.0, 1.0, 1.0))
 
 
 def substep():
@@ -201,9 +198,9 @@ def init_value():
         rx = rand.random()
         ry = rand.random()
         rz = rand.random()
-        x_init[i * 4] = rx * .4 + .2
-        x_init[i * 4 + 1] = ry * .4 + .2
-        x_init[i * 4 + 2] = rz * .4 + .2
+        x_init[i * 4] = rx * 0.4 + 0.2
+        x_init[i * 4 + 1] = ry * 0.4 + 0.2
+        x_init[i * 4 + 2] = rz * 0.4 + 0.2
     v_init = np.zeros(n_particles * 4, dtype=np.float32)
     J_init = np.ones(n_particles, dtype=np.float32)
     C_init = np.zeros(n_particles * 12, dtype=np.float32)
@@ -217,7 +214,7 @@ def init_value():
 init_value()
 gui = GUI("Test MPM", (resolution, resolution))
 while gui.running():
-    for i in range(n_steps):
+    for _ in range(n_steps):
         substep()
     clear_display(dispatch_size=(resolution, resolution, 1))
     draw_particles(dispatch_size=(n_particles, 1, 1))

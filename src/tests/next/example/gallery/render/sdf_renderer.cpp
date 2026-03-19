@@ -251,7 +251,7 @@ int sdf_renderer(Device &device, luisa::string filename = "sdf_renderer.png") {
     double average_fps = spp_count / (clock.toc() - t0) * 1000;
     LUISA_INFO("{} samples/s", average_fps);
 
-    luisa::vector<uint8_t> host_image(width * height * 4u);// FIXME: this is unsafe for swapchain formats
+    luisa::vector<uint8_t> host_image(width * height * 4u);// Note: assumes RGBA8 output from ldr_image; would need format-aware sizing for other swapchain formats
     stream << hdr2ldr_shader(accum_image, ldr_image, 2.0).dispatch(width, height)
            << ldr_image.copy_to(host_image.data())
            << synchronize();

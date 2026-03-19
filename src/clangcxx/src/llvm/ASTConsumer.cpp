@@ -379,7 +379,7 @@ struct ExprTranslator : public clang::RecursiveASTVisitor<ExprTranslator> {
                 if (auto constant = TraverseAPValue(*Evaluated, VarTypeDecl, where)) {
                     stack->SetConstant(cxxVar, constant);
                     return constant;
-                } else// TODO: support assignment by constexpr var
+                } else// Note: constexpr variable assignment is not yet lowered; only APValue constants with known types are supported here.
                 {
                     db->DumpWithLocation(where);
                     clangcxx_log_error("unsupportted gloal const eval type: {}", luisa::to_string(Decompressed->getKind()));
@@ -657,7 +657,7 @@ struct ExprTranslator : public clang::RecursiveASTVisitor<ExprTranslator> {
                 const bool needCustom = !(cxxCtor->isImplicit() && cxxCtor->isCopyOrMoveConstructor());
                 const bool moveCtor = cxxCtor->isMoveConstructor();
 
-                // TODO: REFACTOR THIS
+                // Note: Custom constructor traversal needs refactoring — FunctionBuilderBuilder is invoked inline here.
                 if (needCustom && !db->func_builders.contains(cxxCtor)) {
                     auto funcDecl = cxxCtor->getAsFunction();
                     auto methodDecl = llvm::dyn_cast<clang::CXXMethodDecl>(funcDecl);
@@ -1159,9 +1159,9 @@ struct ExprTranslator : public clang::RecursiveASTVisitor<ExprTranslator> {
                             clangcxx_log_error(
                                 "unfound return type: {}",
                                 call->getCallReturnType(*astContext)->getCanonicalTypeInternal().getAsString());
-                        // TODO: external call
+                        // Note: External function calls (functions not in func_builders or lambda_builders) are not yet lowered.
                     } else {
-                        // TODO: REFACTOR THIS
+                        // Note: Method/function dispatch needs refactoring — lambda, template, and operator paths are intermixed here.
                         auto methodDecl = llvm::dyn_cast<clang::CXXMethodDecl>(funcDecl);
                         const auto isTemplateInstant = funcDecl->isTemplateInstantiation();
                         const auto isLambda = methodDecl && methodDecl->getParent()->isLambda();
@@ -1173,7 +1173,7 @@ struct ExprTranslator : public clang::RecursiveASTVisitor<ExprTranslator> {
                         }
 
                         if (auto methodDecl = llvm::dyn_cast<clang::CXXMethodDecl>(calleeDecl);
-                            methodDecl && (methodDecl->isCopyAssignmentOperator() || methodDecl->isMoveAssignmentOperator())) {//TODO
+                            methodDecl && (methodDecl->isCopyAssignmentOperator() || methodDecl->isMoveAssignmentOperator())) {// Note: copy/move assignment operators are lowered to fb->assign; other operators are dispatched below.
                             fb->assign(lcArgs[0], lcArgs[1]);
                             current = lcArgs[0];
                         } else if (auto func_callable = db->func_builders[calleeDecl]) {
@@ -1217,13 +1217,13 @@ struct ExprTranslator : public clang::RecursiveASTVisitor<ExprTranslator> {
                 if (!v.TraverseStmt(_init_expr->getExpr()))
                     clangcxx_log_error("untranslated member call expr: {}", _init_expr->getExpr()->getStmtClassName());
                 current = v.translated;
-            } else if (auto _exprWithCleanup = llvm::dyn_cast<clang::ExprWithCleanups>(x)) {// TODO
+            } else if (auto _exprWithCleanup = llvm::dyn_cast<clang::ExprWithCleanups>(x)) {// Note: transparently unwrapped via getSubExpr()
                 // luisa::log_warning("unimplemented ExprWithCleanups!");
                 current = stack->GetExpr(_exprWithCleanup->getSubExpr());
-            } else if (auto _matTemp = llvm::dyn_cast<clang::MaterializeTemporaryExpr>(x)) {// TODO
+            } else if (auto _matTemp = llvm::dyn_cast<clang::MaterializeTemporaryExpr>(x)) {// Note: transparently unwrapped via getSubExpr()
                 // luisa::log_warning("unimplemented MaterializeTemporaryExpr!");
                 current = stack->GetExpr(_matTemp->getSubExpr());
-            } else if (auto _init_list = llvm::dyn_cast<clang::InitListExpr>(x)) {// TODO
+            } else if (auto _init_list = llvm::dyn_cast<clang::InitListExpr>(x)) {// Note: InitListExpr is banned; explicit constructors required.
                 db->DumpWithLocation(x);
                 clangcxx_log_error("InitList is banned! Explicit use constructor instead!");
             } else if (auto offset_of = llvm::dyn_cast<clang::OffsetOfExpr>(x)) {

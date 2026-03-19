@@ -111,8 +111,9 @@ void MetalCommandEncoder::visit(BufferDownloadCommand *command) noexcept {
                                 download_buffer->buffer(),
                                 download_buffer->offset(), size);
         encoder->endEncoding();
-        // copy from download buffer to user buffer
-        // TODO: use a better way to pass data back to CPU
+        // copy from download buffer to user buffer via CPU callback (Metal requirement)
+        // Note: A direct GPU-to-CPU copy path (e.g. MTLBlitCommandEncoder with shared storage) could
+        //       avoid this intermediate staging buffer.
         add_callback(FunctionCallbackContext::create([download_buffer, data, size] {
             std::memcpy(data, download_buffer->data(), size);
         }));
@@ -195,8 +196,8 @@ void MetalCommandEncoder::visit(TextureDownloadCommand *command) noexcept {
                                  download_buffer->offset(),
                                  pitch_size, image_size);
         encoder->endEncoding();
-        // copy from download buffer to user buffer
-        // TODO: use a better way to pass data back to CPU
+        // copy from download buffer to user buffer via CPU callback (Metal requirement)
+        // Note: A direct GPU-to-CPU copy path (e.g. shared-storage texture readback) could avoid staging.
         add_callback(FunctionCallbackContext::create([download_buffer, data, total_size] {
             std::memcpy(data, download_buffer->data(), total_size);
         }));

@@ -1221,7 +1221,8 @@ void MetalCodegenAST::visit(const TypeIDExpr *expr) noexcept {
     _scratch << "static_cast<";
     _emit_type_name(expr->type());
     _scratch << ">(0ull)";
-    // TODO: use expr->data_type() to generate correct type
+    // Note: TypeIDExpr emits a zero-cast placeholder. Replace with a real type-ID
+    //       table (expr->data_type()) once type IDs are assigned at compilation time.
 }
 
 void MetalCodegenAST::visit(const StringIDExpr *expr) noexcept {
@@ -1468,7 +1469,7 @@ void MetalCodegenAST::visit(const PrintStmt *stmt) noexcept {
     _emit_indention();
     _scratch << "static_assert(alignof(__lc_print_args_t) == " << type->alignment() << "u);\n";
     _emit_indention();
-    _scratch << "__lc_print_args_t print_args{"// TODO
+    _scratch << "__lc_print_args_t print_args{"// Note: print_args struct initialized inline; fields populated below.
              << ".size = " << type->size() << ", "
              << ".token = " << token << ", ";
     for (auto i = 0u; i < stmt->arguments().size(); i++) {

@@ -7,11 +7,13 @@ This test verifies the fix for the issue where a**3 and a**4 would cause:
 The bug was in builtin.py where nested builtin_bin_op calls were not
 properly wrapping intermediate results in SimpleNamespace objects.
 """
-from luisa import *
-from luisa.types import *
-import numpy as np
 
 import sys
+
+import numpy as np
+from luisa import *
+from luisa.types import *
+
 backend_name = None
 if len(sys.argv) >= 2:
     backend_name = sys.argv[1]
@@ -21,22 +23,24 @@ init(backend_name=backend_name)
 buffer_in = Buffer(4, float)
 buffer_out = Buffer(4, float)
 
+
 @func
 def test_power():
     idx = dispatch_id().x
     val = buffer_in.read(idx)
-    
+
     # Test power of 2 (this always worked)
-    val2 = val ** 2
-    
+    _val2 = val**2
+
     # Test power of 3 (this was broken before the fix)
-    val3 = val ** 3
-    
+    _val3 = val**3
+
     # Test power of 4 (this was broken before the fix)
-    val4 = val ** 4
-    
+    val4 = val**4
+
     # Store the result of power of 4 for verification
     buffer_out.write(idx, val4)
+
 
 # Test data
 test_data = np.array([2.0, 3.0, 4.0, 5.0], dtype=np.float32)
@@ -51,7 +55,7 @@ synchronize()
 result = np.zeros(4, dtype=np.float32)
 buffer_out.copy_to(result)
 
-expected = test_data ** 4
+expected = test_data**4
 print("Input:", test_data)
 print("Output (a**4):", result)
 print("Expected:", expected)
